@@ -4,18 +4,22 @@ import CategoriesAndPrices from "@/components/home/CategoriesAndPrices";
 import WelcomePopup from "@/components/home/WelcomePopup";
 import prisma from "@/lib/prisma";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 export default async function Home() {
-  const slides = await prisma.carouselSlide.findMany({ orderBy: { orderIndex: 'asc' } });
-  const brands = await prisma.brand.findMany({ orderBy: { id: 'asc' } }); // Could sort differently if needed
-  const categories = await prisma.category.findMany();
+  const [slides, brands, categories, banner, settings] = await Promise.all([
+    prisma.carouselSlide.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
+    prisma.brand.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
+    prisma.category.findMany({ where: { isVisible: true } }),
+    prisma.homepageBanner.findFirst({ where: { isVisible: true } }),
+    prisma.siteSettings.findFirst(),
+  ]);
   return (
     <>
       <WelcomePopup />
       
       {/* HERO SECTION */}
-      <HeroCarousel slides={slides} />
+      <HeroCarousel slides={slides} slideInterval={settings?.carouselDelayMs} />
 
       {/* SECTION SEO - CONTENU OPTIMISÉ (visually hidden for SEO) */}
       <section className="sr-only">
@@ -69,16 +73,21 @@ export default async function Home() {
       {/* Section Marques */}
       <BrandsGrid brands={brands} />
 
-      {/* SECTION ACCESSOIRES */}
-      <section className="py-0 accessories-section-wrapper" aria-labelledby="accessoires-title">
-        <div className="accessories-image-container">
-          <img
-            src="/img/banner3.webp"
-            alt="Pièces et accessoires moto - SIMCC Motorsports"
-            className="accessories-image"
-          />
-        </div>
-      </section>
+      {/* SECTION BANNIÈRE DYNAMIQUE */}
+      {banner && (
+        <section className="py-0 accessories-section-wrapper" aria-labelledby="accessoires-title">
+          <div className="accessories-image-container">
+            <picture>
+              <source media="(max-width: 767px)" srcSet={banner.imageMobile || banner.imageDesktop} />
+              <img
+                src={banner.imageDesktop}
+                alt={banner.altText || 'Bannière actumoto'}
+                className="accessories-image"
+              />
+            </picture>
+          </div>
+        </section>
+      )}
     </>
   );
 }

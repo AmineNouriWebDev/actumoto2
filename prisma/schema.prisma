@@ -10,35 +10,40 @@ datasource db {
 }
 
 model Brand {
-  id         String   @id @default(uuid())
-  name       String   @unique
+  id         String  @id @default(uuid())
+  name       String  @unique
   logo       String
-  comingSoon Boolean  @default(false)
-  
+  comingSoon Boolean @default(false)
+  isVisible  Boolean @default(true)
+  orderIndex Int     @default(0)
+
   models        Model[]
   dealerContact DealerContact?
 }
 
 model Category {
-  id   String @id @default(uuid())
-  name String @unique
-  logo String
+  id        String  @id @default(uuid())
+  name      String  @unique
+  logo      String
+  isVisible Boolean @default(true)
 
   models Model[]
 }
 
 model Model {
-  id         String   @id @default(uuid())
+  id         String  @id @default(uuid())
   name       String
   fuelType   String?
-  price      Float?   // Null means "En arrivage"
-  currency   String   @default("DT")
+  price      Float?
+  currency   String  @default("DT")
   brandId    String
   categoryId String?
+  isVisible  Boolean @default(true)
+  orderIndex Int     @default(0)
 
   brand    Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
   category Category? @relation(fields: [categoryId], references: [id])
-  
+
   images Image[]
   specs  Specs?
 }
@@ -47,13 +52,13 @@ model Specs {
   id              String  @id @default(uuid())
   modelId         String  @unique
   typeMoteur      String?
-  cylindree       Float?
-  puissance       Float?
-  coupleMaximal   Float?
+  cylindree       String?
+  puissance       String?
+  coupleMaximal   String?
   refroidissement String?
-  tankCapacity    Float?
-  vitesseMaximale Float?
-  autonomie       Float?
+  tankCapacity    String?
+  vitesseMaximale String?
+  autonomie       String?
   alimentation    String?
   freinage        String?
   systemeFreinage String?
@@ -71,17 +76,18 @@ model Image {
 }
 
 model DealerContact {
-  id              String   @id @default(uuid())
-  brandId         String   @unique
-  website         String?
-  instagram       String?
-  facebook        String?
-  emails          String[]
-  phones          String[]
-  showroomAddress String?
+  id               String   @id @default(uuid())
+  brandId          String   @unique
+  website          String?
+  instagram        String?
+  facebook         String?
+  youtube          String?
+  tiktok           String?
+  emails           String[]
+  phones           String[]
+  showroomAddress  String?
   showroomLocation String?
-  
-  salesParts      Json?    // For points of sale and maintenance
+  salesParts       Json?
 
   brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
 }
@@ -94,4 +100,37 @@ model CarouselSlide {
   imageMobile  String?
   link         String?
   orderIndex   Int     @default(0)
+  isVisible    Boolean @default(true)
+}
+
+model WelcomePopup {
+  id              String  @id @default(uuid())
+  isEnabled       Boolean @default(true)
+  durationSeconds Int     @default(4)
+  imageDesktop    String?
+  imageMobile     String?
+  link            String?
+  altText         String?
+}
+
+model HomepageBanner {
+  id           String  @id @default(uuid())
+  imageDesktop String
+  imageMobile  String?
+  altText      String?
+  isVisible    Boolean @default(true)
+}
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSettings {
+  id              String @id @default(uuid())
+  carouselDelayMs Int    @default(4000)
 }

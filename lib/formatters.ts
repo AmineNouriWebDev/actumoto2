@@ -4,7 +4,7 @@
  * Formate une spécification pour occasionModelsData
  * Les valeurs sont déjà formatées comme du texte, on les affiche juste avec "-" si vides
  */
-function formatOccasionSpecification(key, value) {
+function formatOccasionSpecification(key: string, value: any) {
     if (value === null || value === undefined || value === "" || value === "Environ 180 km/h") {
         return "-";
     }
@@ -18,50 +18,47 @@ function formatOccasionSpecification(key, value) {
  * @param {string} fuelType - Type de carburant ("Thermique" ou "Electrique")
  * @returns {string} - Valeur formatée avec unité
  */
-function formatSpecification(key, value, fuelType = "Thermique") {
+function formatSpecification(key: string, value: any, fuelType = "Thermique") {
     // Si la valeur est null ou vide, retourner "-"
     if (value === null || value === undefined || value === "") {
         return "-";
     }
 
-    // Si c'est une chaîne (occasionModelsData), retourner telle quelle
-    if (typeof value === 'string') {
-        return value;
-    }
 
-    const specs = {
+
+    const specs: Record<string, any> = {
         // Unités simples
-        "kilometrage": (v) => v, // Déjà formaté avec "km" dans les données
-        "cylindree": (v) => `${v} cc`,
-        "coupleMaximal": (v) => `${v} Nm`,
-        "vitesseMaximale": (v) => `${v} km/h`,
-        "refroidissement": (v) => v,
-        "typeMoteur": (v) => v,
-        "alimentation": (v) => v,
-        "freinage": (v) => v,
-        "systemeFreinage": (v) => v,
+        "kilometrage": (v: any) => v, // Déjà formaté avec "km" dans les données
+        "cylindree": (v: any) => String(v).toLowerCase().includes('cc') ? v : `${v} cc`,
+        "coupleMaximal": (v: any) => String(v).toLowerCase().includes('nm') ? v : `${v} Nm`,
+        "vitesseMaximale": (v: any) => String(v).toLowerCase().includes('km/h') ? v : `${v} km/h`,
+        "refroidissement": (v: any) => v,
+        "typeMoteur": (v: any) => v,
+        "alimentation": (v: any) => v,
+        "freinage": (v: any) => v,
+        "systemeFreinage": (v: any) => v,
 
         // Unités conditionnelles selon fuelType
-        "puissance": (v, fuel) => {
+        "puissance": (v: any, fuel: any) => {
             if (fuel === "Electrique") {
-                return `${Math.round(v)} W`;
+                return String(v).toLowerCase().includes('w') ? v : `${Math.round(v)} W`;
             }
-            return `${v} ch`;
+            return String(v).toLowerCase().includes('ch') ? v : `${v} ch`;
         },
 
         // Unités selon fuelType
-        "tankCapacity": (v) => {
+        "tankCapacity": (v: any) => {
             if (v === null || v === undefined || v === "") return "-";
-            return `${v} L`;
+            return String(v).toLowerCase().includes('litre') ? v : `${v} Litres`;
         },
 
-        "autonomie": (v) => {
+        "autonomie": (v: any) => {
             if (v === null || v === undefined || v === "") return "-";
-            return `${v} km`;
+            return String(v).toLowerCase().includes('km') ? v : `${v} Km`;
         },
 
         // Prix
-        "price": (v) => {
+        "price": (v: any) => {
             if (v === null || v === undefined) return "En arrivage";
             return `${v.toLocaleString('fr-FR')} TND`;
         }
@@ -80,7 +77,7 @@ function formatSpecification(key, value, fuelType = "Thermique") {
  * @param {Object} model - Objet modèle avec toutes les specs
  * @returns {Object} - Specs à afficher
  */
-function getDisplaySpecs(model) {
+function getDisplaySpecs(model: any) {
     const { specs, fuelType } = model;
     const display = { ...specs };
 
@@ -101,7 +98,7 @@ function getDisplaySpecs(model) {
  */
 
 // Exemple 1: Affichage simple
-function displayModelCard(model) {
+function displayModelCard(model: any) {
     const specs = getDisplaySpecs(model);
     
     let html = `
@@ -129,9 +126,9 @@ function displayModelCard(model) {
 }
 
 // Exemple 2: Affichage dynamique avec boucle
-function displayAllSpecs(model) {
+function displayAllSpecs(model: any) {
     const specs = getDisplaySpecs(model);
-    const specNames = {
+    const specNames: Record<string, string> = {
         "typeMoteur": "Type Moteur",
         "cylindree": "Cylindrée",
         "puissance": "Puissance",

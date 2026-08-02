@@ -31,6 +31,8 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
     where: { name: brandName },
     include: {
       models: {
+        where: { isVisible: true },
+        orderBy: { orderIndex: 'asc' },
         include: { specs: true, images: { orderBy: { orderIndex: 'asc' } }, category: true }
       }
     }
@@ -47,8 +49,7 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
     category: m.category?.name
   }));
 
-  // Original reverses the array before rendering
-  const reversedModels = [...models].reverse();
+  const orderedModels = [...models];
 
   return (
     <>
@@ -75,7 +76,7 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
           </div>
 
           {/* Models grid — same ID as original */}
-          {reversedModels.length === 0 ? (
+          {brand.comingSoon || orderedModels.length === 0 ? (
             <div className="flex items-center justify-center w-full min-h-[50vh] p-4">
               <img
                 src="/img/banner3.webp"
@@ -90,7 +91,7 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
               role="list"
               aria-label="Liste des modèles de motos"
             >
-              {reversedModels.map((model: any, index: number) => (
+              {orderedModels.map((model: any, index: number) => (
                 <ModelCard key={index} model={model} brand={brandName} index={index} />
               ))}
             </div>

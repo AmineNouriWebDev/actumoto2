@@ -653,6 +653,7 @@ h3,
           margin-top: 0; /* Collé au header */
           margin-left: 0;
           margin-right: 0;
+          height: 50vh;
         }
 
         .hero-image-container {
@@ -664,10 +665,9 @@ h3,
         }
 
         .hero-image {
-          max-height: 100%;
           width: 100%;
-          height: auto;
-          object-fit: contain; /* Conserve tout le contenu */
+          height: 100%;
+          object-fit: cover; /* Remplit les 50vh avec l'image carrée */
         }
       }
 
@@ -1114,7 +1114,7 @@ h3,
       /* Mobile */
       @media (max-width: 767px) {
         .hero-section {
-          height: calc(100vh - 80px);
+          height: 50vh;
           margin-top: 0;
         }
 
@@ -1160,7 +1160,7 @@ h3,
       /* Small mobile */
       @media (max-width: 480px) {
         .hero-section {
-          height: calc(100vh - 80px);
+          height: 50vh;
         }
 
         .carousel-indicators {

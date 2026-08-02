@@ -127,7 +127,7 @@ async function main() {
     const slide = carouselSlides[i];
     await prisma.carouselSlide.create({
       data: {
-        title: slide.title || null,
+        title: (slide as any).title || null,
         alt: slide.alt || null,
         imageDesktop: slide.image_desktop,
         imageMobile: slide.image_mobile || slide.image_desktop,

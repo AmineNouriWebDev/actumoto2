@@ -13,7 +13,7 @@ export default async function BrandContactsSection({ brand }: BrandContactsSecti
   if (!brandData || !brandData.dealerContact) return null;
   
   const contacts = brandData.dealerContact;
-  const displayMode = "text"; // Or whatever default is preferred
+  let displayMode = "text"; // Or whatever default is preferred
 
   return (
     <div className="brand-contacts-wrapper">

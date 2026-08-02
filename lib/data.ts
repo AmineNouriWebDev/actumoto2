@@ -1,7 +1,7 @@
 // data.js - Données centralisées pour le site
 
 // Fonction utilitaire pour formater les prix avec séparateur de milliers
-function formatPrice(price, currency = "DT") {
+function formatPrice(price: number | null, currency = "DT") {
     if (price === null) {
         return "En arrivage";
     }
@@ -12,7 +12,7 @@ function formatPrice(price, currency = "DT") {
 }
 
 // Version HTML pour un meilleur contrôle du style (ex: DT plus petit)
-function formatPriceHtml(price, currency = "DT") {
+function formatPriceHtml(price: number | null, currency = "DT") {
     if (price === null) {
         return `<span class="text-red-600 font-bold text-xl">En arrivage</span>`;
     }

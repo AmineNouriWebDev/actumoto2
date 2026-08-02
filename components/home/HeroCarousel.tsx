@@ -12,10 +12,9 @@ interface Slide {
   title?: string | null;
 }
 
-export default function HeroCarousel({ slides }: { slides: Slide[] }) {
+export default function HeroCarousel({ slides, slideInterval = 4000 }: { slides: Slide[]; slideInterval?: number }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const slideInterval = 4000;
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const startAutoSlide = () => {
@@ -121,7 +120,7 @@ export default function HeroCarousel({ slides }: { slides: Slide[] }) {
                 }}
               >
                 {slide.link ? (
-                  <a href={slide.link} className="carousel-slide-link" aria-label={slide.alt}>
+                  <a href={slide.link} className="carousel-slide-link" aria-label={slide.alt || undefined}>
                     {slideContent}
                   </a>
                 ) : (
@@ -137,6 +136,7 @@ export default function HeroCarousel({ slides }: { slides: Slide[] }) {
             <button
               key={slide.id || index}
               className={`indicator ${index === currentSlide ? "active" : ""}`}
+              style={{ backgroundColor: index === currentSlide ? "red" : "rgba(255, 255, 255, 0.5)" }}
               onClick={() => goToSlide(index)}
               aria-label={`Afficher l'image ${index + 1}`}
             />

@@ -11,7 +11,9 @@ export const metadata = {
 
 export default async function ModelesPage() {
   const modelsData = await prisma.model.findMany({
+    where: { isVisible: true },
     include: { brand: true, category: true, images: { orderBy: { orderIndex: "asc" } }, specs: true },
+    orderBy: [{ orderIndex: "asc" }],
   });
 
   const formattedModels = modelsData.map((m) => ({
