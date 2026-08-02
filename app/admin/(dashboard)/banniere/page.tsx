@@ -8,7 +8,7 @@ export default async function AdminBannierePage() {
   async function handleUpdate(formData: FormData) {
     "use server";
     await updateBanner(formData);
-    redirect("/admin/banniere");
+    redirect("/admin/banniere?success=Bannière+mise+à+jour+avec+succès");
   }
 
   return (
@@ -51,12 +51,13 @@ export default async function AdminBannierePage() {
 
           <div className="admin-form-grid">
             <div className="form-group span-2">
-              <label>Image Desktop * <span className="form-dim-hint">(recommandé : 1920×400px max)</span></label>
-              <input type="text" name="imageDesktop" required defaultValue={banner?.imageDesktop || ""} placeholder="/img/banner3.webp" />
+              <label>Image Desktop * <span className="form-dim-hint">(recommandé : 1920×600px)</span></label>
+              <input type="file" name="imageDesktopFile" accept="image/*" style={{ background: "white", color: "black", padding: "0.4rem" }} />
+              <span className="form-hint">L'image sera automatiquement convertie en WebP (laisser vide pour conserver l'actuelle)</span>
             </div>
             <div className="form-group span-2">
-              <label>Image Mobile <span className="form-dim-hint">(recommandé : 640×300px max)</span></label>
-              <input type="text" name="imageMobile" defaultValue={banner?.imageMobile || ""} placeholder="/img/banner3-mobile.webp" />
+              <label>Image Mobile <span className="form-dim-hint">(recommandé : Carré 600×600px)</span></label>
+              <input type="file" name="imageMobileFile" accept="image/*" style={{ background: "white", color: "black", padding: "0.4rem" }} />
             </div>
             <div className="form-group">
               <label>Texte alternatif (SEO)</label>

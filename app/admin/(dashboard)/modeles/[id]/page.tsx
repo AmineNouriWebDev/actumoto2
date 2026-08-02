@@ -20,7 +20,7 @@ export default async function EditModelPage({ params }: { params: Promise<{ id: 
   async function handleUpdate(formData: FormData) {
     "use server";
     await updateModel(id, formData);
-    redirect("/admin/modeles");
+    redirect("/admin/modeles?success=Modèle+modifié+avec+succès");
   }
 
   const FUEL_TYPES = ["Thermique", "Electrique", "Hybride"];

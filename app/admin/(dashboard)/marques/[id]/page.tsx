@@ -12,7 +12,7 @@ export default async function EditBrandPage({ params }: { params: Promise<{ id: 
   async function handleUpdate(formData: FormData) {
     "use server";
     await updateBrand(id, formData);
-    redirect("/admin/marques");
+    redirect("/admin/marques?success=Marque+modifiée+avec+succès");
   }
 
   return (

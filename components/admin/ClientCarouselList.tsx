@@ -7,6 +7,8 @@ import ConfirmForm from "./ConfirmForm";
 import SortableGrid from "./SortableGrid";
 import { verticalListSortingStrategy } from "@dnd-kit/sortable";
 
+import { toast } from "react-toastify";
+
 interface ClientCarouselListProps {
   initialSlides: CarouselSlide[];
   initialDelayMs: number;
@@ -27,7 +29,7 @@ export default function ClientCarouselList({ initialSlides, initialDelayMs }: Cl
     e.preventDefault();
     startTransition(async () => {
       await updateCarouselDelay(delaySec * 1000);
-      alert("Délai mis à jour !");
+      toast.success("Délai mis à jour avec succès !", { theme: "dark" });
     });
   };
 

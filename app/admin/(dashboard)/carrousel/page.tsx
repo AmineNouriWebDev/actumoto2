@@ -13,7 +13,7 @@ export default async function AdminCarouselPage() {
   async function handleCreate(formData: FormData) {
     "use server";
     await createSlide(formData);
-    redirect("/admin/carrousel");
+    redirect("/admin/carrousel?success=Slide+ajouté+avec+succès");
   }
 
   return (

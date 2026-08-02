@@ -18,7 +18,7 @@ export default async function NewModelPage() {
   async function handleCreate(formData: FormData) {
     "use server";
     await createModel(formData);
-    redirect("/admin/modeles");
+    redirect("/admin/modeles?success=Modèle+ajouté+avec+succès");
   }
 
   return (

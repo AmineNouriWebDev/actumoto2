@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 async function handleCreate(formData: FormData) {
   "use server";
   await createBrand(formData);
-  redirect("/admin/marques");
+  redirect("/admin/marques?success=Marque+ajoutée+avec+succès");
 }
 
 export default function NewBrandPage() {

@@ -8,7 +8,7 @@ export default async function AdminPopupPage() {
   async function handleUpdate(formData: FormData) {
     "use server";
     await updatePopup(formData);
-    redirect("/admin/popup");
+    redirect("/admin/popup?success=Popup+mise+à+jour+avec+succès");
   }
 
   return (
@@ -54,11 +54,12 @@ export default async function AdminPopupPage() {
           <div className="admin-form-grid">
             <div className="form-group span-2">
               <label>Image Desktop * <span className="form-dim-hint">(recommandé : 800×600px max)</span></label>
-              <input type="text" name="imageDesktop" defaultValue={popup?.imageDesktop || ""} placeholder="/img/popup/desktop.webp" />
+              <input type="file" name="imageDesktopFile" accept="image/*" style={{ background: "white", color: "black", padding: "0.4rem" }} />
+              <span className="form-hint">L'image sera automatiquement convertie en WebP (laisser vide pour conserver l'actuelle)</span>
             </div>
             <div className="form-group span-2">
               <label>Image Mobile <span className="form-dim-hint">(recommandé : 400×600px max)</span></label>
-              <input type="text" name="imageMobile" defaultValue={popup?.imageMobile || ""} placeholder="/img/popup/mobile.jpeg" />
+              <input type="file" name="imageMobileFile" accept="image/*" style={{ background: "white", color: "black", padding: "0.4rem" }} />
             </div>
             <div className="form-group">
               <label>Lien cliquable (optionnel)</label>

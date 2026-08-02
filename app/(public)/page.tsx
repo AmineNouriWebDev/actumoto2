@@ -75,14 +75,19 @@ export default async function Home() {
 
       {/* SECTION BANNIÈRE DYNAMIQUE */}
       {banner && (
-        <section className="py-0 accessories-section-wrapper" aria-labelledby="accessoires-title">
-          <div className="accessories-image-container">
-            <picture>
+        <section 
+          className="accessories-section-wrapper bg-black" 
+          aria-labelledby="accessoires-title"
+          style={{ margin: 0, padding: 0, display: "flex", flexDirection: "column", width: "100%", overflow: "hidden" }}
+        >
+          <div className="accessories-image-container w-full" style={{ margin: 0, padding: 0, backgroundColor: "#000" }}>
+            <picture style={{ display: "block", width: "100%", height: "100%", margin: 0, padding: 0 }}>
               <source media="(max-width: 767px)" srcSet={banner.imageMobile || banner.imageDesktop} />
               <img
                 src={banner.imageDesktop}
                 alt={banner.altText || 'Bannière actumoto'}
                 className="accessories-image"
+                style={{ display: "block", width: "100%", height: "100%", objectFit: "cover", margin: 0, padding: 0 }}
               />
             </picture>
           </div>
