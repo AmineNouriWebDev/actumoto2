@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Brand {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  logo       String
+  comingSoon Boolean  @default(false)
+  
+  models        Model[]
+  dealerContact DealerContact?
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String @unique
+  logo String
+
+  models Model[]
+}
+
+model Model {
+  id         String   @id @default(uuid())
+  name       String
+  fuelType   String?
+  price      Float?   // Null means "En arrivage"
+  currency   String   @default("DT")
+  brandId    String
+  categoryId String?
+
+  brand    Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id])
+  
+  images Image[]
+  specs  Specs?
+}
+
+model Specs {
+  id              String  @id @default(uuid())
+  modelId         String  @unique
+  typeMoteur      String?
+  cylindree       Float?
+  puissance       Float?
+  coupleMaximal   Float?
+  refroidissement String?
+  tankCapacity    Float?
+  vitesseMaximale Float?
+  autonomie       Float?
+  alimentation    String?
+  freinage        String?
+  systemeFreinage String?
+
+  model Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
+}
+
+model Image {
+  id         String @id @default(uuid())
+  url        String
+  orderIndex Int    @default(0)
+  modelId    String
+
+  model Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
+}
+
+model DealerContact {
+  id              String   @id @default(uuid())
+  brandId         String   @unique
+  website         String?
+  instagram       String?
+  facebook        String?
+  emails          String[]
+  phones          String[]
+  showroomAddress String?
+  showroomLocation String?
+  
+  salesParts      Json?    // For points of sale and maintenance
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+}
+
+model CarouselSlide {
+  id           String  @id @default(uuid())
+  title        String?
+  alt          String?
+  imageDesktop String
+  imageMobile  String?
+  link         String?
+  orderIndex   Int     @default(0)
+}
