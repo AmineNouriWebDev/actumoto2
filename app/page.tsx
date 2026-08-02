@@ -2,14 +2,20 @@ import HeroCarousel from "@/components/home/HeroCarousel";
 import BrandsGrid from "@/components/home/BrandsGrid";
 import CategoriesAndPrices from "@/components/home/CategoriesAndPrices";
 import WelcomePopup from "@/components/home/WelcomePopup";
+import prisma from "@/lib/prisma";
 
-export default function Home() {
+export const revalidate = 3600;
+
+export default async function Home() {
+  const slides = await prisma.carouselSlide.findMany({ orderBy: { orderIndex: 'asc' } });
+  const brands = await prisma.brand.findMany({ orderBy: { id: 'asc' } }); // Could sort differently if needed
+  const categories = await prisma.category.findMany();
   return (
     <>
       <WelcomePopup />
       
       {/* HERO SECTION */}
-      <HeroCarousel />
+      <HeroCarousel slides={slides} />
 
       {/* SECTION SEO - CONTENU OPTIMISÉ (visually hidden for SEO) */}
       <section className="sr-only">
@@ -58,10 +64,10 @@ export default function Home() {
       </section>
 
       {/* Navigation Catégories / Prix */}
-      <CategoriesAndPrices />
+      <CategoriesAndPrices categories={categories} />
 
       {/* Section Marques */}
-      <BrandsGrid />
+      <BrandsGrid brands={brands} />
 
       {/* SECTION ACCESSOIRES */}
       <section className="py-0 accessories-section-wrapper" aria-labelledby="accessoires-title">

@@ -1,9 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { brands } from "@/lib/data";
 
-export default function BrandsGrid() {
+interface Brand {
+  name: string;
+  logo: string;
+  comingSoon?: boolean;
+}
+
+export default function BrandsGrid({ brands }: { brands: Brand[] }) {
   return (
     <>
       <section className="pt-16 md:pt-8 pb-4">

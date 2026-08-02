@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { categories } from "@/lib/data";
+
+interface Category {
+  name: string;
+  logo: string;
+}
 
 const priceRanges = [
   { slug: "moins-de-4000",   label: <><span className="price-range-arrow">Moins de</span> <span className="price-range-text">4K</span></> },
@@ -13,7 +17,7 @@ const priceRanges = [
   { slug: "plus-de-20000",   label: <><span className="price-range-arrow">Plus de</span> <span className="price-range-text">20K</span></> },
 ];
 
-export default function CategoriesAndPrices() {
+export default function CategoriesAndPrices({ categories }: { categories: Category[] }) {
   const [activeTab, setActiveTab] = useState<"categories" | "prices">("categories");
 
   return (
@@ -44,7 +48,7 @@ export default function CategoriesAndPrices() {
           <div className="container mx-auto px-4">
             <h2 id="categories-title" className="sr-only">Catégories de motos</h2>
             <div className="categories-container" role="list" aria-label="Liste des catégories de motos disponibles">
-              {categories.map((category: any, index: number) => (
+              {categories.map((category: Category, index: number) => (
                 <Link
                   key={index}
                   href={`/categories/${encodeURIComponent(category.name)}`}

@@ -2,11 +2,10 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { modelsData } from "@/lib/data";
 
 import ModelCard from "./ModelCard";
 
-export default function CatalogClient() {
+export default function CatalogClient({ models }: { models: any[] }) {
   const searchParams = useSearchParams();
   const [filteredModels, setFilteredModels] = useState<any[]>([]);
 
@@ -17,13 +16,7 @@ export default function CatalogClient() {
     const minPriceParam = searchParams.get("minPrice");
     const maxPriceParam = searchParams.get("maxPrice");
 
-    // Flatten all models with their brand attached
-    let allModels = [];
-    for (const [brand, models] of Object.entries(modelsData)) {
-      models.forEach((m: any) => {
-        allModels.push({ ...m, brand });
-      });
-    }
+    let allModels = [...models];
 
     // Filter
     if (marqueParam) {

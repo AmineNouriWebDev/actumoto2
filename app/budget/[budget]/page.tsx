@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Fragment } from "react";
-import { modelsData, brands } from "@/lib/data";
+import prisma from "@/lib/prisma";
 import ModelCard from "@/components/modeles/ModelCard";
 import Link from "next/link";
 import ComparateurBar from "@/components/modeles/ComparateurBar";
@@ -35,22 +35,33 @@ export default async function BudgetPage({ params }: { params: Promise<{ budget:
 
   if (!range) notFound();
 
-  // Collect models grouped by brand (same as original showModelsByPriceRange)
+  const modelsData = await prisma.model.findMany({
+    where: {
+      price: {
+        gte: range.min,
+        lte: range.max,
+      },
+    },
+    include: { brand: true, category: true, images: { orderBy: { orderIndex: "asc" } }, specs: true },
+  });
+
   const groupedByBrand: Record<string, { models: any[]; brandOrder: number }> = {};
+  const brands = await prisma.brand.findMany({ orderBy: { id: "asc" } });
 
-  Object.keys(modelsData).forEach((brandKey) => {
-    const brandModels = (modelsData as any)[brandKey].filter((model: any) => {
-      const price = parseFloat(model.price);
-      return !isNaN(price) && price >= range.min && price <= range.max;
-    });
-
-    if (brandModels.length > 0) {
-      const brandOrder = (brands as any[]).findIndex((b) => b.name === brandKey);
-      groupedByBrand[brandKey] = {
-        models: [...brandModels].reverse(), // original reverses
+  modelsData.forEach((model) => {
+    const brandName = model.brand.name;
+    if (!groupedByBrand[brandName]) {
+      const brandOrder = brands.findIndex((b) => b.id === model.brandId);
+      groupedByBrand[brandName] = {
+        models: [],
         brandOrder: brandOrder === -1 ? 999 : brandOrder,
       };
     }
+    groupedByBrand[brandName].models.push({
+      ...model,
+      images: model.images.map((img: any) => img.url),
+      category: model.category?.name,
+    });
   });
 
   const sortedBrands = Object.keys(groupedByBrand).sort(
@@ -82,7 +93,7 @@ export default async function BudgetPage({ params }: { params: Promise<{ budget:
                     {brandKey}
                   </div>
                   {groupedByBrand[brandKey].models.map((model: any, index: number) => (
-                    <ModelCard key={`${brandKey}-${index}`} model={model} brand={brandKey} index={index} />
+                    <ModelCard key={`${brandKey}-${model.id || index}`} model={model} brand={brandKey} index={index} />
                   ))}
                 </Fragment>
               ))}

@@ -1,12 +1,26 @@
 import { Suspense } from "react";
 import CatalogClient from "@/components/modeles/CatalogClient";
+import prisma from "@/lib/prisma";
+
+export const revalidate = 3600;
 
 export const metadata = {
   title: "Modèles de Motos & Scooters - Catalogue & Prix | actumoto.tn",
   description: "🇹🇳 Catalogue complet de motos et scooters avec prix en Tunisie. Découvrez tous les modèles par marque : Peugeot, CFMOTO, Suzuki. Comparateur de prix motos 2024.",
 };
 
-export default function ModelesPage() {
+export default async function ModelesPage() {
+  const modelsData = await prisma.model.findMany({
+    include: { brand: true, category: true, images: { orderBy: { orderIndex: "asc" } }, specs: true },
+  });
+
+  const formattedModels = modelsData.map((m) => ({
+    ...m,
+    brand: m.brand.name,
+    category: m.category?.name,
+    images: m.images.map((img: any) => img.url),
+  }));
+
   return (
     <>
       <section className="pt-24 pb-8 md:pt-32 md:pb-12 text-center bg-gray-50 border-b border-gray-200">
@@ -21,7 +35,7 @@ export default function ModelesPage() {
       </section>
 
       <Suspense fallback={<div className="container mx-auto p-12 text-center text-xl">Chargement du catalogue...</div>}>
-        <CatalogClient />
+        <CatalogClient models={formattedModels} />
       </Suspense>
     </>
   );

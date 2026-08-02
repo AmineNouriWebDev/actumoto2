@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { modelsData } from "@/lib/data";
 import { formatSpecification } from "@/lib/formatters";
 
 const specLabels: Record<string, string> = {
@@ -52,19 +51,25 @@ export default function ComparateurPage() {
     setCompareList(list);
   }, []);
 
-  // Resolve full model data
+  // Resolve full model data from API
   useEffect(() => {
-    const resolved: FullModel[] = [];
-    compareList.forEach((item) => {
-      const brandModels = (modelsData as any)[item.brand];
-      if (brandModels) {
-        const model = brandModels.find((m: any) => m.name === item.name);
-        if (model) {
-          resolved.push({ ...model, brand: item.brand, itemReferenceName: item.name });
-        }
+    if (compareList.length === 0) {
+      setFullModels([]);
+      return;
+    }
+    
+    fetch("/api/models/compare", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: compareList })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.models) {
+        setFullModels(data.models);
       }
-    });
-    setFullModels(resolved);
+    })
+    .catch(err => console.error("Failed to fetch comparison models:", err));
   }, [compareList]);
 
   const removeModel = useCallback((brand: string, name: string) => {

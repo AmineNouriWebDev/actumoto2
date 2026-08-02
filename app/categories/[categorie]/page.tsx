@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Fragment } from "react";
-import { modelsData, brands } from "@/lib/data";
+import prisma from "@/lib/prisma";
 import ModelCard from "@/components/modeles/ModelCard";
 import Link from "next/link";
 import ComparateurBar from "@/components/modeles/ComparateurBar";
@@ -16,32 +16,48 @@ export async function generateMetadata({ params }: { params: Promise<{ categorie
   };
 }
 
-export function generateStaticParams() {
-  return CATEGORIES.map((c) => ({ categorie: encodeURIComponent(c) }));
+export async function generateStaticParams() {
+  const categories = await prisma.category.findMany({ select: { name: true } });
+  return categories.map((c) => ({ categorie: encodeURIComponent(c.name) }));
 }
+
+export const revalidate = 3600;
 
 export default async function CategoriePage({ params }: { params: Promise<{ categorie: string }> }) {
   const { categorie } = await params;
   const categoryName = decodeURIComponent(categorie);
 
-  // Collect models grouped by brand (same logic as original showModelsByCategory)
-  const groupedByBrand: Record<string, { models: any[]; brandOrder: number }> = {};
-
-  Object.keys(modelsData).forEach((brandKey) => {
-    const brandModels = (modelsData as any)[brandKey].filter((model: any) => {
-      if (categoryName.toLowerCase() === "electrique") {
-        return model.fuelType && model.fuelType.toLowerCase() === "electrique";
-      }
-      return model.category && model.category.toLowerCase() === categoryName.toLowerCase();
+  let modelsData: any[] = [];
+  if (categoryName.toLowerCase() === "electrique") {
+    modelsData = await prisma.model.findMany({
+      where: { fuelType: { equals: "Electrique", mode: "insensitive" } },
+      include: { brand: true, category: true, images: { orderBy: { orderIndex: "asc" } }, specs: true },
     });
+  } else {
+    modelsData = await prisma.model.findMany({
+      where: { category: { name: { equals: categoryName, mode: "insensitive" } } },
+      include: { brand: true, category: true, images: { orderBy: { orderIndex: "asc" } }, specs: true },
+    });
+  }
 
-    if (brandModels.length > 0) {
-      const brandOrder = (brands as any[]).findIndex((b) => b.name === brandKey);
-      groupedByBrand[brandKey] = {
-        models: [...brandModels].reverse(), // original reverses
+  // Collect models grouped by brand
+  const groupedByBrand: Record<string, { models: any[]; brandOrder: number }> = {};
+  const brands = await prisma.brand.findMany({ orderBy: { id: "asc" } });
+
+  modelsData.forEach((model) => {
+    const brandName = model.brand.name;
+    if (!groupedByBrand[brandName]) {
+      const brandOrder = brands.findIndex((b) => b.id === model.brandId);
+      groupedByBrand[brandName] = {
+        models: [],
         brandOrder: brandOrder === -1 ? 999 : brandOrder,
       };
     }
+    groupedByBrand[brandName].models.push({
+      ...model,
+      images: model.images.map((img: any) => img.url),
+      category: model.category?.name,
+    });
   });
 
   const sortedBrands = Object.keys(groupedByBrand).sort(
@@ -74,7 +90,7 @@ export default async function CategoriePage({ params }: { params: Promise<{ cate
                   {brandKey}
                 </div>
                 {groupedByBrand[brandKey].models.map((model: any, index: number) => (
-                  <ModelCard key={`${brandKey}-${index}`} model={model} brand={brandKey} index={index} />
+                  <ModelCard key={`${brandKey}-${model.id || index}`} model={model} brand={brandKey} index={index} />
                 ))}
               </Fragment>
             ))}

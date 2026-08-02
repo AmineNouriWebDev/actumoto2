@@ -2,9 +2,17 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { carouselSlides } from "@/lib/data";
 
-export default function HeroCarousel() {
+interface Slide {
+  id?: string;
+  imageDesktop: string;
+  imageMobile?: string | null;
+  alt?: string | null;
+  link?: string | null;
+  title?: string | null;
+}
+
+export default function HeroCarousel({ slides }: { slides: Slide[] }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const slideInterval = 4000;
@@ -24,14 +32,14 @@ export default function HeroCarousel() {
   const nextSlide = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
     setTimeout(() => setIsTransitioning(false), 500);
   };
 
   const prevSlide = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
     setTimeout(() => setIsTransitioning(false), 500);
   };
 
@@ -86,17 +94,17 @@ export default function HeroCarousel() {
         onTouchEnd={handleTouchEnd}
       >
         <div className="carousel-track">
-          {carouselSlides.map((slide, index) => {
+          {slides.map((slide, index) => {
             const isActive = index === currentSlide;
-            const mobileImageSrc = slide.image_mobile || slide.image_desktop;
-            const desktopImageSrc = slide.image_desktop;
+            const mobileImageSrc = slide.imageMobile || slide.imageDesktop;
+            const desktopImageSrc = slide.imageDesktop;
             
             const slideContent = (
               <picture>
                 <source media="(max-width: 767px)" srcSet={mobileImageSrc} />
                 <img 
                   src={desktopImageSrc} 
-                  alt={slide.alt} 
+                  alt={slide.alt || 'Slide image'} 
                   className="carousel-image"
                   loading={index === 0 ? "eager" : "lazy"}
                 />
@@ -125,9 +133,9 @@ export default function HeroCarousel() {
         </div>
 
         <div className="carousel-indicators">
-          {carouselSlides.map((slide, index) => (
-            <span 
-              key={slide.id}
+          {slides.map((slide, index) => (
+            <button
+              key={slide.id || index}
               className={`indicator ${index === currentSlide ? "active" : ""}`}
               onClick={() => goToSlide(index)}
               aria-label={`Afficher l'image ${index + 1}`}

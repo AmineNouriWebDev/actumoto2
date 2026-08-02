@@ -1,33 +1,19 @@
-import { dealersContacts } from "@/lib/data";
+import prisma from "@/lib/prisma";
 
 interface BrandContactsSectionProps {
   brand: string;
 }
 
-function getDealerContactsKey(brand: string): string | null {
-  const dc = dealersContacts as any;
-  if (!dc) return null;
-  if (dc[brand]) return brand;
-
-  const normalize = (v: string) =>
-    v.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, " ");
-  
-  const normalizedInput = normalize(brand);
-  const matchingKey = Object.keys(dc).find((key) => {
-    const n = normalize(key);
-    return n === normalizedInput || n.includes(normalizedInput) || normalizedInput.includes(n);
+export default async function BrandContactsSection({ brand }: BrandContactsSectionProps) {
+  const brandData = await prisma.brand.findUnique({
+    where: { name: brand },
+    include: { dealerContact: true }
   });
-  return matchingKey || null;
-}
-
-export default function BrandContactsSection({ brand }: BrandContactsSectionProps) {
-  const contactsKey = getDealerContactsKey(brand);
-  const dc = dealersContacts as any;
   
-  if (!contactsKey || !dc[contactsKey]) return null;
+  if (!brandData || !brandData.dealerContact) return null;
   
-  const contacts = dc[contactsKey];
-  const displayMode = contacts.addressDisplayMode || "text";
+  const contacts = brandData.dealerContact;
+  const displayMode = "text"; // Or whatever default is preferred
 
   return (
     <div className="brand-contacts-wrapper">
@@ -35,8 +21,8 @@ export default function BrandContactsSection({ brand }: BrandContactsSectionProp
         <h2 className="contacts-title futurist-font">Concessionnaire {brand}</h2>
         
         {/* Address */}
-        {contacts.addresses && contacts.addresses.length > 0 && (
-          displayMode === "maps" ? (
+        {contacts.showroomAddress && (
+          displayMode === "maps" && contacts.showroomLocation ? (
             <div className="contact-item maps-item">
               <div className="maps-container">
                 <iframe
@@ -44,12 +30,12 @@ export default function BrandContactsSection({ brand }: BrandContactsSectionProp
                   loading="lazy"
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(contacts.addresses[0] + ", Tunisia")}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(contacts.showroomAddress + ", Tunisia")}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                   style={{ border: 0 }}
-                  aria-label={`Google Maps - ${contacts.addresses[0]}`}
+                  aria-label={`Google Maps - ${contacts.showroomAddress}`}
                 />
                 <a
-                  href={contacts.mapUrl || `https://www.google.com/maps/search/${encodeURIComponent(contacts.addresses[0] + ", Tunisia")}`}
+                  href={contacts.showroomLocation}
                   className="maps-link-open"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -63,7 +49,7 @@ export default function BrandContactsSection({ brand }: BrandContactsSectionProp
             <div className="contact-item">
               <div className="contact-icon">📍</div>
               <div className="contact-details">
-                <div className="contact-line">{contacts.addresses[0]}</div>
+                <div className="contact-line">{contacts.showroomAddress}</div>
               </div>
             </div>
           )
@@ -138,13 +124,13 @@ export default function BrandContactsSection({ brand }: BrandContactsSectionProp
         )}
 
         {/* Dealers/Revendeurs */}
-        {contacts.dealers && contacts.dealers.length > 0 && (
+        {contacts.salesParts && (contacts.salesParts as any[]).length > 0 && (
           <div className="dealers-section">
             <div className="dealers-section-title">
               <span>🏪</span> Revendeurs agréés
             </div>
             <div className="dealers-grid">
-              {contacts.dealers.map((dealer: any, i: number) => (
+              {(contacts.salesParts as any[]).map((dealer: any, i: number) => (
                 <div key={i} className="dealer-card">
                   <div className="dealer-card-name">{dealer.name}</div>
                   {dealer.city && <div className="dealer-card-city">{dealer.city}</div>}

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { modelsData, dealersContacts } from "@/lib/data";
+import prisma from "@/lib/prisma";
 import ModelCard from "@/components/modeles/ModelCard";
 import Link from "next/link";
 import BrandContactsSection from "@/components/modeles/BrandContactsSection";
@@ -14,20 +14,38 @@ export async function generateMetadata({ params }: { params: Promise<{ marque: s
   };
 }
 
-export function generateStaticParams() {
-  return Object.keys(modelsData).map((marque) => ({
-    marque: encodeURIComponent(marque),
+export async function generateStaticParams() {
+  const brands = await prisma.brand.findMany({ select: { name: true } });
+  return brands.map((b) => ({
+    marque: encodeURIComponent(b.name),
   }));
 }
+
+export const revalidate = 3600;
 
 export default async function MarquePage({ params }: { params: Promise<{ marque: string }> }) {
   const { marque } = await params;
   const brandName = decodeURIComponent(marque);
-  const models = (modelsData as any)[brandName];
+  
+  const brand = await prisma.brand.findUnique({
+    where: { name: brandName },
+    include: {
+      models: {
+        include: { specs: true, images: { orderBy: { orderIndex: 'asc' } }, category: true }
+      }
+    }
+  });
 
-  if (!models) {
+  if (!brand) {
     notFound();
   }
+
+  // Map to match the structure expected by ModelCard
+  const models = brand.models.map(m => ({
+    ...m,
+    images: m.images.map(img => img.url),
+    category: m.category?.name
+  }));
 
   // Original reverses the array before rendering
   const reversedModels = [...models].reverse();
