@@ -79,14 +79,6 @@ export default async function NewModelPage() {
           </div>
         </div>
 
-        <div className="admin-card">
-          <h2 className="admin-card-title">📸 Images (Glissez pour réorganiser)</h2>
-          <div className="form-group">
-            <ModelImageUploader initialImages={[]} />
-            <span className="form-hint">La première image sera l'image principale du modèle.</span>
-          </div>
-        </div>
-
         {/* Specs */}
         <div className="admin-card">
           <h2 className="admin-card-title">⚙️ Caractéristiques Techniques</h2>
@@ -152,6 +144,16 @@ export default async function NewModelPage() {
             </div>
           </div>
         </div>
+
+        <div className="admin-card">
+          <h2 className="admin-card-title">📸 Images (Glissez pour réorganiser)</h2>
+          <div className="form-group">
+            <ModelImageUploader initialImages={[]} />
+            <span className="form-hint">La première image sera l'image principale du modèle.</span>
+          </div>
+        </div>
+
+
 
         <div className="admin-form-actions">
           <Link href="/admin/modeles" className="btn-secondary">Annuler</Link>

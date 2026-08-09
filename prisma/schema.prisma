@@ -31,21 +31,36 @@ model Category {
 }
 
 model Model {
-  id         String  @id @default(uuid())
-  name       String
-  fuelType   String?
-  price      Float?
-  currency   String  @default("DT")
-  brandId    String
-  categoryId String?
-  isVisible  Boolean @default(true)
-  orderIndex Int     @default(0)
+  id            String  @id @default(uuid())
+  name          String
+  fuelType      String?
+  price         Float?
+  currency      String  @default("DT")
+  brandId       String
+  categoryId    String?
+  isVisible     Boolean @default(true)
+  orderIndex    Int     @default(0)
+  hasDetailPage Boolean @default(false)
+  description   String?
+  youtubeUrl    String?
+  videoUrl      String?
 
   brand    Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
   category Category? @relation(fields: [categoryId], references: [id])
 
   images Image[]
   specs  Specs?
+  colors ModelColor[]
+}
+
+model ModelColor {
+  id         String @id @default(uuid())
+  modelId    String
+  name       String
+  hex        String
+  orderIndex Int    @default(0)
+
+  model Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
 }
 
 model Specs {

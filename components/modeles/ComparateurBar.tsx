@@ -59,11 +59,15 @@ export default function ComparateurBar() {
           className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scrollbar"
           id="comparateur-items"
         >
-          {compareList.map((item, index) => (
-            <div key={index} className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-sm font-semibold whitespace-nowrap relative pr-8">
-              {item.image && (
-                <img src={item.image} alt={item.name} className="w-10 h-7 object-cover rounded bg-white" />
-              )}
+          {compareList.map((item, index) => {
+            // Fix path to avoid relative path issues when navigating deep routes
+            const imgSrc = item.image ? item.image.replace(/^\.\//, "/") : "";
+            
+            return (
+              <div key={index} className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-sm font-semibold whitespace-nowrap relative pr-8">
+                {imgSrc && (
+                  <img src={imgSrc} alt={item.name} className="w-10 h-7 object-cover rounded bg-white" />
+                )}
               <div className="flex flex-col leading-none justify-center">
                 <span className="text-gray-500 text-[10px] uppercase">{item.brand}</span>
                 <span className="text-xs">{item.name}</span>
@@ -77,7 +81,8 @@ export default function ComparateurBar() {
                 ✕
               </button>
             </div>
-          ))}
+            );
+          })}
         </div>
         
         <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end flex-shrink-0 pt-1 border-t sm:border-none border-gray-100">

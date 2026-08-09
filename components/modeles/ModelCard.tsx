@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { formatSpecification } from "@/lib/formatters";
+import Link from "next/link";
 
 // Réplique exacte de formatPriceHtml() de data.js
 function formatPriceDisplay(price: number | null | undefined, currency: string = "DT") {
@@ -279,6 +280,17 @@ export default function ModelCard({ model, brand, index }: ModelCardProps) {
                 </button>
               )}
             </div>
+
+            {/* Bouton Voir les détails — visible uniquement si hasDetailPage */}
+            {model.hasDetailPage && (
+              <Link
+                href={`/marques/${encodeURIComponent(brand)}/${encodeURIComponent(model.name)}`}
+                className="detail-page-btn"
+                title={`Voir les détails de la ${brand} ${model.name}`}
+              >
+                🔍 Voir les détails
+              </Link>
+            )}
 
             {/* Specs container — data-open controls visibility via CSS (same as original) */}
             {model.specs && (

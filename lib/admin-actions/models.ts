@@ -79,12 +79,33 @@ export async function updateModel(id: string, formData: FormData) {
   const priceRaw = formData.get("price") as string;
   const price = priceRaw ? parseFloat(priceRaw) : null;
   const currency = (formData.get("currency") as string) || "DT";
+  const hasDetailPage = formData.getAll("hasDetailPage").includes("true");
+  const description = (formData.get("description") as string || "").trim() || null;
+  const youtubeUrl = (formData.get("youtubeUrl") as string || "").trim() || null;
+  const videoUrl = (formData.get("videoUrl") as string || "").trim() || null;
   const imageUrls = (formData.get("imageUrls") as string || "")
     .split("\n").map(s => s.trim()).filter(Boolean);
 
+  // Get brand name for cache revalidation
+  const existing = await prisma.model.findUnique({
+    where: { id },
+    include: { brand: true },
+  });
+
   await prisma.model.update({
     where: { id },
-    data: { name: name.trim(), brandId, categoryId: categoryId || undefined, fuelType, price, currency },
+    data: {
+      name: name.trim(),
+      brandId,
+      categoryId: categoryId ?? null,
+      fuelType: fuelType ?? null,
+      price,
+      currency,
+      hasDetailPage,
+      description,
+      youtubeUrl,
+      videoUrl,
+    },
   });
 
   // Update specs
@@ -112,6 +133,11 @@ export async function updateModel(id: string, formData: FormData) {
   revalidatePath("/admin/modeles");
   revalidatePath(`/admin/modeles/${id}`);
   revalidatePath("/");
+  // Revalidate the public detail page
+  if (existing?.brand?.name) {
+    revalidatePath(`/marques/${encodeURIComponent(existing.brand.name)}/${encodeURIComponent(name.trim())}`);
+    revalidatePath(`/marques/${encodeURIComponent(existing.brand.name)}`);
+  }
 }
 
 export async function updateModelOrder(updates: { id: string; orderIndex: number }[]) {
@@ -124,4 +150,38 @@ export async function updateModelOrder(updates: { id: string; orderIndex: number
   await Promise.all(promises);
   revalidatePath("/admin/modeles");
   revalidatePath("/");
+}
+
+// ─── Couleurs disponibles ────────────────────────────────────────────────────
+
+export async function addModelColor(modelId: string, name: string, hex: string) {
+  const maxOrder = await prisma.modelColor.findFirst({
+    where: { modelId },
+    orderBy: { orderIndex: "desc" },
+    select: { orderIndex: true },
+  });
+  await prisma.modelColor.create({
+    data: { modelId, name, hex, orderIndex: maxOrder ? maxOrder.orderIndex + 1 : 0 },
+  });
+  revalidatePath(`/admin/modeles/${modelId}`);
+}
+
+export async function deleteModelColor(colorId: string, modelId: string) {
+  await prisma.modelColor.delete({ where: { id: colorId } });
+  revalidatePath(`/admin/modeles/${modelId}`);
+}
+
+export async function updateModelColors(
+  modelId: string,
+  colors: { id?: string; name: string; hex: string; orderIndex: number }[]
+) {
+  // Delete all existing colors for this model
+  await prisma.modelColor.deleteMany({ where: { modelId } });
+  // Recreate
+  for (const color of colors) {
+    await prisma.modelColor.create({
+      data: { modelId, name: color.name, hex: color.hex, orderIndex: color.orderIndex },
+    });
+  }
+  revalidatePath(`/admin/modeles/${modelId}`);
 }

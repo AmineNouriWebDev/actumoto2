@@ -15,7 +15,7 @@ function ToastListener() {
     const errorMsg = searchParams.get("error");
 
     if (successMsg) {
-      toast.success(successMsg, {
+      toast.success(decodeURIComponent(successMsg), {
         position: "bottom-right",
         autoClose: 4000,
         hideProgressBar: false,
@@ -27,7 +27,7 @@ function ToastListener() {
     }
 
     if (errorMsg) {
-      toast.error(errorMsg, {
+      toast.error(decodeURIComponent(errorMsg), {
         position: "bottom-right",
         autoClose: 5000,
         theme: "dark",
