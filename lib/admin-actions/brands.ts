@@ -77,12 +77,37 @@ export async function updateBrand(id: string, formData: FormData) {
   const youtube = (formData.get("youtube") as string || "").trim() || null;
   const tiktok = (formData.get("tiktok") as string || "").trim() || null;
   const showroomAddress = (formData.get("showroomAddress") as string || "").trim() || null;
-  const showroomLocation = (formData.get("showroomLocation") as string || "").trim() || null;
+  let showroomLocationRaw = (formData.get("showroomLocation") as string || "").trim() || null;
+  
+  let showroomLocation = showroomLocationRaw;
+  if (showroomLocationRaw && !showroomLocationRaw.startsWith("http")) {
+    // Treat as coordinates or zone name and build a Maps search URL
+    showroomLocation = `https://maps.google.com/maps?q=${encodeURIComponent(showroomLocationRaw)}`;
+  }
+  
+  // Parse sales parts (resellers)
+  let salesParts = null;
+  try {
+    const rawSalesParts = formData.get("salesParts") as string;
+    if (rawSalesParts) {
+      const parsed = JSON.parse(rawSalesParts);
+      if (Array.isArray(parsed)) {
+        salesParts = parsed.map(dealer => {
+          if (dealer.mapUrl && !dealer.mapUrl.startsWith("http")) {
+            dealer.mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(dealer.mapUrl)}`;
+          }
+          return dealer;
+        });
+      }
+    }
+  } catch(e) {
+    console.error("Error parsing salesParts", e);
+  }
 
   await prisma.dealerContact.upsert({
     where: { brandId: id },
-    update: { phones, emails, website, facebook, instagram, youtube, tiktok, showroomAddress, showroomLocation },
-    create: { brandId: id, phones, emails, website, facebook, instagram, youtube, tiktok, showroomAddress, showroomLocation },
+    update: { phones, emails, website, facebook, instagram, youtube, tiktok, showroomAddress, showroomLocation, salesParts },
+    create: { brandId: id, phones, emails, website, facebook, instagram, youtube, tiktok, showroomAddress, showroomLocation, salesParts },
   });
 
   revalidatePath("/admin/marques");

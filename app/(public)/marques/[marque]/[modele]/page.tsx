@@ -6,6 +6,8 @@ import DetailGallery from "@/components/modeles/DetailGallery";
 import DetailActions from "@/components/modeles/DetailActions";
 import DetailReviewSection from "@/components/modeles/DetailReviewSection";
 import ComparateurBar from "@/components/modeles/ComparateurBar";
+import { auth } from "@/lib/auth";
+import { checkFavorite } from "@/lib/client-actions/favorites";
 import type { Metadata } from "next";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -104,6 +106,10 @@ export default async function ModelDetailPage({
   });
 
   if (!model) notFound();
+
+  const session = await auth();
+  const isLoggedIn = !!session?.user;
+  const initialIsFavorite = await checkFavorite(model.id);
 
   const images = model.images.map((img) => img.url);
   const fuelType = model.fuelType ?? "Thermique";
@@ -250,10 +256,12 @@ export default async function ModelDetailPage({
 
               {/* Actions (Comparer & Favoris) */}
               <DetailActions
+                modelId={model.id}
                 brandName={brandName}
                 modelName={modelName}
                 modelPrice={model.price}
                 mainImage={model.images[0]?.url || ""}
+                initialIsFavorite={initialIsFavorite}
               />
             </div>
 

@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { updateBrand } from "@/lib/admin-actions/brands";
+import BrandDealersEditor from "@/components/admin/BrandDealersEditor";
 
 export default async function EditBrandPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -74,9 +75,10 @@ export default async function EditBrandPage({ params }: { params: Promise<{ id: 
               <label>Adresse Showroom</label>
               <input type="text" name="showroomAddress" defaultValue={dc?.showroomAddress || ""} />
             </div>
-            <div className="form-group">
-              <label>Lien Google Maps</label>
-              <input type="url" name="showroomLocation" defaultValue={dc?.showroomLocation || ""} />
+            <div className="form-group span-2">
+              <label>Localisation du Showroom (Google Maps)</label>
+              <input type="text" name="showroomLocation" defaultValue={dc?.showroomLocation || ""} placeholder="URL Google Maps OU Coordonnées (ex: 34.7398, 10.7600)" />
+              <span className="form-hint">Collez un lien direct Google Maps, ou tapez des coordonnées GPS pour générer la carte automatiquement.</span>
             </div>
           </div>
           <div style={{ borderTop: "1px solid #374151", paddingTop: "1rem", marginTop: "0.5rem" }}>
@@ -100,6 +102,8 @@ export default async function EditBrandPage({ params }: { params: Promise<{ id: 
               </div>
             </div>
           </div>
+          
+          <BrandDealersEditor initialDealers={(dc?.salesParts as any[]) || []} />
         </div>
 
         <div className="admin-form-actions">

@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { authConfig } from "./auth.config";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  session: { strategy: "jwt" },
   ...authConfig,
   providers: [
     CredentialsProvider({
@@ -16,11 +17,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const user = await prisma.adminUser.findUnique({
-          where: { email: credentials.email as string },
+        const email = (credentials.email as string).trim().toLowerCase();
+        const user = await prisma.user.findUnique({
+          where: { email },
         });
 
-        if (!user) return null;
+        if (!user || !user.password) return null;
 
         const isPasswordValid = await bcrypt.compare(
           credentials.password as string,
@@ -33,7 +35,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           id: user.id,
           email: user.email,
           name: user.name || user.email,
-        };
+          role: user.role, // Inject role here
+        } as any;
       },
     }),
   ],

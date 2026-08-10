@@ -5,17 +5,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 
-const navItems = [
-  { href: "/admin", label: "Dashboard", icon: "📊", exact: true },
-  { href: "/admin/marques", label: "Marques", icon: "🏷️" },
-  { href: "/admin/modeles", label: "Modèles", icon: "🏍️" },
-  { href: "/admin/carrousel", label: "Carrousel", icon: "🖼️" },
-  { href: "/admin/popup", label: "Popup", icon: "📢" },
-  { href: "/admin/banniere", label: "Bannière", icon: "🖼" },
-  { href: "/admin/admins", label: "Administrateurs", icon: "👤" },
+const allNavItems = [
+  { href: "/admin", label: "Dashboard", icon: "📊", exact: true, roles: ["ADMIN", "DEALER"] },
+  { href: "/admin/marques", label: "Marques", icon: "🏷️", roles: ["ADMIN"] },
+  { href: "/admin/modeles", label: "Modèles", icon: "🏍️", roles: ["ADMIN", "DEALER"] },
+  { href: "/admin/carrousel", label: "Carrousel", icon: "🖼️", roles: ["ADMIN"] },
+  { href: "/admin/popup", label: "Popup", icon: "📢", roles: ["ADMIN"] },
+  { href: "/admin/banniere", label: "Bannière", icon: "🖼", roles: ["ADMIN"] },
+  { href: "/admin/admins", label: "Administrateurs", icon: "👤", roles: ["ADMIN"] },
+  { href: "/admin/concessionnaires", label: "Concessionnaires", icon: "🏢", roles: ["ADMIN"] },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ role }: { role?: string }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
 
@@ -23,6 +24,11 @@ export default function AdminSidebar() {
     if (exact) return pathname === href;
     return pathname.startsWith(href);
   };
+
+  const navItems = allNavItems.filter((item) => {
+    if (!role) return false;
+    return item.roles.includes(role);
+  });
 
   const SidebarContent = () => (
     <div className="sidebar-inner">

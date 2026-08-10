@@ -16,7 +16,7 @@ async function handleDelete(id: string) {
 }
 
 export default async function AdminUsersPage() {
-  const admins = await prisma.adminUser.findMany({ orderBy: { createdAt: "asc" } });
+  const admins = await prisma.user.findMany({ where: { role: "ADMIN" }, orderBy: { createdAt: "asc" } });
 
   return (
     <div>

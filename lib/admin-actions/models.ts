@@ -3,18 +3,46 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function toggleModelVisibility(id: string, isVisible: boolean) {
+  const session = await auth();
+  if (session?.user?.role === "DEALER") {
+    const model = await prisma.model.findUnique({ where: { id }, select: { brandId: true } });
+    if (model) {
+      const dealer = await prisma.user.findUnique({ where: { id: session.user.id }, include: { assignedBrands: true } });
+      if (!dealer?.assignedBrands.some(ab => ab.brandId === model.brandId)) {
+        throw new Error("Non autorisé");
+      }
+    }
+  }
+
   await prisma.model.update({ where: { id }, data: { isVisible: !isVisible } });
   revalidatePath("/admin/modeles");
   revalidatePath("/");
 }
 
 export async function deleteModel(id: string) {
+  const session = await auth();
+  if (session?.user?.role === "DEALER") {
+    const model = await prisma.model.findUnique({ where: { id }, select: { brandId: true } });
+    if (model) {
+      const dealer = await prisma.user.findUnique({ where: { id: session.user.id }, include: { assignedBrands: true } });
+      if (!dealer?.assignedBrands.some(ab => ab.brandId === model.brandId)) {
+        throw new Error("Non autorisé");
+      }
+    }
+  }
+
   await prisma.model.delete({ where: { id } });
   revalidatePath("/admin/modeles");
   revalidatePath("/");
 }
 
+import { auth } from "@/lib/auth";
+
 export async function createModel(formData: FormData) {
+  const session = await auth();
+  const userId = session?.user?.id;
+  const role = session?.user?.role as string | undefined;
+
   const name = formData.get("name") as string;
   const brandId = formData.get("brandId") as string;
   const categoryId = (formData.get("categoryId") as string) || null;
@@ -26,6 +54,27 @@ export async function createModel(formData: FormData) {
     .split("\n").map(s => s.trim()).filter(Boolean);
 
   if (!name || !brandId) return { error: "Nom et marque sont requis." };
+
+  if (role === "DEALER" && userId) {
+    const dealerUser = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { assignedBrands: true }
+    });
+    
+    if (!dealerUser) return { error: "Utilisateur introuvable." };
+    if (!dealerUser.assignedBrands.some(ab => ab.brandId === brandId)) {
+      return { error: "Vous n'êtes pas autorisé à ajouter un modèle pour cette marque." };
+    }
+    
+    const allowedBrandIds = dealerUser.assignedBrands.map(ab => ab.brandId);
+    const dynamicCount = await prisma.model.count({
+      where: { brandId: { in: allowedBrandIds } }
+    });
+    
+    if (dynamicCount >= dealerUser.modelsQuota) {
+      return { error: "Quota de modèles atteint. Veuillez contacter l'administrateur." };
+    }
+  }
 
   const maxOrder = await prisma.model.findFirst({
     where: { brandId },
@@ -67,11 +116,18 @@ export async function createModel(formData: FormData) {
     await prisma.image.create({ data: { modelId: model.id, url: imageUrls[i], orderIndex: i } });
   }
 
+  // Remove modelsCreatedCount increment
+
   revalidatePath("/admin/modeles");
   revalidatePath("/");
+  return { id: model.id };
 }
 
 export async function updateModel(id: string, formData: FormData) {
+  const session = await auth();
+  const userId = session?.user?.id;
+  const role = session?.user?.role as string | undefined;
+
   const name = formData.get("name") as string;
   const brandId = formData.get("brandId") as string;
   const categoryId = (formData.get("categoryId") as string) || null;
@@ -79,6 +135,20 @@ export async function updateModel(id: string, formData: FormData) {
   const priceRaw = formData.get("price") as string;
   const price = priceRaw ? parseFloat(priceRaw) : null;
   const currency = (formData.get("currency") as string) || "DT";
+  
+  if (!name || !brandId) return { error: "Nom et marque sont requis." };
+
+  if (role === "DEALER" && userId) {
+    const dealerUser = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { assignedBrands: true }
+    });
+    
+    if (!dealerUser || !dealerUser.assignedBrands.some(ab => ab.brandId === brandId)) {
+      return { error: "Vous n'êtes pas autorisé à modifier un modèle pour cette marque." };
+    }
+  }
+
   const hasDetailPage = formData.getAll("hasDetailPage").includes("true");
   const description = (formData.get("description") as string || "").trim() || null;
   const youtubeUrl = (formData.get("youtubeUrl") as string || "").trim() || null;

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createModel } from "@/lib/admin-actions/models";
 import ModelImageUploader from "@/components/admin/ModelImageUploader";
+import { auth } from "@/lib/auth";
 
 const FUEL_TYPES = ["Thermique", "Electrique", "Hybride"];
 const CURRENCIES = ["DT", "EUR", "USD"];
@@ -10,10 +11,29 @@ const COOLING_OPTIONS = ["Air", "Liquide", "Air/Huile"];
 const FEEDING_OPTIONS = ["Carburateur", "Injection électronique", "Injection directe"];
 
 export default async function NewModelPage() {
-  const [brands, categories] = await Promise.all([
-    prisma.brand.findMany({ where: { isVisible: true }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
-    prisma.category.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
-  ]);
+  const session = await auth();
+  if (!session?.user) redirect("/admin/login");
+
+  const userId = session.user.id;
+  const role = session.user.role;
+
+  let brands: any[] = [];
+  
+  if (role === "DEALER") {
+    const dealerUser = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { assignedBrands: { include: { brand: true } } }
+    });
+    brands = dealerUser?.assignedBrands.map(ab => ab.brand).sort((a, b) => a.name.localeCompare(b.name)) || [];
+  } else {
+    brands = await prisma.brand.findMany({ 
+      where: { isVisible: true }, 
+      select: { id: true, name: true }, 
+      orderBy: { name: "asc" } 
+    });
+  }
+
+  const categories = await prisma.category.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } });
 
   async function handleCreate(formData: FormData) {
     "use server";

@@ -6,22 +6,55 @@ const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
-  const isOnAdmin = req.nextUrl.pathname.startsWith("/admin");
-  const isOnLogin = req.nextUrl.pathname.startsWith("/admin/login");
+  const role = req.auth?.user?.role as string | undefined;
+  
+  const path = req.nextUrl.pathname;
+  const isOnAdmin = path.startsWith("/admin");
+  const isOnAdminLogin = path === "/admin/login";
+  
+  const isOnCompte = path.startsWith("/compte");
+  const isOnClientLogin = path === "/connexion" || path === "/inscription";
 
-  if (isOnAdmin && !isOnLogin && !isLoggedIn) {
-    const loginUrl = new URL("/admin/login", req.nextUrl);
-    return NextResponse.redirect(loginUrl);
+  // 1. Protection de l'espace /admin
+  if (isOnAdmin && !isOnAdminLogin) {
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/admin/login", req.nextUrl));
+    }
+    // Si connecté mais pas Admin/Dealer, on le jette
+    if (role !== "ADMIN" && role !== "DEALER") {
+      return NextResponse.redirect(new URL("/", req.nextUrl));
+    }
   }
 
-  if (isOnLogin && isLoggedIn) {
-    const adminUrl = new URL("/admin", req.nextUrl);
-    return NextResponse.redirect(adminUrl);
+  // 2. Redirection si déjà connecté sur /admin/login
+  if (isOnAdminLogin && isLoggedIn) {
+    if (role === "ADMIN" || role === "DEALER") {
+      return NextResponse.redirect(new URL("/admin", req.nextUrl));
+    } else {
+      return NextResponse.redirect(new URL("/compte", req.nextUrl));
+    }
+  }
+
+  // 3. Protection de l'espace /compte
+  if (isOnCompte) {
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/connexion", req.nextUrl));
+    }
+    // Les Admins et Dealers peuvent théoriquement aller sur /compte, mais c'est surtout pour CLIENT
+  }
+
+  // 4. Redirection si déjà connecté sur /connexion ou /inscription
+  if (isOnClientLogin && isLoggedIn) {
+    if (role === "ADMIN" || role === "DEALER") {
+      return NextResponse.redirect(new URL("/admin", req.nextUrl));
+    } else {
+      return NextResponse.redirect(new URL("/compte", req.nextUrl));
+    }
   }
 
   return NextResponse.next();
 });
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/compte/:path*", "/connexion", "/inscription"],
 };

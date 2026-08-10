@@ -2,27 +2,36 @@
 
 import { useState } from "react";
 
-export default function DetailReviewSection() {
+import { addReview } from "@/lib/client-actions/reviews";
+import { toast } from "react-toastify";
+
+export default function DetailReviewSection({ modelId, isLoggedIn }: { modelId: string, isLoggedIn: boolean }) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [review, setReview] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); 
 
-  // Mock de l'état de connexion (sera géré par la session plus tard)
-  const isLoggedIn = false; 
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoggedIn) {
-      alert("Vous devez être connecté pour soumettre un avis. (Système de connexion à venir)");
+      toast.error("Vous devez être connecté pour soumettre un avis.");
       return;
     }
     if (rating === 0) {
-      alert("Veuillez sélectionner une note.");
+      toast.error("Veuillez sélectionner une note.");
       return;
     }
-    // Simulation d'envoi
-    setIsSubmitted(true);
+    
+    setIsLoading(true);
+    const res = await addReview(modelId, rating, review);
+    setIsLoading(false);
+
+    if (res?.error) {
+      toast.error(res.error);
+    } else {
+      setIsSubmitted(true);
+    }
   };
 
   return (
@@ -93,6 +102,7 @@ export default function DetailReviewSection() {
 
             <button
               type="submit"
+              disabled={isLoading}
               style={{
                 background: "#ff0000",
                 color: "#fff",
@@ -100,18 +110,17 @@ export default function DetailReviewSection() {
                 padding: "0.75rem 1.5rem",
                 borderRadius: "8px",
                 fontWeight: 600,
-                cursor: "pointer",
-                transition: "opacity 0.2s"
+                cursor: isLoading ? "not-allowed" : "pointer",
+                transition: "opacity 0.2s",
+                opacity: isLoading ? 0.7 : 1
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.8")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
             >
-              Envoyer mon avis
+              {isLoading ? "Envoi en cours..." : "Envoyer mon avis"}
             </button>
             
             {!isLoggedIn && (
               <p style={{ marginTop: "1rem", fontSize: "0.85rem", color: "#6b7280" }}>
-                <em>Note : Ce formulaire nécessite d'être connecté. Le système d'authentification sera bientôt disponible.</em>
+                <em>Vous devez être connecté pour laisser un avis. <a href="/connexion" style={{ color: "#ff0000", textDecoration: "underline" }}>Se connecter</a></em>
               </p>
             )}
           </form>

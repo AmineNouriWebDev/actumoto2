@@ -1,19 +1,48 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import { auth } from "@/lib/auth";
 
 export default async function AdminDashboard() {
+  const session = await auth();
+  const role = session?.user?.role as string | undefined;
+
+  // Si c'est un PRO (Dealer), on affiche un tableau de bord très simple/vide
+  if (role === "DEALER") {
+    return (
+      <div>
+        <div className="admin-page-header">
+          <div>
+            <h1 className="admin-page-title">Tableau de Bord Professionnel</h1>
+            <p className="admin-page-subtitle">Bienvenue sur votre espace concessionnaire.</p>
+          </div>
+          <a href="/" target="_blank" className="btn-secondary">🌐 Voir le site en direct</a>
+        </div>
+        
+        <div className="admin-card" style={{ textAlign: "center", padding: "4rem 2rem", color: "#9ca3af" }}>
+          <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>👋</div>
+          <h2 style={{ fontSize: "1.25rem", color: "#e5e7eb", marginBottom: "0.5rem" }}>Bienvenue dans votre espace Pro</h2>
+          <p>Utilisez le menu à gauche pour gérer les modèles de vos marques assignées.</p>
+          <div style={{ marginTop: "2rem" }}>
+            <Link href="/admin/modeles" className="btn-primary">Gérer mes modèles</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // LOGIQUE ADMINISTRATEUR
   const [brands, models, slides, admins] = await Promise.all([
     prisma.brand.findMany({ select: { id: true, isVisible: true, comingSoon: true } }),
     prisma.model.findMany({ select: { id: true, isVisible: true } }),
     prisma.carouselSlide.findMany({ select: { id: true, isVisible: true } }),
-    prisma.adminUser.findMany({ select: { id: true } }),
+    prisma.user.count({ where: { role: "ADMIN" } }),
   ]);
 
   const stats = [
     { label: "Marques", value: brands.length, sub: `${brands.filter(b => !b.isVisible).length} cachées`, icon: "🏷️", colorVar: "#3b82f6", href: "/admin/marques" },
     { label: "Modèles", value: models.length, sub: `${models.filter(m => !m.isVisible).length} cachés`, icon: "🏍️", colorVar: "#8b5cf6", href: "/admin/modeles" },
     { label: "Slides Carrousel", value: slides.length, sub: `${slides.filter(s => s.isVisible).length} actifs`, icon: "🖼️", colorVar: "#10b981", href: "/admin/carrousel" },
-    { label: "Administrateurs", value: admins.length, sub: "comptes admin", icon: "👤", colorVar: "#f59e0b", href: "/admin/admins" },
+    { label: "Administrateurs", value: admins, sub: "comptes admin", icon: "👤", colorVar: "#f59e0b", href: "/admin/admins" },
   ];
 
   const quickActions = [

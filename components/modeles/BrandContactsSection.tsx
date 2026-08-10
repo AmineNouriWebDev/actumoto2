@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { dealersContacts } from "@/lib/data";
 
 interface BrandContactsSectionProps {
   brand: string;
@@ -10,10 +11,25 @@ export default async function BrandContactsSection({ brand }: BrandContactsSecti
     include: { dealerContact: true }
   });
   
-  if (!brandData || !brandData.dealerContact) return null;
+  const staticContact = (dealersContacts as any)[brand];
+  const dbContact = brandData?.dealerContact;
+
+  if (!dbContact && !staticContact) return null;
   
-  const contacts = brandData.dealerContact;
-  let displayMode = "text"; // Or whatever default is preferred
+  const contacts = {
+    showroomAddress: dbContact?.showroomAddress || staticContact?.addresses?.[0],
+    showroomLocation: dbContact?.showroomLocation || staticContact?.mapUrl,
+    phones: (dbContact?.phones?.length ? dbContact.phones : staticContact?.phones) || [],
+    emails: (dbContact?.emails?.length ? dbContact.emails : staticContact?.emails) || [],
+    website: dbContact?.website || staticContact?.website,
+    facebook: dbContact?.facebook || staticContact?.facebook,
+    instagram: dbContact?.instagram || staticContact?.instagram,
+    youtube: dbContact?.youtube || staticContact?.youtube,
+    tiktok: dbContact?.tiktok || staticContact?.tiktok,
+    salesParts: (dbContact?.salesParts && (dbContact.salesParts as any[]).length > 0) ? dbContact.salesParts : staticContact?.dealers,
+  };
+
+  let displayMode = staticContact?.addressDisplayMode || (contacts.showroomLocation ? "maps" : "text");
 
   return (
     <div className="brand-contacts-wrapper">

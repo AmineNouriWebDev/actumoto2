@@ -2,25 +2,63 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import ClientModelList from "@/components/admin/ClientModelList";
 import ModelFilters from "@/components/admin/ModelFilters";
+import { auth } from "@/lib/auth";
 
 export default async function AdminModelsPage({
   searchParams,
 }: {
   searchParams: Promise<{ search?: string; brand?: string; page?: string }>;
 }) {
+  const session = await auth();
+  const role = session?.user?.role as string | undefined;
+  const userId = session?.user?.id as string | undefined;
+
   const { search, brand: brandFilter, page } = await searchParams;
   const currentPage = parseInt(page || "1");
   const perPage = 20;
 
   let models: any[] = [];
   let total = 0;
-  const brands = await prisma.brand.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } });
+  
+  // 1. Déterminer les marques autorisées et les quotas
+  let brands: any[] = [];
+  let allowedBrandIds: string[] | null = null; // null = all brands allowed (ADMIN)
+  let quotaReached = false;
+  let dealerInfo = null;
 
-  const showList = brandFilter || search;
+  if (role === "DEALER" && userId) {
+    const dealerUser = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { assignedBrands: { include: { brand: true } } }
+    });
+    brands = dealerUser?.assignedBrands.map(ab => ab.brand).sort((a, b) => a.name.localeCompare(b.name)) || [];
+    allowedBrandIds = brands.map(b => b.id);
+    
+    if (dealerUser) {
+      const dynamicCount = await prisma.model.count({
+        where: { brandId: { in: allowedBrandIds } }
+      });
+      quotaReached = dynamicCount >= dealerUser.modelsQuota;
+      dealerInfo = { count: dynamicCount, quota: dealerUser.modelsQuota };
+    }
+  } else {
+    brands = await prisma.brand.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } });
+  }
+
+  const showList = brandFilter || search || role === "DEALER"; // Dealers should probably see the list immediately if they only have a few brands
 
   if (showList) {
     const where: any = {};
-    if (brandFilter) where.brandId = brandFilter;
+    if (brandFilter) {
+      if (allowedBrandIds && !allowedBrandIds.includes(brandFilter)) {
+        where.brandId = "NOT_ALLOWED"; // Force empty result if they try to access another brand
+      } else {
+        where.brandId = brandFilter;
+      }
+    } else if (allowedBrandIds) {
+      where.brandId = { in: allowedBrandIds }; // If no filter selected, only show allowed brands
+    }
+
     if (search) where.name = { contains: search, mode: "insensitive" };
     
     [models, total] = await Promise.all([
@@ -43,8 +81,21 @@ export default async function AdminModelsPage({
         <div>
           <h1 className="admin-page-title">Modèles de Motos</h1>
           <p className="admin-page-subtitle">{total} modèles au total</p>
+          {role === "DEALER" && dealerInfo && (
+            <p style={{ fontSize: "0.85rem", color: quotaReached ? "#ef4444" : "#10b981", marginTop: "0.25rem" }}>
+              Quota : {dealerInfo.count} / {dealerInfo.quota} modèles utilisés
+            </p>
+          )}
         </div>
-        <Link href="/admin/modeles/nouveau" className="btn-primary">+ Nouveau Modèle</Link>
+        
+        {quotaReached ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.5rem" }}>
+            <button className="btn-secondary" disabled style={{ opacity: 0.5, cursor: "not-allowed" }}>+ Nouveau Modèle</button>
+            <span style={{ fontSize: "0.75rem", color: "#ef4444" }}>Quota atteint. Veuillez contacter l'administrateur.</span>
+          </div>
+        ) : (
+          <Link href="/admin/modeles/nouveau" className="btn-primary">+ Nouveau Modèle</Link>
+        )}
       </div>
 
       {/* Filters */}
