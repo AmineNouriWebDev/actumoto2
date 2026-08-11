@@ -1,4 +1,4 @@
-import { occasionModelsData } from "@/lib/data";
+import prisma from "@/lib/prisma";
 import OccasionCard from "@/components/modeles/OccasionCard";
 import Link from "next/link";
 
@@ -7,10 +7,33 @@ export const metadata = {
   description: "🇹🇳 Motos et scooters d'occasion en Tunisie au meilleur prix. Découvrez des motos occasion vérifiées, prix intéressants, toutes marques. Honda, CFMOTO, Kawasaki, BMW, Peugeot occasion.",
 };
 
-export default function OccasionPage() {
+export const revalidate = 60; // Optional: revalidate every minute if desired, or rely on on-demand revalidation.
+
+export default async function OccasionPage() {
+  const occasions = await prisma.occasion.findMany({
+    where: { isVisible: true },
+    include: {
+      images: { orderBy: { orderIndex: 'asc' } },
+      specs: true,
+    },
+    orderBy: { orderIndex: "asc" },
+  });
+
+  // Transform Prisma models into the format expected by OccasionCard
+  const formattedOccasions = occasions.map(occ => ({
+    ...occ,
+    images: occ.images.map(img => img.url),
+    image: occ.images[0]?.url,
+    specs: occ.specs ? {
+      ...occ.specs,
+      tankCapacity: occ.specs.tankCapacity || undefined,
+      autonomie: occ.specs.autonomie || undefined,
+    } : null,
+  }));
+
   return (
     <>
-      <section className="pt-24 pb-8 relative" role="main">
+      <section className="pt-8 pb-8 relative" role="main">
         <Link
           href="/"
           className="section-back-btn"
@@ -33,7 +56,7 @@ export default function OccasionPage() {
             role="list"
             aria-label="Liste des motos d'occasion"
           >
-            {occasionModelsData.map((model, index) => (
+            {formattedOccasions.map((model, index) => (
               <OccasionCard key={index} model={model} index={index} />
             ))}
           </div>

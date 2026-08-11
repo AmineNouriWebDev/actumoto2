@@ -10,8 +10,9 @@ export async function toggleBrandVisibility(id: string, isVisible: boolean) {
 }
 
 export async function toggleBrandComingSoon(id: string, comingSoon: boolean) {
-  await prisma.brand.update({ where: { id }, data: { comingSoon: !comingSoon } });
+  const brand = await prisma.brand.update({ where: { id }, data: { comingSoon: !comingSoon } });
   revalidatePath("/admin/marques");
+  revalidatePath(`/marques/${encodeURIComponent(brand.name)}`);
   revalidatePath("/");
 }
 

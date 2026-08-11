@@ -9,6 +9,7 @@ const allNavItems = [
   { href: "/admin", label: "Dashboard", icon: "📊", exact: true, roles: ["ADMIN", "DEALER"] },
   { href: "/admin/marques", label: "Marques", icon: "🏷️", roles: ["ADMIN"] },
   { href: "/admin/modeles", label: "Modèles", icon: "🏍️", roles: ["ADMIN", "DEALER"] },
+  { href: "/admin/occasion", label: "Occasions", icon: "🔄", roles: ["ADMIN", "DEALER"] },
   { href: "/admin/carrousel", label: "Carrousel", icon: "🖼️", roles: ["ADMIN"] },
   { href: "/admin/popup", label: "Popup", icon: "📢", roles: ["ADMIN"] },
   { href: "/admin/banniere", label: "Bannière", icon: "🖼", roles: ["ADMIN"] },

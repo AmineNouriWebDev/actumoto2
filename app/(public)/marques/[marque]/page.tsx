@@ -4,6 +4,7 @@ import ModelCard from "@/components/modeles/ModelCard";
 import Link from "next/link";
 import BrandContactsSection from "@/components/modeles/BrandContactsSection";
 import ComparateurBar from "@/components/modeles/ComparateurBar";
+import ComingSoonBanner from "@/components/modeles/ComingSoonBanner";
 
 export async function generateMetadata({ params }: { params: Promise<{ marque: string }> }) {
   const { marque } = await params;
@@ -77,14 +78,7 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
 
           {/* Models grid — same ID as original */}
           {brand.comingSoon || orderedModels.length === 0 ? (
-            <div className="flex items-center justify-center w-full min-h-[50vh] p-4">
-              <img
-                src="/img/banner3.webp"
-                alt="Bientôt disponible"
-                className="max-w-full h-auto rounded-lg shadow-lg"
-                style={{ margin: "0 auto" }}
-              />
-            </div>
+            <ComingSoonBanner />
           ) : (
             <div
               id="models-container"

@@ -191,6 +191,52 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
+model Occasion {
+  id          String   @id @default(uuid())
+  name        String
+  marque      String
+  category    String?
+  fuelType    String?
+  price       String?
+  currency    String   @default("DT")
+  isVisible   Boolean  @default(true)
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  specs       OccasionSpecs?
+  images      OccasionImage[]
+}
+
+model OccasionSpecs {
+  id              String  @id @default(uuid())
+  occasionId      String  @unique
+  kilometrage     String?
+  annee           String?
+  typeMoteur      String?
+  cylindree       String?
+  puissance       String?
+  coupleMaximal   String?
+  refroidissement String?
+  tankCapacity    String?
+  vitesseMaximale String?
+  autonomie       String?
+  alimentation    String?
+  freinage        String?
+  systemeFreinage String?
+
+  occasion Occasion @relation(fields: [occasionId], references: [id], onDelete: Cascade)
+}
+
+model OccasionImage {
+  id         String @id @default(uuid())
+  url        String
+  orderIndex Int    @default(0)
+  occasionId String
+
+  occasion Occasion @relation(fields: [occasionId], references: [id], onDelete: Cascade)
+}
+
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique

@@ -15,7 +15,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           rel="stylesheet"
         />
       </head>
-      <body style={{ margin: 0, fontFamily: "'Inter', sans-serif", background: "#111827" }}>
+      <body suppressHydrationWarning style={{ margin: 0, fontFamily: "'Inter', sans-serif", background: "#111827" }}>
         {children}
         <style>{`
           * { box-sizing: border-box; }

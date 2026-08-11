@@ -7,9 +7,10 @@ function formatPriceDisplay(price: number | string | null | undefined, currency:
   if (price === null || price === undefined) {
     return <span className="text-red-600 font-bold text-xl">Sur demande</span>;
   }
-  // Convert price to string to handle both cases cleanly
-  const priceStr = price.toString();
-  // We can just display it directly since occasion prices might be strings like "50,000" or raw numbers
+  let priceStr = price.toString();
+  if (/^\d+$/.test(priceStr)) {
+    priceStr = parseInt(priceStr, 10).toLocaleString("fr-FR").replace(/\s/g, ",");
+  }
   return (
     <span className="text-red-600 font-bold text-2xl leading-none flex items-baseline">
       {priceStr}
@@ -27,6 +28,7 @@ export default function OccasionCard({ model, index }: OccasionCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const specsRef = useRef<HTMLDivElement>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [thumbnailGroupIndex, setThumbnailGroupIndex] = useState(0);
 
   // Fix relative image paths
   const fixPath = (path: string) =>
@@ -117,6 +119,15 @@ export default function OccasionCard({ model, index }: OccasionCardProps) {
     setCurrentImageIndex(idx);
   };
 
+  const handleNextGroup = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const totalGroups = Math.ceil(images.length / 4);
+    setThumbnailGroupIndex((prev) => (prev + 1) % totalGroups);
+  };
+
+  const THUMB_PER_GROUP = 4;
+  const totalGroups = Math.ceil(images.length / THUMB_PER_GROUP);
+
   return (
     <div ref={cardRef} className="occasion-card" role="listitem">
       <div className="card-inner">
@@ -134,18 +145,40 @@ export default function OccasionCard({ model, index }: OccasionCardProps) {
 
         {hasMultipleImages && (
           <div className="image-thumbnails">
-            {images.slice(0, 4).map((img, i) => (
-              <img
-                key={i}
-                src={img}
-                alt={`Miniature ${i + 1}`}
-                className={`thumbnail ${currentImageIndex === i ? "active" : ""}`}
-                onClick={(e) => handleThumbnailClick(e, i)}
-                onError={(e) => { e.currentTarget.style.display = "none"; }}
-              />
+            {Array.from({ length: totalGroups }).map((_, groupIdx) => (
+              <div
+                key={groupIdx}
+                className="thumbnail-group"
+                style={{ display: thumbnailGroupIndex === groupIdx ? "flex" : "none" }}
+              >
+                {images
+                  .slice(groupIdx * THUMB_PER_GROUP, groupIdx * THUMB_PER_GROUP + THUMB_PER_GROUP)
+                  .map((img, i) => {
+                    const absIdx = groupIdx * THUMB_PER_GROUP + i;
+                    return (
+                      <img
+                        key={absIdx}
+                        src={img}
+                        alt={`Miniature ${absIdx + 1}`}
+                        className={`thumbnail ${currentImageIndex === absIdx ? "active" : ""}`}
+                        onClick={(e) => handleThumbnailClick(e, absIdx)}
+                        onError={(e) => { e.currentTarget.style.display = "none"; }}
+                      />
+                    );
+                  })}
+              </div>
             ))}
-            {images.length > 4 && (
-              <div className="text-xs text-gray-500 self-center">+{images.length - 4}</div>
+            {totalGroups > 1 && (
+              <div className="thumbnail-nav">
+                <button
+                  type="button"
+                  className="thumbnail-nav-btn next-btn"
+                  onClick={handleNextGroup}
+                  title="Voir plus d'images"
+                >
+                  ›
+                </button>
+              </div>
             )}
           </div>
         )}
@@ -154,11 +187,17 @@ export default function OccasionCard({ model, index }: OccasionCardProps) {
           <div className="occasion-info">
             <div className="occasion-marque">{model.marque}</div>
             <h2 className="occasion-name">{model.name}</h2>
+            {fuelType === "Électrique" || fuelType === "Electrique" ? (
+              <div className="electric-badge mt-1 mb-2">
+                <span>⚡</span> ÉLECTRIQUE
+              </div>
+            ) : null}
             
             <div className="occasion-footer">
-              <div className="occasion-price">{model.price}</div>
+              <div className="occasion-price">{formatPriceDisplay(model.price, model.currency)}</div>
               {model.specs && (
                 <button
+                  type="button"
                   className="specs-btn"
                   data-target-id={uniqueId}
                   onClick={toggleSpecs}
