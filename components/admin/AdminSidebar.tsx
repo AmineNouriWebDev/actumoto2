@@ -15,6 +15,7 @@ const allNavItems = [
   { href: "/admin/banniere", label: "Bannière", icon: "🖼", roles: ["ADMIN"] },
   { href: "/admin/admins", label: "Administrateurs", icon: "👤", roles: ["ADMIN"] },
   { href: "/admin/concessionnaires", label: "Concessionnaires", icon: "🏢", roles: ["ADMIN"] },
+  { href: "/admin/utilisateurs", label: "Utilisateurs", icon: "👥", roles: ["ADMIN"] },
 ];
 
 export default function AdminSidebar({ role }: { role?: string }) {

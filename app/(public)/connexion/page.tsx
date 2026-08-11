@@ -5,11 +5,13 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,7 +26,11 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        toast.error("Email ou mot de passe incorrect");
+        if (result.error.includes("Email non vérifié")) {
+          toast.error("Veuillez vérifier votre adresse email pour activer votre compte.");
+        } else {
+          toast.error("Email ou mot de passe incorrect.");
+        }
         setIsLoading(false);
       } else {
         router.push("/compte");
@@ -58,16 +64,26 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="auth-form-group">
+          <div className="auth-form-group relative">
             <label>Mot de passe</label>
-            <input
-              type="password"
-              className="auth-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="auth-input pr-10"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                title={showPassword ? "Masquer" : "Afficher"}
+              >
+                {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+              </button>
+            </div>
             <div style={{ textAlign: "right", marginTop: "0.5rem" }}>
               <Link href="/mot-de-passe-oublie" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.8rem", textDecoration: "underline" }}>
                 Mot de passe oublié ?

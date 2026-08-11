@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import ToastProvider from "@/components/admin/ToastProvider";
 
 export const metadata: Metadata = {
   title: "actumoto.tn - Comparateur de prix motos et scooters en Tunisie",
@@ -38,6 +39,7 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
+        <ToastProvider />
         <Header />
         <main role="main" className="pt-[80px]">
           {children}

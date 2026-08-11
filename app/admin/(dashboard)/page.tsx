@@ -31,17 +31,22 @@ export default async function AdminDashboard() {
   }
 
   // LOGIQUE ADMINISTRATEUR
-  const [brands, models, slides, admins] = await Promise.all([
+  const [brands, models, slides, admins, activeUsers, pendingUsers, dealers] = await Promise.all([
     prisma.brand.findMany({ select: { id: true, isVisible: true, comingSoon: true } }),
     prisma.model.findMany({ select: { id: true, isVisible: true } }),
     prisma.carouselSlide.findMany({ select: { id: true, isVisible: true } }),
     prisma.user.count({ where: { role: "ADMIN" } }),
+    prisma.user.count({ where: { role: "CLIENT", emailVerified: { not: null } } }),
+    prisma.user.count({ where: { role: "CLIENT", emailVerified: null } }),
+    prisma.user.count({ where: { role: "DEALER" } }),
   ]);
+
+  const totalUsers = activeUsers + pendingUsers + dealers;
 
   const stats = [
     { label: "Marques", value: brands.length, sub: `${brands.filter(b => !b.isVisible).length} cachées`, icon: "🏷️", colorVar: "#3b82f6", href: "/admin/marques" },
     { label: "Modèles", value: models.length, sub: `${models.filter(m => !m.isVisible).length} cachés`, icon: "🏍️", colorVar: "#8b5cf6", href: "/admin/modeles" },
-    { label: "Slides Carrousel", value: slides.length, sub: `${slides.filter(s => s.isVisible).length} actifs`, icon: "🖼️", colorVar: "#10b981", href: "/admin/carrousel" },
+    { label: "Utilisateurs", value: totalUsers, sub: `${activeUsers} actifs, ${pendingUsers} attente, ${dealers} pros`, icon: "👥", colorVar: "#ec4899", href: "/admin/utilisateurs" },
     { label: "Administrateurs", value: admins, sub: "comptes admin", icon: "👤", colorVar: "#f59e0b", href: "/admin/admins" },
   ];
 
@@ -50,7 +55,7 @@ export default async function AdminDashboard() {
     { label: "Ajouter un Modèle", href: "/admin/modeles/nouveau", icon: "🏍️" },
     { label: "Gérer le Carrousel", href: "/admin/carrousel", icon: "🖼️" },
     { label: "Modifier la Popup", href: "/admin/popup", icon: "📢" },
-    { label: "Modifier la Bannière", href: "/admin/banniere", icon: "🖼" },
+    { label: "Gérer les Utilisateurs", href: "/admin/utilisateurs", icon: "👥" },
     { label: "Gérer les Admins", href: "/admin/admins", icon: "👤" },
   ];
 

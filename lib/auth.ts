@@ -31,6 +31,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (!isPasswordValid) return null;
 
+        if (user.role === "CLIENT" && !user.emailVerified) {
+          throw new Error("Email non vérifié. Veuillez vérifier votre adresse email pour activer votre compte.");
+        }
+
         return {
           id: user.id,
           email: user.email,

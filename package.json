@@ -17,6 +17,7 @@
     "@prisma/client": "^7.9.1",
     "bcryptjs": "^3.0.3",
     "jodit-react": "^5.4.70",
+    "lucide-react": "^1.31.0",
     "next": "16.2.10",
     "next-auth": "^5.0.0-beta.32",
     "pg": "^8.22.0",

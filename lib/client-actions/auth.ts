@@ -6,7 +6,7 @@ import crypto from "crypto";
 
 export async function registerClient(formData: FormData) {
   const name = (formData.get("name") as string || "").trim();
-  const email = (formData.get("email") as string || "").trim();
+  const email = (formData.get("email") as string || "").trim().toLowerCase();
   const password = formData.get("password") as string;
 
   if (!name || !email || !password) return { error: "Tous les champs sont requis." };
@@ -44,5 +44,34 @@ export async function registerClient(formData: FormData) {
     link: verificationLink
   });
   
+  return { success: true };
+}
+
+export async function verifyEmail(token: string, email: string) {
+  const record = await prisma.verificationToken.findFirst({
+    where: { token, identifier: email },
+  });
+
+  if (!record) {
+    return { error: "Lien de vérification invalide ou expiré." };
+  }
+
+  if (record.expires < new Date()) {
+    await prisma.verificationToken.delete({ where: { token } });
+    return { error: "Le lien de vérification a expiré." };
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    return { error: "Utilisateur non trouvé." };
+  }
+
+  await prisma.user.update({
+    where: { email },
+    data: { emailVerified: new Date() },
+  });
+
+  await prisma.verificationToken.delete({ where: { token } });
+
   return { success: true };
 }
