@@ -4,8 +4,17 @@ import { revalidatePath } from "next/cache";
 import { uploadAndConvertToWebp, deletePhysicalImage } from "@/lib/upload";
 
 export async function toggleBrandVisibility(id: string, isVisible: boolean) {
-  await prisma.brand.update({ where: { id }, data: { isVisible: !isVisible } });
+  const newVisibility = !isVisible;
+  await prisma.brand.update({ where: { id }, data: { isVisible: newVisibility } });
+  
+  // Cascade visibility to all models of this brand
+  await prisma.model.updateMany({
+    where: { brandId: id },
+    data: { isVisible: newVisibility }
+  });
+
   revalidatePath("/admin/marques");
+  revalidatePath("/admin/modeles");
   revalidatePath("/");
 }
 
