@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: actumoto-app:prod
+    container_name: actumoto_app_prod
+    restart: unless-stopped
+    depends_on:
+      - db
+    env_file:
+      - .env.prod
+    volumes:
+      - uploads_prod:/app/public/img
+    networks:
+      - traefik_net
+      - prod_internal
+    labels:
+      - "traefik.enable=true"
+      # Main domain rules
+      - "traefik.http.routers.actumoto-prod.rule=Host(`actumoto.tn`) || Host(`www.actumoto.tn`)"
+      - "traefik.http.routers.actumoto-prod.entrypoints=websecure"
+      - "traefik.http.routers.actumoto-prod.tls.certresolver=letsencrypt"
+      - "traefik.http.services.actumoto-prod.loadbalancer.server.port=3000"
+      # Redirect www to non-www
+      - "traefik.http.middlewares.redirect-to-non-www.redirectregex.regex=^https?://www.actumoto.tn/(.*)"
+      - "traefik.http.middlewares.redirect-to-non-www.redirectregex.replacement=https://actumoto.tn/$${1}"
+      - "traefik.http.routers.actumoto-prod.middlewares=redirect-to-non-www"
+
+  db:
+    image: postgres:15-alpine
+    container_name: actumoto_db_prod
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    volumes:
+      - pgdata_prod:/var/lib/postgresql/data
+    networks:
+      - prod_internal
+
+volumes:
+  uploads_prod:
+  pgdata_prod:
+
+networks:
+  traefik_net:
+    external: true
+  prod_internal:
+    driver: bridge

@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "80:80"
+      - "443:443"
+    command:
+      - "--api.insecure=false"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # Global HTTP to HTTPS redirect
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      # Let's Encrypt certificates
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=contact@actumoto.tn"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      # Load dynamic config if any
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+      - "./dynamic:/etc/traefik/dynamic"
+    networks:
+      - traefik_net
+    labels:
+      - "traefik.enable=true"
+      # BasicAuth Middleware for staging
+      # The password is generated for the user: AEzaKMI1234*
+      # htpasswd -nb staging 'AEzaKMI1234*'
+      # Output: staging:$apr1$b5VvJ4T4$9B8K.rL1ZpXz1.mZkG./h. (Note: use actual htpasswd output)
+      - "traefik.http.middlewares.auth-staging.basicauth.users=staging:$$1$$hZ1MAEfY$$BZmhsryeaJaF7cL7HuThm1"
+      
+      # NoIndex Middleware for staging
+      - "traefik.http.middlewares.noindex-staging.headers.customresponseheaders.X-Robots-Tag=noindex, nofollow, noarchive"
+
+networks:
+  traefik_net:
+    name: traefik_net
+    external: true

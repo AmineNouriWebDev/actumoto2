@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: actumoto-app:staging
+    container_name: actumoto_app_staging
+    restart: unless-stopped
+    depends_on:
+      - db
+    env_file:
+      - .env.staging
+    volumes:
+      - uploads_staging:/app/public/img
+    networks:
+      - traefik_net
+      - staging_internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.actumoto-staging.rule=Host(`test.actumoto.tn`)"
+      - "traefik.http.routers.actumoto-staging.entrypoints=websecure"
+      - "traefik.http.routers.actumoto-staging.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.actumoto-staging.middlewares=auth-staging,noindex-staging"
+      - "traefik.http.services.actumoto-staging.loadbalancer.server.port=3000"
+
+  db:
+    image: postgres:15-alpine
+    container_name: actumoto_db_staging
+    restart: unless-stopped
+    env_file:
+      - .env.staging
+    volumes:
+      - pgdata_staging:/var/lib/postgresql/data
+    networks:
+      - staging_internal
+
+volumes:
+  uploads_staging:
+  pgdata_staging:
+
+networks:
+  traefik_net:
+    external: true
+  staging_internal:
+    driver: bridge
