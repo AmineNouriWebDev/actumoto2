@@ -25,9 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ budget: s
   };
 }
 
-export function generateStaticParams() {
-  return Object.keys(PRICE_RANGES).map((budget) => ({ budget }));
-}
+
 
 export default async function BudgetPage({ params }: { params: Promise<{ budget: string }> }) {
   const { budget } = await params;

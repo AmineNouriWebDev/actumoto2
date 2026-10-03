@@ -15,13 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ marque: s
   };
 }
 
-export async function generateStaticParams() {
-  if (process.env.DOCKER_BUILD === "1") return [];
-  const brands = await prisma.brand.findMany({ select: { name: true } });
-  return brands.map((b) => ({
-    marque: encodeURIComponent(b.name),
-  }));
-}
+
 
 
 

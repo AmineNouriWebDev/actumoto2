@@ -16,11 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ categorie
   };
 }
 
-export async function generateStaticParams() {
-  if (process.env.DOCKER_BUILD === "1") return [];
-  const categories = await prisma.category.findMany({ select: { name: true } });
-  return categories.map((c) => ({ categorie: encodeURIComponent(c.name) }));
-}
+
 
 
 

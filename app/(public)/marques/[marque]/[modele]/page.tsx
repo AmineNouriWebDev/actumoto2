@@ -70,17 +70,7 @@ export async function generateMetadata({
 
 // ─── Static Params (SSG — pré-rendu à la compilation) ────────────────────────
 
-export async function generateStaticParams() {
-  if (process.env.DOCKER_BUILD === "1") return [];
-  const models = await prisma.model.findMany({
-    where: { hasDetailPage: true, isVisible: true },
-    include: { brand: true },
-  });
-  return models.map((m) => ({
-    marque: encodeURIComponent(m.brand.name),
-    modele: encodeURIComponent(m.name),
-  }));
-}
+
 
 
 
