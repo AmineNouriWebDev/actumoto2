@@ -60,6 +60,22 @@ export async function uploadVideo(file: File, folder: string = "videos"): Promis
 }
 
 /**
+ * Server action wrappers for Client Components to upload files via FormData
+ * because passing File objects directly from client to server can fail serialization.
+ */
+export async function uploadImageAction(formData: FormData, folder: string = "modeles"): Promise<string | null> {
+  const file = formData.get("file") as File;
+  if (!file) return null;
+  return await uploadAndConvertToWebp(file, folder);
+}
+
+export async function uploadVideoAction(formData: FormData, folder: string = "videos"): Promise<string | null> {
+  const file = formData.get("file") as File;
+  if (!file) return null;
+  return await uploadVideo(file, folder);
+}
+
+/**
  * Deletes a file physically from the server.
  */
 export async function deletePhysicalImage(url: string): Promise<boolean> {

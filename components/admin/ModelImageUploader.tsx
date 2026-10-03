@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import SortableGrid from "./SortableGrid";
-import { uploadAndConvertToWebp, deletePhysicalImage } from "@/lib/upload";
+import { uploadImageAction, deletePhysicalImage } from "@/lib/upload";
 
 export default function ModelImageUploader({
   initialImages = [],
@@ -22,7 +22,9 @@ export default function ModelImageUploader({
     const newImages = [...images];
 
     for (let i = 0; i < files.length; i++) {
-      const url = await uploadAndConvertToWebp(files[i], "modeles");
+      const formData = new FormData();
+      formData.append("file", files[i]);
+      const url = await uploadImageAction(formData, "modeles");
       if (url) {
         newImages.push({ id: Math.random().toString(), url });
       }

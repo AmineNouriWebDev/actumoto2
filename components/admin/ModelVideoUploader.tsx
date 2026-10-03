@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { uploadVideo, deletePhysicalImage } from "@/lib/upload";
+import { uploadVideoAction, deletePhysicalImage } from "@/lib/upload";
 
 interface ModelVideoUploaderProps {
   initialVideoUrl?: string | null;
@@ -31,7 +31,9 @@ export default function ModelVideoUploader({
 
     setIsUploading(true);
     try {
-      const url = await uploadVideo(file, "videos");
+      const formData = new FormData();
+      formData.append("file", file);
+      const url = await uploadVideoAction(formData, "videos");
       if (url) {
         // Remove old video if exists
         if (videoUrl && videoUrl.startsWith("/img/")) {
