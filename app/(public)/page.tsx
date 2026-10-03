@@ -4,7 +4,7 @@ import CategoriesAndPrices from "@/components/home/CategoriesAndPrices";
 import WelcomePopup from "@/components/home/WelcomePopup";
 import prisma from "@/lib/prisma";
 
-export const revalidate = 60;
+
 
 export default async function Home() {
   const [slides, brands, categories, banner, settings] = await Promise.all([

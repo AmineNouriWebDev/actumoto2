@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import CatalogClient from "@/components/modeles/CatalogClient";
 import prisma from "@/lib/prisma";
 
-export const revalidate = 3600;
+
 
 export const metadata = {
   title: "Modèles de Motos & Scooters - Catalogue & Prix | actumoto.tn",

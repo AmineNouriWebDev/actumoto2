@@ -7,7 +7,7 @@ export const metadata = {
   description: "🇹🇳 Motos et scooters d'occasion en Tunisie au meilleur prix. Découvrez des motos occasion vérifiées, prix intéressants, toutes marques. Honda, CFMOTO, Kawasaki, BMW, Peugeot occasion.",
 };
 
-export const revalidate = 60; // Optional: revalidate every minute if desired, or rely on on-demand revalidation.
+
 
 export default async function OccasionPage() {
   const occasions = await prisma.occasion.findMany({

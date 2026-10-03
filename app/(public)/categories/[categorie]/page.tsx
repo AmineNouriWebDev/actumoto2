@@ -22,7 +22,7 @@ export async function generateStaticParams() {
   return categories.map((c) => ({ categorie: encodeURIComponent(c.name) }));
 }
 
-export const revalidate = 3600;
+
 
 export default async function CategoriePage({ params }: { params: Promise<{ categorie: string }> }) {
   const { categorie } = await params;
