@@ -54,13 +54,13 @@ export default async function Home() {
             <a href="https://www.facebook.com/profile.php?id=61584281323170" className="social-btn facebook" aria-label="Facebook (lien)" target="_blank" rel="noreferrer">
               <img src="/img/social/facebook.png" alt="Facebook actumoto.tn" />
             </a>
-            <a href="https://www.instagram.com/marwen_actumoto/" className="social-btn instagram" aria-label="Instagram (lien)" target="_blank" rel="noreferrer">
+            <a href="https://www.instagram.com/actumoto.tn?stkn=MTRqNzhiczQ3aWFvNw==" className="social-btn instagram" aria-label="Instagram (lien)" target="_blank" rel="noreferrer">
               <img src="/img/social/instagram.png" alt="Instagram actumoto.tn" />
             </a>
             <a href="https://www.youtube.com/@ActumotoTn" className="social-btn youtube" aria-label="YouTube (lien)" target="_blank" rel="noreferrer">
               <img src="/img/social/youtube.png" alt="YouTube actumoto.tn" />
             </a>
-            <a href="https://www.tiktok.com/@marwenactumoto" className="social-btn tiktok" aria-label="TikTok (lien)" target="_blank" rel="noreferrer">
+            <a href="https://www.tiktok.com/@actumoto.tn?_r=1&_t=ZS-9AFrMJkO9jz" className="social-btn tiktok" aria-label="TikTok (lien)" target="_blank" rel="noreferrer">
               <img src="/img/social/tiktok.png" alt="TikTok actumoto.tn" />
             </a>
           </div>

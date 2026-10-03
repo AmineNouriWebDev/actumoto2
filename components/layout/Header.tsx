@@ -25,7 +25,7 @@ export default async function Header() {
                 <img src="/img/social/facebook.png" alt="Facebook" />
               </a>
               <a
-                href="https://www.instagram.com/marwen_actumoto/"
+                href="https://www.instagram.com/actumoto.tn?stkn=MTRqNzhiczQ3aWFvNw=="
                 className="header-social-btn"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -43,7 +43,7 @@ export default async function Header() {
                 <img src="/img/social/youtube.png" alt="YouTube" />
               </a>
               <a
-                href="https://www.tiktok.com/@marwenactumoto"
+                href="https://www.tiktok.com/@actumoto.tn?_r=1&_t=ZS-9AFrMJkO9jz"
                 className="header-social-btn"
                 target="_blank"
                 rel="noopener noreferrer"
