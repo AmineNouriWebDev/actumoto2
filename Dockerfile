@@ -20,8 +20,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # Generate prisma client
 RUN npx prisma generate
 
-ENV DOCKER_BUILD=1
-RUN npm run build
+RUN DOCKER_BUILD=1 npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
