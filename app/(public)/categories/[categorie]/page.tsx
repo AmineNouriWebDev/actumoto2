@@ -27,12 +27,12 @@ export default async function CategoriePage({ params }: { params: Promise<{ cate
   let modelsData: any[] = [];
   if (categoryName.toLowerCase() === "electrique") {
     modelsData = await prisma.model.findMany({
-      where: { fuelType: { equals: "Electrique", mode: "insensitive" } },
+      where: { fuelType: { equals: "Electrique", mode: "insensitive" }, isVisible: true },
       include: { brand: true, category: true, images: { orderBy: { orderIndex: "asc" } }, specs: true },
     });
   } else {
     modelsData = await prisma.model.findMany({
-      where: { category: { name: { equals: categoryName, mode: "insensitive" } } },
+      where: { category: { name: { equals: categoryName, mode: "insensitive" } }, isVisible: true },
       include: { brand: true, category: true, images: { orderBy: { orderIndex: "asc" } }, specs: true },
     });
   }

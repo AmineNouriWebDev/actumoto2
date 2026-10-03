@@ -39,6 +39,7 @@ export default async function BudgetPage({ params }: { params: Promise<{ budget:
         gte: range.min,
         lte: range.max,
       },
+      isVisible: true,
     },
     include: { brand: true, category: true, images: { orderBy: { orderIndex: "asc" } }, specs: true },
   });
