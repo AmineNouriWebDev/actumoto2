@@ -146,39 +146,14 @@ h3,
 @media (max-width: 1023px) {
     .header-container {
         display: flex;
-        justify-content: flex-start; 
-        padding-left: 10px;
+        justify-content: space-between; 
+        padding-left: 0;
     }
     
     .nav-links {
-        display: none !important;
-    }
-}
-
-.mobile-occasion-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2100;
-    position: fixed;
-    right: 20px;
-    top: 31px;
-    color: #fff;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.mobile-occasion-link:hover {
-    color: #ff0000;
-}
-
-@media (min-width: 1024px) {
-    .mobile-occasion-link {
-        display: none !important;
+        display: flex;
+        gap: 0.75rem;
+        font-size: 0.65rem;
     }
 }
 
