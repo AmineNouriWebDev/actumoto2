@@ -37,6 +37,23 @@ services:
     networks:
       - staging_internal
 
+  static:
+    image: nginx:alpine
+    container_name: actumoto_static_staging
+    restart: unless-stopped
+    volumes:
+      - uploads_staging:/usr/share/nginx/html/img:ro
+    networks:
+      - traefik_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.actumoto-static.rule=Host(`test.actumoto.tn`) && PathPrefix(`/img`)"
+      - "traefik.http.routers.actumoto-static.entrypoints=websecure"
+      - "traefik.http.routers.actumoto-static.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.actumoto-static.middlewares=auth-staging,noindex-staging"
+      - "traefik.http.services.actumoto-static.loadbalancer.server.port=80"
+
+
 volumes:
   uploads_staging:
   pgdata_staging:
