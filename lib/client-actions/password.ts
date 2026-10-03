@@ -63,7 +63,10 @@ export async function resetPassword(formData: FormData) {
 
   await prisma.user.update({
     where: { email },
-    data: { password: hashed }
+    data: { 
+      password: hashed,
+      emailVerified: new Date()
+    }
   });
 
   // On supprime le token pour qu'il ne soit plus réutilisable

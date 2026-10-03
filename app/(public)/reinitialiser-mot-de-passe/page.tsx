@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { resetPassword } from "@/lib/client-actions/password";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -73,9 +75,26 @@ function ResetPasswordForm() {
             <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.95rem", textAlign: "center", margin: 0 }}>
               Veuillez saisir votre nouveau mot de passe (8 caractères minimum).
             </p>
-            <div className="auth-form-group">
+            <div className="auth-form-group relative">
               <label>Nouveau mot de passe</label>
-              <input type="password" name="password" className="auth-input" placeholder="••••••••" minLength={8} required />
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  name="password" 
+                  className="auth-input pr-10" 
+                  placeholder="••••••••" 
+                  minLength={8} 
+                  required 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  title={showPassword ? "Masquer" : "Afficher"}
+                >
+                  {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+                </button>
+              </div>
             </div>
 
             <button type="submit" className="auth-btn" disabled={isLoading} style={{ marginTop: "1rem" }}>
