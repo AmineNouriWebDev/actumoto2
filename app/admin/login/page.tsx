@@ -3,38 +3,71 @@
 import { useState, useTransition } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { requestAdminOtp } from "@/lib/admin-actions/auth";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState<1 | 2>(1);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     startTransition(async () => {
       try {
-        const result = await signIn("credentials", {
-          email,
-          password,
-          redirect: false,
-        });
-
-        if (result?.error) {
-          setError("Email ou mot de passe incorrect.");
+        if (step === 1) {
+          // Request OTP
+          const formData = new FormData();
+          formData.append("email", email);
+          formData.append("password", password);
+          
+          const result = await requestAdminOtp(formData);
+          
+          if (result.error) {
+            setError(result.error);
+          } else if (result.requireOtp) {
+            setStep(2);
+          } else {
+            // Not an admin, login directly
+            await performSignIn();
+          }
         } else {
-          router.push("/admin");
-          router.refresh();
+          // Step 2: Verify OTP
+          await performSignIn();
         }
       } catch (err) {
         console.error(err);
         setError("Une erreur s'est produite lors de la connexion.");
       }
     });
+  };
+
+  const performSignIn = async () => {
+    const result = await signIn("credentials", {
+      email,
+      password,
+      otp,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      if (result.error.includes("Code incorrect")) {
+        setError("Code de vérification incorrect ou expiré.");
+      } else {
+        setError("Email ou mot de passe incorrect.");
+        setStep(1);
+      }
+    } else {
+      router.push("/admin");
+      router.refresh();
+    }
   };
 
   return (
@@ -53,60 +86,92 @@ export default function AdminLoginPage() {
             </div>
           )}
 
-          <div className="form-group">
-            <label htmlFor="email">Adresse Email</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@actumoto.tn"
-              required
-              autoComplete="email"
-            />
-          </div>
+          {step === 1 ? (
+            <>
+              <div className="form-group">
+                <label htmlFor="email">Adresse Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@actumoto.tn"
+                  required
+                  autoComplete="email"
+                />
+              </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Mot de passe</label>
-            <div style={{ position: "relative" }}>
+              <div className="form-group">
+                <label htmlFor="password">Mot de passe</label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••"
+                    required
+                    autoComplete="current-password"
+                    style={{ paddingRight: "3rem" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "0.5rem",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "none",
+                      border: "none",
+                      color: "rgba(255,255,255,0.5)",
+                      cursor: "pointer",
+                      padding: "0.5rem",
+                    }}
+                    aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                  >
+                    {showPassword ? "👁️‍🗨️" : "👁️"}
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="form-group">
+              <label htmlFor="otp">Code de vérification (Telegram)</label>
               <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••"
+                id="otp"
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Ex: 123456"
                 required
-                autoComplete="current-password"
-                style={{ paddingRight: "3rem" }}
+                maxLength={6}
+                pattern="\d{6}"
+                style={{ textAlign: "center", letterSpacing: "0.5rem", fontSize: "1.25rem", fontWeight: "bold" }}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  right: "0.5rem",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  color: "rgba(255,255,255,0.5)",
-                  cursor: "pointer",
-                  padding: "0.5rem",
-                }}
-                aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-              >
-                {showPassword ? "👁️‍🗨️" : "👁️"}
-              </button>
+              <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.5)", marginTop: "0.5rem", textAlign: "center" }}>
+                Un code à 6 chiffres a été envoyé sur Telegram.
+              </p>
             </div>
-          </div>
+          )}
 
           <button type="submit" className="login-btn" disabled={isPending}>
             {isPending ? (
-              <span className="btn-spinner">⏳ Connexion...</span>
+              <span className="btn-spinner">⏳ Traitement...</span>
             ) : (
-              "Se connecter"
+              step === 1 ? "Se connecter" : "Vérifier le code"
             )}
           </button>
+          
+          {step === 2 && !isPending && (
+            <button 
+              type="button" 
+              onClick={() => { setStep(1); setOtp(""); setError(""); }}
+              style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: "0.875rem", marginTop: "-0.5rem" }}
+            >
+              ← Retour
+            </button>
+          )}
         </form>
 
         <p className="login-footer">

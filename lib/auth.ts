@@ -12,6 +12,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        otp: { label: "OTP", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
@@ -32,6 +33,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (user.role === "CLIENT" && !user.emailVerified) {
           throw new Error("Email non vérifié. Veuillez vérifier votre adresse email pour activer votre compte.");
+        }
+
+        if (user.role === "ADMIN") {
+          const otp = credentials.otp as string;
+          if (!otp) {
+            throw new Error("OTP_REQUIRED");
+          }
+
+          const verificationToken = await prisma.verificationToken.findFirst({
+            where: {
+              identifier: `admin-otp:${email}`,
+              token: otp,
+              expires: { gt: new Date() }
+            }
+          });
+
+          if (!verificationToken) {
+            throw new Error("Code incorrect ou expiré.");
+          }
+
+          // Delete token after successful use
+          await prisma.verificationToken.deleteMany({
+            where: {
+              identifier: `admin-otp:${email}`,
+              token: otp
+            }
+          });
         }
 
         return {
