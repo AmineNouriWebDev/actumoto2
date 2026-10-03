@@ -61,9 +61,7 @@ export default async function CategoriePage({ params }: { params: Promise<{ cate
     (a, b) => groupedByBrand[a].brandOrder - groupedByBrand[b].brandOrder
   );
 
-  if (sortedBrands.length === 0) {
-    notFound();
-  }
+  // Removed notFound() for empty categories
 
   return (
     <>
@@ -79,19 +77,25 @@ export default async function CategoriePage({ params }: { params: Promise<{ cate
             <p>Découvrez tous les modèles de {categoryName.toLowerCase()} disponibles avec prix et caractéristiques.</p>
           </div>
 
-          <div id="models-container" role="list" aria-label="Liste des modèles de motos">
-            {sortedBrands.map((brandKey) => (
-              <Fragment key={brandKey}>
-                {/* Brand group header — same as original .brand-group-header */}
-                <div key={`header-${brandKey}`} className="brand-group-header">
-                  {brandKey}
-                </div>
-                {groupedByBrand[brandKey].models.map((model: any, index: number) => (
-                  <ModelCard key={`${brandKey}-${model.id || index}`} model={model} brand={brandKey} index={index} />
-                ))}
-              </Fragment>
-            ))}
-          </div>
+          {sortedBrands.length === 0 ? (
+            <div className="flex items-center justify-center w-full min-h-[50vh] p-4">
+              <p className="text-gray-500 text-lg">Aucun modèle disponible dans cette catégorie pour le moment.</p>
+            </div>
+          ) : (
+            <div id="models-container" role="list" aria-label="Liste des modèles de motos">
+              {sortedBrands.map((brandKey) => (
+                <Fragment key={brandKey}>
+                  {/* Brand group header — same as original .brand-group-header */}
+                  <div key={`header-${brandKey}`} className="brand-group-header">
+                    {brandKey}
+                  </div>
+                  {groupedByBrand[brandKey].models.map((model: any, index: number) => (
+                    <ModelCard key={`${brandKey}-${model.id || index}`} model={model} brand={brandKey} index={index} />
+                  ))}
+                </Fragment>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
