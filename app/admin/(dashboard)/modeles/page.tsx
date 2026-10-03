@@ -65,7 +65,7 @@ export default async function AdminModelsPage({
       prisma.model.findMany({
         where,
         include: { brand: true, category: true, images: { take: 1, orderBy: { orderIndex: "asc" } } },
-        orderBy: [{ brand: { name: "asc" } }, { orderIndex: "asc" }],
+        orderBy: [{ brand: { name: "asc" } }, { orderIndex: "asc" }, { name: "asc" }],
         skip: (currentPage - 1) * perPage,
         take: perPage,
       }),

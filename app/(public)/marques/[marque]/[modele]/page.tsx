@@ -102,6 +102,11 @@ export default async function ModelDetailPage({
       specs: true,
       images: { orderBy: { orderIndex: "asc" } },
       colors: { orderBy: { orderIndex: "asc" } },
+      reviews: {
+        where: { isApproved: true, comment: { not: null } },
+        include: { user: { select: { name: true } } },
+        orderBy: { createdAt: "desc" },
+      },
     },
   });
 
@@ -110,6 +115,11 @@ export default async function ModelDetailPage({
   const session = await auth();
   const isLoggedIn = !!session?.user;
   const initialIsFavorite = await checkFavorite(model.id);
+
+  const existingReview = session?.user?.id ? await prisma.review.findUnique({
+    where: { userId_modelId: { userId: session.user.id, modelId: model.id } },
+    select: { rating: true, comment: true }
+  }) : null;
 
   const images = model.images.map((img) => img.url);
   const fuelType = model.fuelType ?? "Thermique";
@@ -215,10 +225,22 @@ export default async function ModelDetailPage({
             <div className="detail-price-block">
               <div className="detail-price-label">Prix conseillé</div>
               {priceFormatted ? (
-                <div className="detail-price-value">
-                  {model.price!.toLocaleString("fr-FR").replace(/\s/g, ",")}
-                  <span>{model.currency}</span>
-                </div>
+                model.promoPrice ? (
+                  <div className="flex flex-col">
+                    <div className="text-gray-400 line-through text-sm font-medium">
+                      {model.price!.toLocaleString("fr-FR").replace(/\s/g, " ")} {model.currency}
+                    </div>
+                    <div className="detail-price-value text-red-600">
+                      {model.promoPrice.toLocaleString("fr-FR").replace(/\s/g, " ")}
+                      <span>{model.currency}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="detail-price-value">
+                    {model.price!.toLocaleString("fr-FR").replace(/\s/g, " ")}
+                    <span>{model.currency}</span>
+                  </div>
+                )
               ) : (
                 <div className="detail-price-en-arrivage">En arrivage</div>
               )}
@@ -336,15 +358,36 @@ export default async function ModelDetailPage({
         )}
 
         {/* Section Avis / Notation */}
-        <DetailReviewSection />
+        <DetailReviewSection modelId={model.id} isLoggedIn={isLoggedIn} existingReview={existingReview} />
 
-        {/* Section commentaires — placeholder pour plus tard */}
+        {/* Section commentaires */}
         <div className="max-w-[1200px] mx-auto px-4 mt-6 mb-12">
-          <div className="detail-card-section">
+          <div className="detail-card-section" style={{ background: "#fff", border: "1px solid #e5e7eb" }}>
             <h3 className="detail-section-title">💬 Commentaires & Avis</h3>
-            <p className="text-gray-500 text-sm italic">
-              Connectez-vous pour laisser un avis sur ce modèle. Système de commentaires à venir.
-            </p>
+            {(!model.reviews || model.reviews.length === 0) ? (
+              <p className="text-gray-500 text-sm italic" style={{ padding: "1rem 0" }}>
+                Aucun commentaire pour le moment.
+              </p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginTop: "1.5rem" }}>
+                {model.reviews.map((r: any) => (
+                  <div key={r.id} style={{ padding: "1.25rem", background: "#f9fafb", borderRadius: "12px", border: "1px solid #f3f4f6" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                      <strong style={{ color: "#374151" }}>{r.user?.name || "Anonyme"}</strong>
+                      <span style={{ fontSize: "0.85em", color: "#9ca3af" }}>
+                        {new Date(r.createdAt).toLocaleDateString("fr-FR")}
+                      </span>
+                    </div>
+                    <div style={{ color: "#fbbf24", marginBottom: "0.5rem", fontSize: "1.1em" }}>
+                      {"⭐".repeat(r.rating)}
+                    </div>
+                    <p style={{ color: "#4b5563", lineHeight: "1.5", margin: 0, whiteSpace: "pre-wrap" }}>
+                      {r.comment}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

@@ -39,7 +39,7 @@ export async function registerClient(formData: FormData) {
   
   sendN8nEmail({
     action: "verify_email",
-    email: user.email,
+    email: user.email || "",
     name: user.name || "",
     link: verificationLink
   });

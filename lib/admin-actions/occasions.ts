@@ -33,6 +33,7 @@ export async function createOccasion(formData: FormData) {
   const price = formData.get("price") as string;
   const category = formData.get("category") as string;
   const fuelType = formData.get("fuelType") as string;
+  const promoPrice = formData.get("promoPrice") as string;
 
   if (!name || !marque) return { error: "Nom et marque sont requis." };
 
@@ -50,6 +51,7 @@ export async function createOccasion(formData: FormData) {
       name: name.trim(),
       marque: marque.trim(),
       price: price.trim() || null,
+      promoPrice: promoPrice?.trim() || null,
       category: category.trim() || null,
       fuelType: fuelType?.trim() || null,
       orderIndex: newOrderIndex,
@@ -87,6 +89,7 @@ export async function updateOccasion(id: string, formData: FormData) {
   const price = formData.get("price") as string;
   const category = formData.get("category") as string;
   const fuelType = formData.get("fuelType") as string;
+  const promoPrice = formData.get("promoPrice") as string;
 
   if (!name || !marque) return { error: "Nom et marque sont requis." };
 
@@ -96,6 +99,7 @@ export async function updateOccasion(id: string, formData: FormData) {
       name: name.trim(),
       marque: marque.trim(),
       price: price.trim() || null,
+      promoPrice: promoPrice?.trim() || null,
       category: category.trim() || null,
       fuelType: fuelType?.trim() || null,
       specs: {

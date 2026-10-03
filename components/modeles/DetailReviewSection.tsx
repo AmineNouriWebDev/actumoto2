@@ -5,10 +5,10 @@ import { useState } from "react";
 import { addReview } from "@/lib/client-actions/reviews";
 import { toast } from "react-toastify";
 
-export default function DetailReviewSection({ modelId, isLoggedIn }: { modelId: string, isLoggedIn: boolean }) {
-  const [rating, setRating] = useState(0);
+export default function DetailReviewSection({ modelId, isLoggedIn, existingReview }: { modelId: string, isLoggedIn: boolean, existingReview?: { rating: number, comment: string | null } | null }) {
+  const [rating, setRating] = useState(existingReview?.rating || 0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [review, setReview] = useState("");
+  const [review, setReview] = useState(existingReview?.comment || "");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false); 
 
@@ -18,8 +18,8 @@ export default function DetailReviewSection({ modelId, isLoggedIn }: { modelId: 
       toast.error("Vous devez être connecté pour soumettre un avis.");
       return;
     }
-    if (rating === 0) {
-      toast.error("Veuillez sélectionner une note.");
+    if (rating === 0 && review.trim() === "") {
+      toast.error("Veuillez laisser une note ou un commentaire.");
       return;
     }
     

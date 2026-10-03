@@ -72,6 +72,10 @@ export default async function EditOccasionPage({ params }: { params: Promise<{ i
               <input type="number" name="price" min="0" step="1" defaultValue={occasion.price ?? ""} />
             </div>
             <div className="form-group">
+              <label>Prix en promotion (Optionnel)</label>
+              <input type="number" name="promoPrice" min="0" step="1" defaultValue={occasion.promoPrice ?? ""} />
+            </div>
+            <div className="form-group">
               <label>Devise</label>
               <select name="currency" defaultValue={occasion.currency}>
                 {CURRENCIES.map((c) => (

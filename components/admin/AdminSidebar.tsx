@@ -10,6 +10,7 @@ const allNavItems = [
   { href: "/admin/marques", label: "Marques", icon: "🏷️", roles: ["ADMIN"] },
   { href: "/admin/modeles", label: "Modèles", icon: "🏍️", roles: ["ADMIN", "DEALER"] },
   { href: "/admin/occasion", label: "Occasions", icon: "🔄", roles: ["ADMIN", "DEALER"] },
+  { href: "/admin/commentaires", label: "Commentaires", icon: "💬", roles: ["ADMIN"] },
   { href: "/admin/carrousel", label: "Carrousel", icon: "🖼️", roles: ["ADMIN"] },
   { href: "/admin/popup", label: "Popup", icon: "📢", roles: ["ADMIN"] },
   { href: "/admin/banniere", label: "Bannière", icon: "🖼", roles: ["ADMIN"] },
@@ -18,7 +19,7 @@ const allNavItems = [
   { href: "/admin/utilisateurs", label: "Utilisateurs", icon: "👥", roles: ["ADMIN"] },
 ];
 
-export default function AdminSidebar({ role }: { role?: string }) {
+export default function AdminSidebar({ role, pendingReviewsCount = 0 }: { role?: string, pendingReviewsCount?: number }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
 
@@ -49,6 +50,11 @@ export default function AdminSidebar({ role }: { role?: string }) {
           >
             <span className="nav-icon">{item.icon}</span>
             <span className="nav-label">{item.label}</span>
+            {item.href === "/admin/commentaires" && pendingReviewsCount > 0 && (
+              <span style={{ marginLeft: "auto", background: "#ef4444", color: "white", padding: "0.15rem 0.5rem", borderRadius: "999px", fontSize: "0.75rem", fontWeight: 700 }}>
+                {pendingReviewsCount}
+              </span>
+            )}
           </Link>
         ))}
       </nav>

@@ -3,6 +3,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createModel } from "@/lib/admin-actions/models";
 import ModelImageUploader from "@/components/admin/ModelImageUploader";
+import ModelVideoUploader from "@/components/admin/ModelVideoUploader";
+import DetailPageToggle from "@/components/admin/DetailPageToggle";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import { auth } from "@/lib/auth";
 
 const FUEL_TYPES = ["Thermique", "Electrique", "Hybride"];
@@ -91,6 +94,10 @@ export default async function NewModelPage() {
               <input type="number" name="price" min="0" step="1" placeholder="ex: 12500 (vide = En arrivage)" />
             </div>
             <div className="form-group">
+              <label>Prix en promotion (Optionnel)</label>
+              <input type="number" name="promoPrice" min="0" step="1" placeholder="ex: 11000" />
+            </div>
+            <div className="form-group">
               <label>Devise</label>
               <select name="currency">
                 {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -173,7 +180,42 @@ export default async function NewModelPage() {
           </div>
         </div>
 
+        {/* ─── 3. Page de détail (payant) ─── */}
+        <div className="admin-card">
+          <h2 className="admin-card-title">🔍 Page de Détail (Payant)</h2>
+          <p style={{ color: "#6b7280", fontSize: "0.85rem", marginBottom: "1.5rem" }}>
+            Activez la page de détail pour ce modèle. Le bouton <strong>"Voir les détails"</strong> apparaîtra sur la card publique.
+          </p>
 
+          <DetailPageToggle
+            initialValue={false}
+            brandName="Cette marque"
+            modelName="Ce modèle"
+          />
+
+          <div className="form-group" style={{ marginTop: "1.25rem" }}>
+            <label style={{ marginBottom: "0.5rem", display: "block" }}>
+              📝 Description / Présentation du modèle
+              <span style={{ fontWeight: 400, color: "#9ca3af", marginLeft: "0.5rem", fontSize: "0.8rem" }}>
+                (Gras, italique, titres, listes… le HTML sera rendu sur la page de détail)
+              </span>
+            </label>
+            <RichTextEditor
+              name="description"
+              initialValue=""
+              placeholder="Décrivez ce modèle : points forts, public cible, utilisation recommandée..."
+            />
+          </div>
+        </div>
+
+        {/* ─── 4. Vidéo ─── */}
+        <div className="admin-card">
+          <h2 className="admin-card-title">🎬 Vidéo</h2>
+          <p style={{ color: "#6b7280", fontSize: "0.85rem", marginBottom: "1.25rem" }}>
+            Ajoutez une vidéo en importent un fichier MP4 ou en collant un lien YouTube.
+          </p>
+          <ModelVideoUploader />
+        </div>
 
         <div className="admin-form-actions">
           <Link href="/admin/modeles" className="btn-secondary">Annuler</Link>

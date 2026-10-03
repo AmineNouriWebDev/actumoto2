@@ -8,6 +8,11 @@ import ModelVideoUploader from "@/components/admin/ModelVideoUploader";
 import DetailPageToggle from "@/components/admin/DetailPageToggle";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 
+const FUEL_TYPES = ["Thermique", "Electrique", "Hybride"];
+const CURRENCIES = ["DT", "EUR", "USD"];
+const COOLING_OPTIONS = ["Air", "Liquide", "Air/Huile"];
+const FEEDING_OPTIONS = ["Carburateur", "Injection électronique", "Injection directe"];
+
 export default async function EditModelPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [model, brands, categories] = await Promise.all([
@@ -33,8 +38,6 @@ export default async function EditModelPage({ params }: { params: Promise<{ id: 
     redirect("/admin/modeles?success=Mod%C3%A8le+modifi%C3%A9+avec+succ%C3%A8s");
   }
 
-  const FUEL_TYPES = ["Thermique", "Electrique", "Hybride"];
-  const CURRENCIES = ["DT", "EUR", "USD"];
 
   return (
     <div>
@@ -94,8 +97,13 @@ export default async function EditModelPage({ params }: { params: Promise<{ id: 
               </select>
             </div>
             <div className="form-group">
-              <label>Prix (vide = En arrivage)</label>
+              <label>Prix</label>
               <input type="number" name="price" min="0" step="1" defaultValue={model.price ?? ""} />
+              <div className="form-dim-hint">Laissez vide si "En arrivage"</div>
+            </div>
+            <div className="form-group">
+              <label>Prix en promotion (Optionnel)</label>
+              <input type="number" name="promoPrice" min="0" step="1" defaultValue={model.promoPrice ?? ""} />
             </div>
             <div className="form-group">
               <label>Devise</label>
@@ -104,6 +112,72 @@ export default async function EditModelPage({ params }: { params: Promise<{ id: 
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── Caractéristiques Techniques ─── */}
+        <div className="admin-card">
+          <h2 className="admin-card-title">⚙️ Caractéristiques Techniques</h2>
+          <div className="admin-form-grid">
+            <div className="form-group">
+              <label>Type de moteur</label>
+              <input type="text" name="typeMoteur" placeholder="ex: Monocylindre 4 temps, DOHC" list="motorTypes" defaultValue={model.specs?.typeMoteur ?? ""} />
+              <datalist id="motorTypes">
+                <option value="Monocylindre 4 temps" />
+                <option value="Bicylindre en ligne 4 temps" />
+                <option value="Tricylindre en ligne 4 temps" />
+                <option value="V-Twin 4 temps" />
+                <option value="Boxer bicylindre 4 temps" />
+                <option value="4 cylindres en ligne 4 temps" />
+                <option value="Moteur électrique" />
+              </datalist>
+            </div>
+            <div className="form-group">
+              <label>Cylindrée (en cc)</label>
+              <input type="text" name="cylindree" placeholder="ex: 471" defaultValue={model.specs?.cylindree ?? ""} />
+            </div>
+            <div className="form-group">
+              <label>Puissance max (en ch / W)</label>
+              <input type="text" name="puissance" placeholder="ex: 47" defaultValue={model.specs?.puissance ?? ""} />
+            </div>
+            <div className="form-group">
+              <label>Couple maximal (en Nm)</label>
+              <input type="text" name="coupleMaximal" placeholder="ex: 43" defaultValue={model.specs?.coupleMaximal ?? ""} />
+            </div>
+            <div className="form-group">
+              <label>Refroidissement</label>
+              <input type="text" name="refroidissement" placeholder="ex: Liquide" list="coolingTypes" defaultValue={model.specs?.refroidissement ?? ""} />
+              <datalist id="coolingTypes">
+                {COOLING_OPTIONS.map(o => <option key={o} value={o} />)}
+              </datalist>
+            </div>
+            <div className="form-group">
+              <label>Vitesse maximale (en km/h)</label>
+              <input type="text" name="vitesseMaximale" placeholder="ex: 180" defaultValue={model.specs?.vitesseMaximale ?? ""} />
+            </div>
+            <div className="form-group">
+              <label>Capacité réservoir (en Litres)</label>
+              <input type="text" name="tankCapacity" placeholder="ex: 17.7" defaultValue={model.specs?.tankCapacity ?? ""} />
+            </div>
+            <div className="form-group">
+              <label>Autonomie électrique (en km)</label>
+              <input type="text" name="autonomie" placeholder="ex: 150" defaultValue={model.specs?.autonomie ?? ""} />
+            </div>
+            <div className="form-group">
+              <label>Alimentation</label>
+              <input type="text" name="alimentation" placeholder="ex: Injection électronique" list="feedingTypes" defaultValue={model.specs?.alimentation ?? ""} />
+              <datalist id="feedingTypes">
+                {FEEDING_OPTIONS.map(o => <option key={o} value={o} />)}
+              </datalist>
+            </div>
+            <div className="form-group">
+              <label>Freinage</label>
+              <input type="text" name="freinage" placeholder="ex: Double disque AV, disque AR" defaultValue={model.specs?.freinage ?? ""} />
+            </div>
+            <div className="form-group span-2">
+              <label>Système de freinage</label>
+              <input type="text" name="systemeFreinage" placeholder="ex: ABS" defaultValue={model.specs?.systemeFreinage ?? ""} />
             </div>
           </div>
         </div>

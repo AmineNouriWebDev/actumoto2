@@ -43,10 +43,16 @@ export default function ClientModelList({ initialModels }: { initialModels: Mode
             <td>{model.brand.name}</td>
             <td>{model.category ? model.category.name : <span style={{ color: "#6b7280" }}>-</span>}</td>
             <td>
-              {model.price 
-                ? <span style={{ color: "#10b981", fontWeight: 500 }}>{model.price.toLocaleString("fr-FR")} {model.currency}</span>
-                : <span style={{ color: "#6b7280" }}>N/D</span>
-              }
+              {model.promoPrice ? (
+                <div style={{ display: "flex", flexDirection: "column", fontSize: "0.85em" }}>
+                  <span style={{ textDecoration: "line-through", color: "#6b7280" }}>{model.price?.toLocaleString("fr-FR")} {model.currency}</span>
+                  <span style={{ color: "#ef4444", fontWeight: 600 }}>{model.promoPrice.toLocaleString("fr-FR")} {model.currency}</span>
+                </div>
+              ) : model.price ? (
+                <span style={{ color: "#10b981", fontWeight: 500 }}>{model.price.toLocaleString("fr-FR")} {model.currency}</span>
+              ) : (
+                <span style={{ color: "#6b7280" }}>N/D</span>
+              )}
             </td>
             <td>
               <span className={`status-badge ${model.isVisible ? "status-active" : "status-inactive"}`}>

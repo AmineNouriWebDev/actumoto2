@@ -107,8 +107,8 @@ export async function updateBrand(id: string, formData: FormData) {
 
   await prisma.dealerContact.upsert({
     where: { brandId: id },
-    update: { phones, emails, website, facebook, instagram, youtube, tiktok, showroomAddress, showroomLocation, salesParts },
-    create: { brandId: id, phones, emails, website, facebook, instagram, youtube, tiktok, showroomAddress, showroomLocation, salesParts },
+    update: { phones, emails, website, facebook, instagram, youtube, tiktok, showroomAddress, showroomLocation, salesParts: salesParts as any },
+    create: { brandId: id, phones, emails, website, facebook, instagram, youtube, tiktok, showroomAddress, showroomLocation, salesParts: salesParts as any },
   });
 
   revalidatePath("/admin/marques");

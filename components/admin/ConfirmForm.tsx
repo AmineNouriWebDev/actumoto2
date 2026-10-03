@@ -4,7 +4,7 @@ import { ReactNode, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 interface ConfirmFormProps {
-  action: string | ((formData: FormData) => void | Promise<void>);
+  action: string | ((formData: FormData) => any);
   confirmMessage?: string;
   children: ReactNode;
   style?: React.CSSProperties;

@@ -36,6 +36,7 @@ model Model {
   name          String
   fuelType      String?
   price         Float?
+  promoPrice    Float?
   currency      String  @default("DT")
   brandId       String
   categoryId    String?
@@ -198,6 +199,7 @@ model Occasion {
   category    String?
   fuelType    String?
   price       String?
+  promoPrice  String?
   currency    String   @default("DT")
   isVisible   Boolean  @default(true)
   orderIndex  Int      @default(0)
@@ -283,9 +285,12 @@ model Review {
   modelId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  isApproved Boolean @default(false)
 
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   model Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, modelId])
 }
 
 model QuotaRequest {

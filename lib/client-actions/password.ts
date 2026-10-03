@@ -31,7 +31,7 @@ export async function requestPasswordReset(formData: FormData) {
   
   await sendN8nEmail({
     action: "reset_password",
-    email: user.email,
+    email: user.email || "",
     name: user.name || "",
     link: resetLink
   });

@@ -49,6 +49,8 @@ export async function createModel(formData: FormData) {
   const fuelType = (formData.get("fuelType") as string) || null;
   const priceRaw = formData.get("price") as string;
   const price = priceRaw ? parseFloat(priceRaw) : null;
+  const promoPriceRaw = formData.get("promoPrice") as string;
+  const promoPrice = promoPriceRaw ? parseFloat(promoPriceRaw) : null;
   const currency = (formData.get("currency") as string) || "DT";
   const imageUrls = (formData.get("imageUrls") as string || "")
     .split("\n").map(s => s.trim()).filter(Boolean);
@@ -86,10 +88,11 @@ export async function createModel(formData: FormData) {
   const model = await prisma.model.create({
     data: {
       name: name.trim(),
-      brandId,
-      categoryId: categoryId || undefined,
+      brand: { connect: { id: brandId } },
+      category: categoryId ? { connect: { id: categoryId } } : undefined,
       fuelType,
       price,
+      promoPrice,
       currency,
       isVisible: true,
       orderIndex: newOrderIndex,
@@ -134,6 +137,8 @@ export async function updateModel(id: string, formData: FormData) {
   const fuelType = (formData.get("fuelType") as string) || null;
   const priceRaw = formData.get("price") as string;
   const price = priceRaw ? parseFloat(priceRaw) : null;
+  const promoPriceRaw = formData.get("promoPrice") as string;
+  const promoPrice = promoPriceRaw ? parseFloat(promoPriceRaw) : null;
   const currency = (formData.get("currency") as string) || "DT";
   
   if (!name || !brandId) return { error: "Nom et marque sont requis." };
@@ -166,10 +171,11 @@ export async function updateModel(id: string, formData: FormData) {
     where: { id },
     data: {
       name: name.trim(),
-      brandId,
-      categoryId: categoryId ?? null,
+      brand: { connect: { id: brandId } },
+      category: categoryId ? { connect: { id: categoryId } } : { disconnect: true },
       fuelType: fuelType ?? null,
       price,
+      promoPrice,
       currency,
       hasDetailPage,
       description,

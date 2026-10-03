@@ -65,7 +65,7 @@ export default function RichTextEditor({
         <JoditEditor
           ref={editor}
           value={content}
-          config={config}
+          config={config as any}
           onBlur={(newContent) => setContent(newContent)} // Préférable d'utiliser onBlur pour les perfs
           onChange={(newContent) => {}} // On garde une fonction vide pour éviter les re-renders excessifs
         />

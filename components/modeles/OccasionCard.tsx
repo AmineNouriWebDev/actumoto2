@@ -3,17 +3,36 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { formatSpecification } from "@/lib/formatters";
 
-function formatPriceDisplay(price: number | string | null | undefined, currency: string = "DT") {
+function formatPriceDisplay(price: number | string | null | undefined, promoPrice: string | null | undefined, currency: string = "DT") {
   if (price === null || price === undefined) {
     return <span className="text-red-600 font-bold text-xl">Sur demande</span>;
   }
-  let priceStr = price.toString();
-  if (/^\d+$/.test(priceStr)) {
-    priceStr = parseInt(priceStr, 10).toLocaleString("fr-FR").replace(/\s/g, ",");
+  
+  const formatStr = (val: string | number) => {
+    let str = val.toString();
+    if (/^\d+$/.test(str)) {
+      str = parseInt(str, 10).toLocaleString("fr-FR").replace(/\s/g, " ");
+    }
+    return str;
+  };
+
+  if (promoPrice) {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="text-gray-400 line-through text-sm font-medium">
+          {formatStr(price)} {currency}
+        </span>
+        <span className="text-red-600 font-bold text-2xl leading-none flex items-baseline">
+          {formatStr(promoPrice)}
+          <span className="text-sm font-normal ml-1">{currency}</span>
+        </span>
+      </div>
+    );
   }
+
   return (
     <span className="text-red-600 font-bold text-2xl leading-none flex items-baseline">
-      {priceStr}
+      {formatStr(price)}
       <span className="text-sm font-normal ml-1">{currency}</span>
     </span>
   );
@@ -194,7 +213,7 @@ export default function OccasionCard({ model, index }: OccasionCardProps) {
             ) : null}
             
             <div className="occasion-footer">
-              <div className="occasion-price">{formatPriceDisplay(model.price, model.currency)}</div>
+              <div className="occasion-price">{formatPriceDisplay(model.price, model.promoPrice, model.currency)}</div>
               {model.specs && (
                 <button
                   type="button"

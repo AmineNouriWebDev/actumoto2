@@ -59,6 +59,10 @@ export default async function NewOccasionPage() {
               <input type="number" name="price" min="0" step="1" placeholder="ex: 12500" />
             </div>
             <div className="form-group">
+              <label>Prix en promotion (Optionnel)</label>
+              <input type="number" name="promoPrice" min="0" step="1" placeholder="ex: 11000" />
+            </div>
+            <div className="form-group">
               <label>Devise</label>
               <select name="currency">
                 {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}

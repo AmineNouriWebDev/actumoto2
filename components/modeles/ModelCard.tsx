@@ -5,12 +5,28 @@ import { formatSpecification } from "@/lib/formatters";
 import Link from "next/link";
 
 // Réplique exacte de formatPriceHtml() de data.js
-function formatPriceDisplay(price: number | null | undefined, currency: string = "DT") {
+function formatPriceDisplay(price: number | null | undefined, promoPrice: number | null | undefined, currency: string = "DT") {
   if (price === null || price === undefined) {
     return <span className="text-red-600 font-bold text-xl">En arrivage</span>;
   }
-  // fr-FR → "34 100", on remplace l'espace par virgule → "34,100"
-  const formatted = price.toLocaleString("fr-FR").replace(/\s/g, ",");
+  
+  const formatNumber = (num: number) => num.toLocaleString("fr-FR").replace(/\s/g, " ");
+
+  if (promoPrice) {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="text-gray-400 line-through text-sm font-medium">
+          {formatNumber(price)} {currency}
+        </span>
+        <span className="text-red-600 font-bold text-2xl leading-none flex items-baseline">
+          {formatNumber(promoPrice)}
+          <span className="text-sm font-normal ml-1">{currency}</span>
+        </span>
+      </div>
+    );
+  }
+
+  const formatted = formatNumber(price);
   return (
     <span className="text-red-600 font-bold text-2xl leading-none flex items-baseline">
       {formatted}
@@ -225,7 +241,7 @@ export default function ModelCard({ model, brand, index }: ModelCardProps) {
               )}
             </div>
             <div className="flex flex-col items-end text-right">
-              {formatPriceDisplay(model.price, model.currency || "DT")}
+              {formatPriceDisplay(model.price, model.promoPrice, model.currency || "DT")}
             </div>
           </div>
 

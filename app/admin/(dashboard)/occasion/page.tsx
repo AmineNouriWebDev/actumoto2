@@ -5,7 +5,7 @@ import ClientOccasionList from "@/components/admin/ClientOccasionList";
 export default async function AdminOccasionPage() {
   const occasions = await prisma.occasion.findMany({
     include: { images: { orderBy: { orderIndex: 'asc' } } },
-    orderBy: { orderIndex: "asc" },
+    orderBy: [{ orderIndex: "asc" }, { name: "asc" }],
   });
 
   return (

@@ -15,7 +15,7 @@ export default function ModelFilters({ brands }: { brands: Brand[] }) {
   
   const search = searchParams.get("search") || "";
   const brandFilter = searchParams.get("brand") || "";
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const updateFilters = useCallback((key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());

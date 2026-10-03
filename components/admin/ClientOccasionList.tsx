@@ -47,7 +47,14 @@ export default function ClientOccasionList({ initialOccasions }: { initialOccasi
               <div style={{ color: "#f9fafb", fontWeight: 600 }}>{occ.name}</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                 <span className="badge badge-gray">{occ.marque}</span>
-                {occ.price && <span className="badge badge-green">{occ.price} {occ.currency}</span>}
+                {occ.promoPrice ? (
+                  <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
+                    <span className="badge badge-gray" style={{ textDecoration: "line-through" }}>{occ.price} {occ.currency}</span>
+                    <span className="badge badge-red">{occ.promoPrice} {occ.currency}</span>
+                  </div>
+                ) : occ.price ? (
+                  <span className="badge badge-green">{occ.price} {occ.currency}</span>
+                ) : null}
                 {!occ.isVisible && <span className="badge badge-red">Caché</span>}
               </div>
             </div>
