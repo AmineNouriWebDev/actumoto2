@@ -369,9 +369,11 @@ export default async function ModelDetailPage({
                         {new Date(r.createdAt).toLocaleDateString("fr-FR")}
                       </span>
                     </div>
-                    <div style={{ color: "#fbbf24", marginBottom: "0.5rem", fontSize: "1.1em" }}>
-                      {"⭐".repeat(r.rating)}
-                    </div>
+                    {r.rating > 0 && (
+                      <div style={{ color: "#fbbf24", marginBottom: "0.5rem", fontSize: "1.1em" }}>
+                        {"⭐".repeat(r.rating)}
+                      </div>
+                    )}
                     <p style={{ color: "#4b5563", lineHeight: "1.5", margin: 0, whiteSpace: "pre-wrap" }}>
                       {r.comment}
                     </p>

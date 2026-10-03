@@ -37,7 +37,9 @@ export default function DetailReviewSection({ modelId, isLoggedIn, existingRevie
   return (
     <div className="max-w-[1200px] mx-auto px-4 mt-8 mb-8">
       <div className="detail-card-section" style={{ background: "#f9fafb", border: "1px solid #e5e7eb" }}>
-        <h3 className="detail-section-title">⭐ Donner votre avis sur cette moto</h3>
+        <h3 className="detail-section-title">
+          {existingReview ? "✏️ Modifier votre avis sur cette moto" : "⭐ Donner votre avis sur cette moto"}
+        </h3>
         
         {isSubmitted ? (
           <div style={{ padding: "2rem", textAlign: "center", background: "#ecfdf5", borderRadius: "8px", color: "#065f46" }}>
@@ -49,7 +51,7 @@ export default function DetailReviewSection({ modelId, isLoggedIn, existingRevie
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: "1.5rem" }}>
               <label style={{ display: "block", fontWeight: 600, color: "#374151", marginBottom: "0.5rem" }}>
-                Votre note sur 5
+                Votre note sur 5 (optionnelle si vous laissez un commentaire)
               </label>
               <div style={{ display: "flex", gap: "0.25rem" }}>
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -74,14 +76,14 @@ export default function DetailReviewSection({ modelId, isLoggedIn, existingRevie
                   </button>
                 ))}
                 <span style={{ marginLeft: "1rem", color: "#6b7280", fontSize: "0.9rem", alignSelf: "center" }}>
-                  {rating > 0 ? `${rating} / 5` : "Sélectionnez une note"}
+                  {rating > 0 ? `${rating} / 5` : "Aucune note sélectionnée"}
                 </span>
               </div>
             </div>
 
             <div style={{ marginBottom: "1.5rem" }}>
               <label style={{ display: "block", fontWeight: 600, color: "#374151", marginBottom: "0.5rem" }}>
-                Votre commentaire (optionnel)
+                Votre commentaire (optionnel si vous laissez une note)
               </label>
               <textarea
                 value={review}
@@ -115,7 +117,7 @@ export default function DetailReviewSection({ modelId, isLoggedIn, existingRevie
                 opacity: isLoading ? 0.7 : 1
               }}
             >
-              {isLoading ? "Envoi en cours..." : "Envoyer mon avis"}
+              {isLoading ? "Envoi en cours..." : (existingReview ? "Modifier mon avis" : "Envoyer mon avis")}
             </button>
             
             {!isLoggedIn && (
