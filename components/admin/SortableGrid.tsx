@@ -9,6 +9,8 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  TouchSensor,
+  MouseSensor,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -19,6 +21,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { toast } from "react-toastify";
 
 interface SortableGridProps<T extends { id: string }> {
   items: T[];
@@ -58,7 +61,8 @@ export function SortableItem({ id, children }: { id: string; children: React.Rea
           alignItems: "center", 
           justifyContent: "center", 
           fontSize: "1.25rem", 
-          color: "white" 
+          color: "white",
+          touchAction: "none"
         }} 
         className="drag-handle"
         title="Glisser pour réorganiser"
@@ -89,7 +93,8 @@ function SortableGridInner<T extends { id: string }>({ items, onReorder, renderI
   }, [items]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
@@ -103,6 +108,7 @@ function SortableGridInner<T extends { id: string }>({ items, onReorder, renderI
       const newItems = arrayMove(activeItems, oldIndex, newIndex);
       setActiveItems(newItems);
       onReorder(newItems);
+      toast.success("Ordre mis à jour avec succès !");
     }
   };
 

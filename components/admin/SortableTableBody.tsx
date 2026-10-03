@@ -9,6 +9,8 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  TouchSensor,
+  MouseSensor,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -18,6 +20,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { toast } from "react-toastify";
 
 interface SortableTableBodyProps<T extends { id: string }> {
   items: T[];
@@ -39,7 +42,7 @@ export function SortableTableRow({ id, children }: { id: string; children: React
 
   return (
     <tr ref={setNodeRef} style={style}>
-      <td style={{ width: "40px", textAlign: "center", cursor: "grab" }} {...attributes} {...listeners}>
+      <td style={{ width: "40px", textAlign: "center", cursor: "grab", touchAction: "none" }} {...attributes} {...listeners}>
         <div style={{ display: "inline-flex", padding: "0.4rem", background: "rgba(255,255,255,0.1)", borderRadius: "0.25rem", color: "white" }} title="Glisser pour réorganiser">
           ☰
         </div>
@@ -68,7 +71,8 @@ function SortableTableBodyInner<T extends { id: string }>({ items, onReorder, re
   }, [items]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
@@ -82,6 +86,7 @@ function SortableTableBodyInner<T extends { id: string }>({ items, onReorder, re
       const newItems = arrayMove(activeItems, oldIndex, newIndex);
       setActiveItems(newItems);
       onReorder(newItems);
+      toast.success("Ordre mis à jour avec succès !");
     }
   };
 
