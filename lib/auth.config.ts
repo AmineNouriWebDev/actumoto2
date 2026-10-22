@@ -10,7 +10,7 @@ export const authConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id as string;
-        token.role = (user as any).role;
+        token.role = (user as any).role || token.role || "CLIENT";
       }
       return token;
     },

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { toast } from "react-toastify";
 import { registerClient } from "@/lib/client-actions/auth";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import SocialAuthButtons from "@/components/auth/SocialAuthButtons";
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -115,6 +116,8 @@ export default function RegisterPage() {
             ) : "S'inscrire"}
           </button>
         </form>
+
+        <SocialAuthButtons callbackUrl="/compte" />
 
         <div style={{ marginTop: "2rem", textAlign: "center", fontSize: "0.9rem", color: "rgba(255,255,255,0.5)" }}>
           Vous avez déjà un compte ?{" "}

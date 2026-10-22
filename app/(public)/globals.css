@@ -2710,6 +2710,207 @@ h3,
 }
 
 /* =========================================== */
+/* RATING 5 ÉTOILES & WISHLIST — MODEL CARD   */
+/* =========================================== */
+
+/* Structure de base (Mobile First : 2 lignes aérées, jamais collées) */
+.model-card-actions-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 0.45rem 0.6rem;
+  margin-top: 0.7rem;
+  padding: 0.6rem 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.model-actions-stars {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  display: flex;
+  align-items: center;
+}
+
+.model-actions-wishlist {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.model-actions-score {
+  grid-column: 1 / 3;
+  grid-row: 2 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.4rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+/* Étoiles */
+.stars-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  padding: 2px;
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease;
+  touch-action: manipulation;
+}
+
+.star-btn:hover {
+  transform: scale(1.22);
+}
+
+.star-btn.filled {
+  color: #f59e0b;
+}
+
+/* Labels de score & avis */
+.rating-score-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.avg-score-val {
+  color: #111827;
+  font-weight: 800;
+}
+
+.reviews-count-val {
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.user-score-badge {
+  background: #fef3c7;
+  color: #b45309;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  border: 1px solid #fde68a;
+  white-space: nowrap;
+}
+
+.empty-rating-hint {
+  color: #9ca3af;
+  font-size: 0.72rem;
+  font-style: italic;
+  display: inline-block;
+}
+
+/* Bouton Wishlist */
+.wishlist-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #4b5563;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.wishlist-toggle-btn:hover {
+  background: #fff;
+  border-color: #f87171;
+  color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.12);
+}
+
+.wishlist-toggle-btn.active {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.wishlist-toggle-btn .heart-icon-emoji {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.wishlist-btn-label {
+  font-size: 0.75rem;
+}
+
+/* Version Desktop (> 640px) : restitution fidèle de la disposition sur PC */
+@media (min-width: 641px) {
+  .model-card-actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.65rem;
+    padding: 0.65rem 0.2rem 0 0.2rem;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .model-actions-stars {
+    flex-shrink: 0;
+  }
+
+  .model-actions-score {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.45rem;
+    padding-top: 0;
+    border-top: none;
+    margin-right: auto;
+    margin-left: 0.25rem;
+  }
+
+  .empty-rating-hint {
+    display: none;
+  }
+
+  .model-actions-wishlist {
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+  }
+
+  .star-btn {
+    font-size: 1.18rem;
+    padding: 0;
+  }
+}
+
+
+/* =========================================== */
 /* PAGE DÉTAIL MODÈLE                          */
 /* =========================================== */
 
@@ -3208,6 +3409,76 @@ h3,
 }
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* --- Social Login Buttons (Google & Facebook) --- */
+.auth-separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.auth-separator::before,
+.auth-separator::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-separator span {
+  padding: 0 1rem;
+}
+
+.social-auth-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  outline: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  backdrop-filter: blur(10px);
+}
+
+.social-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.social-btn.google-btn:hover {
+  border-color: rgba(234, 67, 53, 0.4);
+}
+
+.social-btn.facebook-btn:hover {
+  border-color: rgba(24, 119, 242, 0.5);
+  background: rgba(24, 119, 242, 0.15);
+}
+
+.social-btn svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 @media (min-width: 768px) {

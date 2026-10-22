@@ -58,17 +58,28 @@ export default async function ClientDashboardPage() {
               <p style={{ color: "rgba(255,255,255,0.5)", padding: "1rem 0" }}>Vous n'avez pas encore de favoris.</p>
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1.5rem" }}>
-                {user.favorites.map(fav => (
-                  <Link key={fav.id} href={`/marques/${encodeURIComponent(fav.model.brand.name)}/${encodeURIComponent(fav.model.name)}`} style={{ textDecoration: "none", color: "inherit" }}>
-                    <div className="fav-card" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "12px", overflow: "hidden", transition: "all 0.3s" }}>
-                      <img src={fav.model.images[0]?.url || "/placeholder.png"} alt={fav.model.name} style={{ width: "100%", height: "160px", objectFit: "cover" }} />
-                      <div style={{ padding: "1rem" }}>
-                        <div style={{ fontSize: "0.8rem", color: "#ef4444", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" }}>{fav.model.brand.name}</div>
-                        <div style={{ fontWeight: 600, fontSize: "1.1rem", color: "#fff", marginTop: "0.25rem" }}>{fav.model.name}</div>
+                {user.favorites.map((fav) => {
+                  const modelHref = fav.model.hasDetailPage
+                    ? `/marques/${encodeURIComponent(fav.model.brand.name)}/${encodeURIComponent(fav.model.name)}`
+                    : `/marques/${encodeURIComponent(fav.model.brand.name)}`;
+
+                  return (
+                    <Link key={fav.id} href={modelHref} style={{ textDecoration: "none", color: "inherit" }}>
+                      <div className="fav-card" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "12px", overflow: "hidden", transition: "all 0.3s" }}>
+                        <img src={fav.model.images[0]?.url || "/placeholder.png"} alt={fav.model.name} style={{ width: "100%", height: "160px", objectFit: "cover" }} />
+                        <div style={{ padding: "1rem" }}>
+                          <div style={{ fontSize: "0.8rem", color: "#ef4444", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" }}>{fav.model.brand.name}</div>
+                          <div style={{ fontWeight: 600, fontSize: "1.1rem", color: "#fff", marginTop: "0.25rem" }}>{fav.model.name}</div>
+                          {fav.model.price && (
+                            <div style={{ color: "#ef4444", fontWeight: 700, fontSize: "0.95rem", marginTop: "0.4rem" }}>
+                              {fav.model.price.toLocaleString("fr-FR")} {fav.model.currency || "DT"}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -76,23 +87,41 @@ export default async function ClientDashboardPage() {
           {/* Avis */}
           <div className="auth-card" style={{ maxWidth: "100%", padding: "2rem" }}>
             <h2 style={{ fontSize: "1.5rem", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "1rem", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.75rem", color: "#fff" }}>
-              <span style={{ color: "#eab308" }}>⭐</span> Mes Avis
+              <span style={{ color: "#eab308" }}>⭐</span> Mes Avis & Notations
             </h2>
             {user.reviews.length === 0 ? (
-              <p style={{ color: "rgba(255,255,255,0.5)", padding: "1rem 0" }}>Vous n'avez pas encore laissé d'avis.</p>
+              <p style={{ color: "rgba(255,255,255,0.5)", padding: "1rem 0" }}>Vous n'avez pas encore laissé d'avis ou de note.</p>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                {user.reviews.map(review => (
-                  <div key={review.id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "12px", padding: "1.25rem" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.75rem" }}>
-                      <Link href={`/marques/${encodeURIComponent(review.model.brand.name)}/${encodeURIComponent(review.model.name)}`} style={{ fontWeight: 700, color: "#fff", textDecoration: "none", fontSize: "1.1rem" }}>
-                        {review.model.brand.name} {review.model.name}
-                      </Link>
-                      <span style={{ color: "#eab308", fontWeight: 800, background: "rgba(234, 179, 8, 0.1)", padding: "0.25rem 0.75rem", borderRadius: "999px", fontSize: "0.9rem" }}>{review.rating} / 5</span>
+                {user.reviews.map((review) => {
+                  const reviewModelHref = review.model.hasDetailPage
+                    ? `/marques/${encodeURIComponent(review.model.brand.name)}/${encodeURIComponent(review.model.name)}`
+                    : `/marques/${encodeURIComponent(review.model.brand.name)}`;
+
+                  return (
+                    <div key={review.id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "12px", padding: "1.25rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem", flexWrap: "wrap", gap: "0.5rem" }}>
+                        <Link href={reviewModelHref} style={{ fontWeight: 700, color: "#fff", textDecoration: "none", fontSize: "1.1rem" }}>
+                          {review.model.brand.name} {review.model.name}
+                        </Link>
+                        {review.rating > 0 && (
+                          <span style={{ color: "#eab308", fontWeight: 800, background: "rgba(234, 179, 8, 0.1)", padding: "0.25rem 0.75rem", borderRadius: "999px", fontSize: "0.9rem" }}>
+                            ⭐ {review.rating} / 5
+                          </span>
+                        )}
+                      </div>
+                      {review.comment ? (
+                        <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.95rem", margin: 0, fontStyle: "italic", lineHeight: 1.5 }}>
+                          "{review.comment}"
+                        </p>
+                      ) : (
+                        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.85rem", margin: 0, fontStyle: "italic" }}>
+                          (Note attribuée sans commentaire)
+                        </p>
+                      )}
                     </div>
-                    {review.comment && <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.95rem", margin: 0, fontStyle: "italic", lineHeight: 1.5 }}>"{review.comment}"</p>}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

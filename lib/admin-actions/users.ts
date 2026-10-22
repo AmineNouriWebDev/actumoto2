@@ -26,9 +26,48 @@ export async function getUsers() {
       modelsQuota: true,
       modelsCreatedCount: true,
       createdAt: true,
+      _count: {
+        select: {
+          favorites: true,
+          reviews: true,
+        },
+      },
     }
   });
   return users;
+}
+
+export async function getUserDetails(id: string) {
+  await checkAdmin();
+  const user = await prisma.user.findUnique({
+    where: { id },
+    include: {
+      favorites: {
+        include: {
+          model: {
+            include: {
+              brand: true,
+              images: { take: 1, orderBy: { orderIndex: "asc" } },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      },
+      reviews: {
+        include: {
+          model: {
+            include: {
+              brand: true,
+              images: { take: 1, orderBy: { orderIndex: "asc" } },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  });
+
+  return user;
 }
 
 export async function updateUser(id: string, data: { name?: string; email?: string; role?: "ADMIN" | "DEALER" | "CLIENT"; modelsQuota?: number; emailVerified?: boolean }) {

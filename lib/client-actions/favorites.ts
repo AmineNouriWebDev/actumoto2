@@ -19,7 +19,9 @@ export async function toggleFavorite(modelId: string) {
     });
   }
 
-  revalidatePath("/compte");
+  revalidatePath("/", "layout");
+  revalidatePath("/compte", "page");
+  revalidatePath("/marques", "layout");
   return { success: true, isFavorite: !existing };
 }
 

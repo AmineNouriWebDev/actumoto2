@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { formatSpecification } from "@/lib/formatters";
 import Link from "next/link";
+import { toggleFavorite } from "@/lib/client-actions/favorites";
+import { rateModel } from "@/lib/client-actions/reviews";
+import { toast } from "react-toastify";
 
 // Réplique exacte de formatPriceHtml() de data.js
 function formatPriceDisplay(price: number | null | undefined, promoPrice: number | null | undefined, currency: string = "DT") {
@@ -40,14 +43,45 @@ interface ModelCardProps {
   model: any;
   brand: string;
   index: number;
+  isLoggedIn?: boolean;
 }
 
-export default function ModelCard({ model, brand, index }: ModelCardProps) {
+export default function ModelCard({ model, brand, index, isLoggedIn = false }: ModelCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const specsRef = useRef<HTMLDivElement>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [thumbnailGroupIndex, setThumbnailGroupIndex] = useState(0);
   const [isCompared, setIsCompared] = useState(false);
+
+  // Rating & Wishlist state
+  const [isFavorite, setIsFavorite] = useState(Boolean(model.isFavorite));
+  const [userRating, setUserRating] = useState(Number(model.userRating || 0));
+  const [avgRating, setAvgRating] = useState(Number(model.averageRating || 0));
+  const [totalRatings, setTotalRatings] = useState(Number(model.totalRatings || 0));
+  const [hoverRating, setHoverRating] = useState(0);
+  const [isLoadingWishlist, setIsLoadingWishlist] = useState(false);
+  const [isLoadingRating, setIsLoadingRating] = useState(false);
+
+  useEffect(() => {
+    setIsFavorite(Boolean(model.isFavorite));
+    setUserRating(Number(model.userRating || 0));
+    setAvgRating(Number(model.averageRating || 0));
+    setTotalRatings(Number(model.totalRatings || 0));
+  }, [model.isFavorite, model.userRating, model.averageRating, model.totalRatings]);
+
+  // Two-way synchronization with detail page and other components
+  useEffect(() => {
+    const handleModelSync = (e: any) => {
+      if (e.detail?.modelId === model.id) {
+        if (e.detail.isFavorite !== undefined) setIsFavorite(e.detail.isFavorite);
+        if (e.detail.userRating !== undefined) setUserRating(e.detail.userRating);
+        if (e.detail.avgRating !== undefined) setAvgRating(e.detail.avgRating);
+        if (e.detail.totalRatings !== undefined) setTotalRatings(e.detail.totalRatings);
+      }
+    };
+    window.addEventListener("model_interaction_updated", handleModelSync);
+    return () => window.removeEventListener("model_interaction_updated", handleModelSync);
+  }, [model.id]);
 
   // Check initial compare state
   useEffect(() => {
@@ -168,6 +202,113 @@ export default function ModelCard({ model, brand, index }: ModelCardProps) {
     e.stopPropagation();
     const totalGroups = Math.ceil(images.length / 4);
     setThumbnailGroupIndex((prev) => (prev + 1) % totalGroups);
+  };
+
+  // Handle Star Rating
+  const handleRate = async (e: React.MouseEvent, star: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isLoggedIn) {
+      toast.info("Veuillez vous connecter pour noter cette moto.", {
+        position: "top-right",
+        autoClose: 3500,
+      });
+      return;
+    }
+
+    if (isLoadingRating) return;
+
+    const previousRating = userRating;
+    const previousAvg = avgRating;
+    const previousTotal = totalRatings;
+
+    // Optimistic calculation
+    setUserRating(star);
+    let newTotal = previousTotal;
+    let newAvg = previousAvg;
+
+    if (previousRating === 0) {
+      newTotal = previousTotal + 1;
+      newAvg = (previousAvg * previousTotal + star) / newTotal;
+    } else {
+      newAvg = (previousAvg * previousTotal - previousRating + star) / (previousTotal || 1);
+    }
+
+    setTotalRatings(newTotal);
+    setAvgRating(newAvg);
+
+    setIsLoadingRating(true);
+    const res = await rateModel(model.id, star);
+    setIsLoadingRating(false);
+
+    if (res?.error) {
+      setUserRating(previousRating);
+      setAvgRating(previousAvg);
+      setTotalRatings(previousTotal);
+      toast.error(res.error);
+    } else {
+      const finalAvg = res.averageRating ?? newAvg;
+      const finalTotal = res.totalRatings ?? newTotal;
+      if (res.averageRating !== undefined) setAvgRating(res.averageRating);
+      if (res.totalRatings !== undefined) setTotalRatings(res.totalRatings);
+      toast.success(`Note de ${star}/5 enregistrée !`);
+
+      window.dispatchEvent(
+        new CustomEvent("model_interaction_updated", {
+          detail: {
+            modelId: model.id,
+            userRating: star,
+            avgRating: finalAvg,
+            totalRatings: finalTotal,
+          },
+        })
+      );
+    }
+  };
+
+  // Handle Wishlist Toggle
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isLoggedIn) {
+      toast.info("Veuillez vous connecter pour sauvegarder cette moto dans vos favoris.", {
+        position: "top-right",
+        autoClose: 3500,
+      });
+      return;
+    }
+
+    if (isLoadingWishlist) return;
+
+    const previousFav = isFavorite;
+    setIsFavorite(!previousFav);
+
+    setIsLoadingWishlist(true);
+    const res = await toggleFavorite(model.id);
+    setIsLoadingWishlist(false);
+
+    if (res?.error) {
+      setIsFavorite(previousFav);
+      toast.error(res.error);
+    } else if (res?.success) {
+      setIsFavorite(res.isFavorite);
+      if (res.isFavorite) {
+        toast.success("Ajouté à vos favoris !");
+      } else {
+        toast.info("Retiré de vos favoris.");
+      }
+
+      window.dispatchEvent(
+        new CustomEvent("model_interaction_updated", {
+          detail: {
+            modelId: model.id,
+            isFavorite: res.isFavorite,
+          },
+        })
+      );
+    }
   };
 
   const THUMB_PER_GROUP = 4;
@@ -307,6 +448,79 @@ export default function ModelCard({ model, brand, index }: ModelCardProps) {
                 🔍 Voir les détails
               </Link>
             )}
+
+            {/* Barre 5 Étoiles & Coeur/Wishlist */}
+            <div className="model-card-actions-row">
+              {/* Étoiles interactives */}
+              <div className="model-actions-stars">
+                <div
+                  className="stars-wrapper"
+                  title={
+                    userRating > 0
+                      ? `Votre note : ${userRating}/5 (Cliquez pour modifier)`
+                      : avgRating > 0
+                      ? `Note moyenne : ${avgRating.toFixed(1)}/5 (${totalRatings} avis)`
+                      : "Notez cette moto (sur 5 étoiles)"
+                  }
+                >
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const isFilled =
+                      star <= (hoverRating || (userRating > 0 ? userRating : Math.round(avgRating)));
+                    return (
+                      <button
+                        key={star}
+                        type="button"
+                        className={`star-btn ${isFilled ? "filled" : ""}`}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        onClick={(e) => handleRate(e, star)}
+                        disabled={isLoadingRating}
+                        aria-label={`Donner ${star} étoile${star > 1 ? "s" : ""}`}
+                      >
+                        ★
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Note moyenne, avis et badge utilisateur */}
+              <div className="model-actions-score">
+                <span className="rating-score-label">
+                  <strong className="avg-score-val">
+                    {avgRating > 0 ? avgRating.toFixed(1) : "0.0"}/5
+                  </strong>
+                  <span className="reviews-count-val">
+                    ({totalRatings} avis)
+                  </span>
+                </span>
+                {userRating > 0 ? (
+                  <span
+                    className="user-score-badge"
+                    title="Votre évaluation enregistrée"
+                  >
+                    Votre note : {userRating}★
+                  </span>
+                ) : (
+                  <span className="empty-rating-hint">Notez cette moto</span>
+                )}
+              </div>
+
+              {/* Bouton Coeur / Wishlist */}
+              <div className="model-actions-wishlist">
+                <button
+                  type="button"
+                  className={`wishlist-toggle-btn ${isFavorite ? "active" : ""}`}
+                  onClick={handleToggleWishlist}
+                  disabled={isLoadingWishlist}
+                  title={isFavorite ? "Retirer de vos favoris" : "Ajouter à vos favoris"}
+                  aria-label="Favoris"
+                >
+                  <span className="heart-icon-emoji">{isFavorite ? "❤️" : "🤍"}</span>
+                  <span className="wishlist-btn-label">{isFavorite ? "Sauvegardé" : "Favoris"}</span>
+                </button>
+              </div>
+            </div>
 
             {/* Specs container — data-open controls visibility via CSS (same as original) */}
             {model.specs && (

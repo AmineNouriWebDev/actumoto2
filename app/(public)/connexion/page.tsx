@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import SocialAuthButtons from "@/components/auth/SocialAuthButtons";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -99,6 +100,8 @@ export default function LoginPage() {
             ) : "Se connecter"}
           </button>
         </form>
+
+        <SocialAuthButtons callbackUrl="/compte" />
 
         <div style={{ marginTop: "2rem", textAlign: "center", fontSize: "0.9rem", color: "rgba(255,255,255,0.5)" }}>
           Pas encore de compte ?{" "}

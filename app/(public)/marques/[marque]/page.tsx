@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 import ModelCard from "@/components/modeles/ModelCard";
 import Link from "next/link";
 import BrandContactsSection from "@/components/modeles/BrandContactsSection";
@@ -15,23 +16,39 @@ export async function generateMetadata({ params }: { params: Promise<{ marque: s
   };
 }
 
-
-
-
-
 export default async function MarquePage({ params }: { params: Promise<{ marque: string }> }) {
   const { marque } = await params;
   const brandName = decodeURIComponent(marque);
-  
+  const session = await auth();
+  const currentUserId = session?.user?.id;
+
   const brand = await prisma.brand.findUnique({
     where: { name: brandName },
     include: {
       models: {
         where: { isVisible: true },
         orderBy: { orderIndex: 'asc' },
-        include: { specs: true, images: { orderBy: { orderIndex: 'asc' } }, category: true }
-      }
-    }
+        include: {
+          specs: true,
+          images: { orderBy: { orderIndex: 'asc' } },
+          category: true,
+          reviews: {
+            where: currentUserId
+              ? { OR: [{ isApproved: true }, { userId: currentUserId }] }
+              : { isApproved: true },
+            select: { rating: true, userId: true, isApproved: true },
+          },
+          ...(currentUserId
+            ? {
+                favorites: {
+                  where: { userId: currentUserId },
+                  select: { id: true },
+                },
+              }
+            : {}),
+        },
+      },
+    },
   });
 
   if (!brand) {
@@ -39,11 +56,30 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
   }
 
   // Map to match the structure expected by ModelCard
-  const models = brand.models.map(m => ({
-    ...m,
-    images: m.images.map(img => img.url),
-    category: m.category?.name
-  }));
+  const models = brand.models.map((m) => {
+    const validRatings = m.reviews.filter((r) => r.isApproved && r.rating > 0);
+    const totalRatings = validRatings.length;
+    const averageRating =
+      totalRatings > 0
+        ? validRatings.reduce((acc, curr) => acc + curr.rating, 0) / totalRatings
+        : 0;
+    const userReview = currentUserId
+      ? m.reviews.find((r) => r.userId === currentUserId)
+      : null;
+    const isFavorite = currentUserId
+      ? Boolean((m as any).favorites && (m as any).favorites.length > 0)
+      : false;
+
+    return {
+      ...m,
+      images: m.images.map((img) => img.url),
+      category: m.category?.name,
+      userRating: userReview?.rating || 0,
+      averageRating,
+      totalRatings,
+      isFavorite,
+    };
+  });
 
   const orderedModels = [...models];
 
@@ -81,7 +117,13 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
               aria-label="Liste des modèles de motos"
             >
               {orderedModels.map((model: any, index: number) => (
-                <ModelCard key={index} model={model} brand={brandName} index={index} />
+                <ModelCard
+                  key={model.id || index}
+                  model={model}
+                  brand={brandName}
+                  index={index}
+                  isLoggedIn={!!currentUserId}
+                />
               ))}
             </div>
           )}

@@ -94,7 +94,7 @@ export default async function ModelDetailPage({
       images: { orderBy: { orderIndex: "asc" } },
       colors: { orderBy: { orderIndex: "asc" } },
       reviews: {
-        where: { isApproved: true, comment: { not: null } },
+        where: { isApproved: true },
         include: { user: { select: { name: true } } },
         orderBy: { createdAt: "desc" },
       },
@@ -111,6 +111,16 @@ export default async function ModelDetailPage({
     where: { userId_modelId: { userId: session.user.id, modelId: model.id } },
     select: { rating: true, comment: true }
   }) : null;
+
+  const validRatings = model.reviews.filter((r) => r.rating > 0);
+  const totalRatings = validRatings.length;
+  const averageRating =
+    totalRatings > 0
+      ? validRatings.reduce((sum, r) => sum + r.rating, 0) / totalRatings
+      : 0;
+  const commentReviews = model.reviews.filter(
+    (r: any) => r.comment && r.comment.trim().length > 0
+  );
 
   const images = model.images.map((img) => img.url);
   const fuelType = model.fuelType ?? "Thermique";
@@ -267,7 +277,7 @@ export default async function ModelDetailPage({
                 </div>
               )}
 
-              {/* Actions (Comparer & Favoris) */}
+              {/* Actions (Comparer & Favoris & Notation) */}
               <DetailActions
                 modelId={model.id}
                 brandName={brandName}
@@ -275,6 +285,10 @@ export default async function ModelDetailPage({
                 modelPrice={model.price}
                 mainImage={model.images[0]?.url || ""}
                 initialIsFavorite={initialIsFavorite}
+                initialUserRating={existingReview?.rating || 0}
+                initialAverageRating={averageRating}
+                initialTotalRatings={totalRatings}
+                isLoggedIn={isLoggedIn}
               />
             </div>
 
@@ -355,13 +369,13 @@ export default async function ModelDetailPage({
         <div className="max-w-[1200px] mx-auto px-4 mt-6 mb-12">
           <div className="detail-card-section" style={{ background: "#fff", border: "1px solid #e5e7eb" }}>
             <h3 className="detail-section-title">💬 Commentaires & Avis</h3>
-            {(!model.reviews || model.reviews.length === 0) ? (
+            {(!commentReviews || commentReviews.length === 0) ? (
               <p className="text-gray-500 text-sm italic" style={{ padding: "1rem 0" }}>
                 Aucun commentaire pour le moment.
               </p>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginTop: "1.5rem" }}>
-                {model.reviews.map((r: any) => (
+                {commentReviews.map((r: any) => (
                   <div key={r.id} style={{ padding: "1.25rem", background: "#f9fafb", borderRadius: "12px", border: "1px solid #f3f4f6" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
                       <strong style={{ color: "#374151" }}>{r.user?.name || "Anonyme"}</strong>
