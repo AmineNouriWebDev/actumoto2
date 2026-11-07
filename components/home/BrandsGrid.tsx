@@ -10,24 +10,14 @@ interface Brand {
 
 export default function BrandsGrid({ brands }: { brands: Brand[] }) {
   return (
-    <>
-      <section className="pt-16 md:pt-8 pb-4">
-        <div className="container mx-auto px-4 text-center">
-          <h2 id="marques-main-title" className="futurist-font text-xl md:text-2xl text-gray-900 mb-2">
-            TOUTES LES MARQUES <span className="text-red-600">MOTO</span>
-          </h2>
+    <section className="py-6 relative" aria-labelledby="marques-main-title">
+      <div className="container mx-auto px-4">
+        {/* Titre masqué visuellement pour respecter la consigne (conservé sr-only pour SEO & accessibilité) */}
+        <h2 id="marques-main-title" className="sr-only">
+          Toutes les marques moto
+        </h2>
 
-          <div className="social-separator">
-            <div className="separator-line"></div>
-            <div className="red-square"></div>
-            <div className="separator-line"></div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-5 relative" aria-labelledby="marques-main-title">
-        <div className="container mx-auto px-4">
-          <div className="brands-grid" role="list" aria-label="Liste des marques de motos disponibles">
+        <div className="brands-grid" role="list" aria-label="Liste des marques de motos disponibles">
             {brands.map((brand, index) => {
               const href = brand.comingSoon 
                 ? "/coming-soon" 
@@ -61,6 +51,5 @@ export default function BrandsGrid({ brands }: { brands: Brand[] }) {
           </div>
         </div>
       </section>
-    </>
   );
 }

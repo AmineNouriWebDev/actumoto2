@@ -73,7 +73,7 @@ export default function AdminLoginPage() {
     <div className="admin-login-page">
       <div className="login-card">
         <div className="login-logo">
-          <img src="/img/logo-principal-6.png" alt="actumoto.tn" />
+          <img src="/img/logo2.webp" alt="actumoto.tn" />
         </div>
         <h1 className="login-title">Administration</h1>
         <p className="login-subtitle">Connectez-vous pour accéder au panneau d'administration</p>

@@ -37,7 +37,7 @@ export default function AdminSidebar({ role, pendingReviewsCount = 0 }: { role?:
   const SidebarContent = () => (
     <div className="sidebar-inner">
       <div className="sidebar-header">
-        <img src="/img/logo-principal-6.png" alt="actumoto" className="sidebar-logo" />
+        <img src="/img/logo2.webp" alt="actumoto" className="sidebar-logo" />
         <span className="sidebar-badge">Admin</span>
       </div>
 
@@ -85,7 +85,7 @@ export default function AdminSidebar({ role, pendingReviewsCount = 0 }: { role?:
         >
           ☰
         </button>
-        <img src="/img/logo-principal-6.png" alt="actumoto" className="mobile-logo" />
+        <img src="/img/logo2.webp" alt="actumoto" className="mobile-logo" />
       </div>
 
       {/* Mobile overlay */}

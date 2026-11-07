@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
     <div className="auth-page-container">
       <div className="auth-card">
         <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-          <img src="/img/logo-principal-6.png" alt="actumoto" style={{ height: "45px", marginBottom: "1.5rem", filter: "drop-shadow(0 0 10px rgba(220,38,38,0.5))" }} />
+          <img src="/img/logo2.webp" alt="actumoto" style={{ height: "45px", width: "auto", marginBottom: "1.5rem", filter: "drop-shadow(0 0 10px rgba(220,38,38,0.5))" }} />
           <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "#fff", letterSpacing: "0.05em" }}>Mot de passe oublié</h1>
         </div>
 

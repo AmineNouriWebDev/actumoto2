@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import HeaderSearch from "@/components/layout/HeaderSearch";
 import BurgerMenu from "@/components/layout/BurgerMenu";
+import UserNavButton from "@/components/layout/UserNavButton";
 import prisma from "@/lib/prisma";
 
 export default async function Header() {
@@ -32,17 +33,18 @@ export default async function Header() {
             <h1 className="sr-only">actumoto.tn - Concessionnaire moto Tunisie</h1>
             <Link href="/" aria-label="Retour à l'accueil actumoto.tn">
               <img
-                src="/img/logo-principal-6.png"
+                src="/img/logo2.webp"
                 alt="actumoto.tn - Logo concessionnaire motos en Tunisie"
                 className="header-logo main-header-logo"
-                width={250}
-                height={31}
+                width={200}
+                height={47}
               />
             </Link>
           </div>
 
-          {/* Droite : Menu Burger (Mobile & Desktop) */}
-          <div className="header-burger-container flex items-center justify-end">
+          {/* Droite : Bouton Connexion/Déconnexion + Menu Burger */}
+          <div className="header-burger-container flex items-center justify-end gap-2 md:gap-3">
+            <UserNavButton isLoggedIn={isLoggedIn} />
             <BurgerMenu
               isLoggedIn={isLoggedIn}
               dashboardUrl={dashboardUrl}
