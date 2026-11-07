@@ -233,26 +233,31 @@ export default function BurgerMenu({
               </div>
 
               <div className="grid grid-cols-2 gap-2.5">
-                {categories.map((cat, idx) => (
-                  <Link
-                    key={cat.id || idx}
-                    href={`/categories/${encodeURIComponent(cat.name)}`}
-                    onClick={closeMenu}
-                    className="flex items-center justify-center p-2 rounded-xl bg-white hover:bg-red-50/50 border border-gray-200 hover:border-red-500 hover:shadow-md transition-all duration-200 group"
-                    title={cat.name}
-                    aria-label={cat.name}
-                  >
-                    {/* Icône agrandie contenant déjà le nom de la catégorie */}
-                    <div className="w-full h-14 sm:h-16 flex items-center justify-center p-1">
-                      <img
-                        src={cleanImgSrc(cat.logo)}
-                        alt={cat.name}
-                        className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-200"
-                        loading="lazy"
-                      />
-                    </div>
-                  </Link>
-                ))}
+                {categories.map((cat, idx) => {
+                  const isLastOdd = categories.length % 2 !== 0 && idx === categories.length - 1;
+                  return (
+                    <Link
+                      key={cat.id || idx}
+                      href={`/categories/${encodeURIComponent(cat.name)}`}
+                      onClick={closeMenu}
+                      className={`flex items-center justify-center p-2 rounded-xl bg-white hover:bg-red-50/50 border border-gray-200 hover:border-red-500 hover:shadow-md transition-all duration-200 group ${
+                        isLastOdd ? "col-span-2 justify-self-center w-[calc(50%-5px)]" : "w-full"
+                      }`}
+                      title={cat.name}
+                      aria-label={cat.name}
+                    >
+                      {/* Icône agrandie contenant déjà le nom de la catégorie */}
+                      <div className="w-full h-14 sm:h-16 flex items-center justify-center p-1">
+                        <img
+                          src={cleanImgSrc(cat.logo)}
+                          alt={cat.name}
+                          className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-200"
+                          loading="lazy"
+                        />
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             </section>
           )}
