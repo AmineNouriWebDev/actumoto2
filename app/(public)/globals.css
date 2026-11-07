@@ -318,6 +318,19 @@ h3,
       }
 
       /* =========================================== */
+      /* HOME NOUVEAUTES SECTION BACKGROUND          */
+      /* =========================================== */
+      .home-nouveautes-wrapper {
+        position: relative;
+        width: 100%;
+        background-color: #9199a1;
+        background-image: url('/img/background-desktop-bottom.webp');
+        background-repeat: no-repeat;
+        background-position: center top;
+        background-size: cover;
+      }
+
+      /* =========================================== */
       /* HOME BRANDS SECTION BOTTOM BACKGROUND       */
       /* =========================================== */
       .home-brands-bottom-wrapper,

@@ -63,8 +63,8 @@ export default async function Home() {
         </p>
       </section>
 
-      {/* 2. SECTION NOUVEAUTÉS (FOND BLANC) */}
-      <div className="bg-white">
+      {/* 2. SECTION NOUVEAUTÉS (FOND SHOWROOM BOTTOM) */}
+      <div className="home-nouveautes-wrapper">
         <NewModelsSection models={formattedNewModels} />
       </div>
 
