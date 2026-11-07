@@ -1,36 +1,113 @@
 export default function Footer() {
   return (
-    <footer className="footer bg-black text-white py-8 mt-0" role="contentinfo">
+    <footer className="footer bg-black text-white py-6 mt-0 border-t border-white/10" role="contentinfo">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="text-center md:text-left mb-4 md:mb-0">
-            <p className="text-sm md:text-base">
+        {/* Desktop Layout (>= 768px): 3 colonnes (Gauche: FB/IG, Centre: Copyright, Droite: YT/TikTok) */}
+        <div className="hidden md:grid md:grid-cols-3 items-center">
+          {/* Gauche : Facebook & Instagram */}
+          <div className="flex items-center justify-start gap-3">
+            <a
+              href="https://www.facebook.com/profile.php?id=61584281323170"
+              className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook actumoto.tn"
+            >
+              <img src="/img/social/facebook.png" alt="Facebook" className="w-full h-full object-contain" />
+            </a>
+            <a
+              href="https://www.instagram.com/actumoto.tn?stkn=MTRqNzhiczQ3aWFvNw=="
+              className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram actumoto.tn"
+            >
+              <img src="/img/social/instagram.png" alt="Instagram" className="w-full h-full object-contain" />
+            </a>
+          </div>
+
+          {/* Milieu : Copyright */}
+          <div className="text-center">
+            <p className="text-sm text-gray-300">
               Copyright © 2026 actumoto.tn - Tous droits réservés
             </p>
           </div>
-          <div className="flex items-center space-x-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 text-red-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
+
+          {/* Droite : YouTube & TikTok */}
+          <div className="flex items-center justify-end gap-3">
             <a
-              href="mailto:marwenmahroug@gmail.com"
-              className="text-sm md:text-base text-white hover:text-red-300 transition-colors"
-              aria-label="Nous contacter par email"
+              href="https://www.youtube.com/@ActumotoTn"
+              className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube actumoto.tn"
             >
-              actumoto.tn@gmail.com
+              <img src="/img/social/youtube.png" alt="YouTube" className="w-full h-full object-contain" />
             </a>
+            <a
+              href="https://www.tiktok.com/@actumoto.tn?_r=1&_t=ZS-9AFrMJkO9jz"
+              className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok actumoto.tn"
+            >
+              <img src="/img/social/tiktok.png" alt="TikTok" className="w-full h-full object-contain" />
+            </a>
+          </div>
+        </div>
+
+        {/* Mobile Layout (< 768px) : Réseaux sociaux en haut (FB/IG à gauche, YT/TikTok à droite) + Copyright au centre */}
+        <div className="flex flex-col md:hidden items-center gap-4">
+          <div className="flex items-center justify-between w-full px-2">
+            {/* Gauche : Facebook & Instagram */}
+            <div className="flex items-center gap-2.5">
+              <a
+                href="https://www.facebook.com/profile.php?id=61584281323170"
+                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook actumoto.tn"
+              >
+                <img src="/img/social/facebook.png" alt="Facebook" className="w-full h-full object-contain" />
+              </a>
+              <a
+                href="https://www.instagram.com/actumoto.tn?stkn=MTRqNzhiczQ3aWFvNw=="
+                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram actumoto.tn"
+              >
+                <img src="/img/social/instagram.png" alt="Instagram" className="w-full h-full object-contain" />
+              </a>
+            </div>
+
+            {/* Droite : YouTube & TikTok */}
+            <div className="flex items-center gap-2.5">
+              <a
+                href="https://www.youtube.com/@ActumotoTn"
+                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube actumoto.tn"
+              >
+                <img src="/img/social/youtube.png" alt="YouTube" className="w-full h-full object-contain" />
+              </a>
+              <a
+                href="https://www.tiktok.com/@actumoto.tn?_r=1&_t=ZS-9AFrMJkO9jz"
+                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok actumoto.tn"
+              >
+                <img src="/img/social/tiktok.png" alt="TikTok" className="w-full h-full object-contain" />
+              </a>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-xs text-gray-300">
+              Copyright © 2026 actumoto.tn - Tous droits réservés
+            </p>
           </div>
         </div>
       </div>

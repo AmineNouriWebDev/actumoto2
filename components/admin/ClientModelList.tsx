@@ -5,7 +5,7 @@ import Link from "next/link";
 import SortableTableBody from "./SortableTableBody";
 import ConfirmForm from "./ConfirmForm";
 import { Model, Brand, Category } from "@prisma/client";
-import { updateModelOrder, toggleModelVisibility, deleteModel } from "@/lib/admin-actions/models";
+import { updateModelOrder, toggleModelVisibility, toggleModelIsNew, deleteModel } from "@/lib/admin-actions/models";
 
 type ModelWithRelations = Model & { brand: Brand; category: Category | null };
 
@@ -31,6 +31,7 @@ export default function ClientModelList({ initialModels }: { initialModels: Mode
               <th>Catégorie</th>
               <th>Prix</th>
               <th>Statut</th>
+              <th>Nouveauté</th>
               <th style={{ textAlign: "right" }}>Actions</th>
             </tr>
           </thead>
@@ -58,6 +59,31 @@ export default function ClientModelList({ initialModels }: { initialModels: Mode
               <span className={`status-badge ${model.isVisible ? "status-active" : "status-inactive"}`}>
                 {model.isVisible ? "Visible" : "Caché"}
               </span>
+            </td>
+            <td>
+              <form action={toggleModelIsNew.bind(null, model.id, Boolean(model.isNew))}>
+                <button
+                  type="submit"
+                  className={`status-badge cursor-pointer transition-all ${
+                    model.isNew
+                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/50 hover:bg-amber-500/30"
+                      : "bg-gray-800 text-gray-400 border border-gray-700 hover:text-white hover:bg-gray-700"
+                  }`}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.35rem",
+                    padding: "0.25rem 0.6rem",
+                    borderRadius: "6px",
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                  }}
+                  title={model.isNew ? "Retirer des nouveautés" : "Marquer comme nouveauté"}
+                >
+                  <span>{model.isNew ? "⭐" : "☆"}</span>
+                  <span>{model.isNew ? "Nouveau" : "Non"}</span>
+                </button>
+              </form>
             </td>
             <td>
               <div className="row-actions">

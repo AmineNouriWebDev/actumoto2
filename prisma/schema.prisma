@@ -41,6 +41,7 @@ model Model {
   brandId       String
   categoryId    String?
   isVisible     Boolean @default(true)
+  isNew         Boolean @default(false)
   orderIndex    Int     @default(0)
   hasDetailPage Boolean @default(false)
   description   String?

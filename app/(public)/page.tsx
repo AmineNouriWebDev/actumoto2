@@ -1,24 +1,40 @@
 import HeroCarousel from "@/components/home/HeroCarousel";
 import BrandsGrid from "@/components/home/BrandsGrid";
-import CategoriesAndPrices from "@/components/home/CategoriesAndPrices";
+import NewModelsSection from "@/components/home/NewModelsSection";
+// import CategoriesAndPrices from "@/components/home/CategoriesAndPrices";
 import WelcomePopup from "@/components/home/WelcomePopup";
 import prisma from "@/lib/prisma";
 
-
-
 export default async function Home() {
-  const [slides, brands, categories, banner, settings] = await Promise.all([
+  const [slides, brands, categories, banner, settings, newModels] = await Promise.all([
     prisma.carouselSlide.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
     prisma.brand.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
     prisma.category.findMany({ where: { isVisible: true } }),
     prisma.homepageBanner.findFirst({ where: { isVisible: true } }),
     prisma.siteSettings.findFirst(),
+    prisma.model.findMany({
+      where: { isVisible: true, isNew: true },
+      include: {
+        brand: true,
+        category: true,
+        images: { orderBy: { orderIndex: 'asc' } },
+        specs: true,
+      },
+      orderBy: [{ orderIndex: 'asc' }, { name: 'asc' }],
+    }),
   ]);
+
+  const formattedNewModels = newModels.map((m) => ({
+    ...m,
+    brand: m.brand.name,
+    category: m.category?.name,
+    images: m.images.map((img: any) => img.url),
+  }));
   return (
     <>
       <WelcomePopup />
       
-      {/* HERO SECTION */}
+      {/* 1. SLIDER EN PREMIER */}
       <HeroCarousel slides={slides} slideInterval={settings?.carouselDelayMs} />
 
       {/* SECTION SEO - CONTENU OPTIMISÉ (visually hidden for SEO) */}
@@ -47,31 +63,37 @@ export default async function Home() {
         </p>
       </section>
 
-      {/* Social Media Mobile */}
-      <section className="py-4 lg:hidden" aria-label="Réseaux sociaux">
-        <div className="container mx-auto px-4">
-          <div className="social-bar" role="navigation" aria-label="Liens vers nos réseaux sociaux">
-            <a href="https://www.facebook.com/profile.php?id=61584281323170" className="social-btn facebook" aria-label="Facebook (lien)" target="_blank" rel="noreferrer">
-              <img src="/img/social/facebook.png" alt="Facebook actumoto.tn" />
-            </a>
-            <a href="https://www.instagram.com/actumoto.tn?stkn=MTRqNzhiczQ3aWFvNw==" className="social-btn instagram" aria-label="Instagram (lien)" target="_blank" rel="noreferrer">
-              <img src="/img/social/instagram.png" alt="Instagram actumoto.tn" />
-            </a>
-            <a href="https://www.youtube.com/@ActumotoTn" className="social-btn youtube" aria-label="YouTube (lien)" target="_blank" rel="noreferrer">
-              <img src="/img/social/youtube.png" alt="YouTube actumoto.tn" />
-            </a>
-            <a href="https://www.tiktok.com/@actumoto.tn?_r=1&_t=ZS-9AFrMJkO9jz" className="social-btn tiktok" aria-label="TikTok (lien)" target="_blank" rel="noreferrer">
-              <img src="/img/social/tiktok.png" alt="TikTok actumoto.tn" />
-            </a>
+      {/* 2. ZONE BACKGROUND SHOWROOM (DU SLIDER JUSQU'À LA BANNIÈRE DU BAS) */}
+      <div className="home-brands-background-wrapper">
+        {/* Social Media Mobile */}
+        <section className="py-4 lg:hidden" aria-label="Réseaux sociaux">
+          <div className="container mx-auto px-4">
+            <div className="social-bar" role="navigation" aria-label="Liens vers nos réseaux sociaux">
+              <a href="https://www.facebook.com/profile.php?id=61584281323170" className="social-btn facebook" aria-label="Facebook (lien)" target="_blank" rel="noreferrer">
+                <img src="/img/social/facebook.png" alt="Facebook actumoto.tn" />
+              </a>
+              <a href="https://www.instagram.com/actumoto.tn?stkn=MTRqNzhiczQ3aWFvNw==" className="social-btn instagram" aria-label="Instagram (lien)" target="_blank" rel="noreferrer">
+                <img src="/img/social/instagram.png" alt="Instagram actumoto.tn" />
+              </a>
+              <a href="https://www.youtube.com/@ActumotoTn" className="social-btn youtube" aria-label="YouTube (lien)" target="_blank" rel="noreferrer">
+                <img src="/img/social/youtube.png" alt="YouTube actumoto.tn" />
+              </a>
+              <a href="https://www.tiktok.com/@actumoto.tn?_r=1&_t=ZS-9AFrMJkO9jz" className="social-btn tiktok" aria-label="TikTok (lien)" target="_blank" rel="noreferrer">
+                <img src="/img/social/tiktok.png" alt="TikTok actumoto.tn" />
+              </a>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Navigation Catégories / Prix */}
-      <CategoriesAndPrices categories={categories} />
+        {/* Navigation Catégories / Prix cachée (sera intégrée dans le menu nav plus tard) */}
+        {/* <CategoriesAndPrices categories={categories} /> */}
 
-      {/* Section Marques */}
-      <BrandsGrid brands={brands} />
+        {/* Section Nouveautés */}
+        <NewModelsSection models={formattedNewModels} />
+
+        {/* Section Marques */}
+        <BrandsGrid brands={brands} />
+      </div>
 
       {/* SECTION BANNIÈRE DYNAMIQUE */}
       {banner && (

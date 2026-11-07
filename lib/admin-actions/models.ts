@@ -1,6 +1,7 @@
 "use server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/lib/auth";
 
 export async function toggleModelVisibility(id: string, isVisible: boolean) {
   const session = await auth();
@@ -15,6 +16,23 @@ export async function toggleModelVisibility(id: string, isVisible: boolean) {
   }
 
   await prisma.model.update({ where: { id }, data: { isVisible: !isVisible } });
+  revalidatePath("/admin/modeles");
+  revalidatePath("/");
+}
+
+export async function toggleModelIsNew(id: string, isNew: boolean) {
+  const session = await auth();
+  if (session?.user?.role === "DEALER") {
+    const model = await prisma.model.findUnique({ where: { id }, select: { brandId: true } });
+    if (model) {
+      const dealer = await prisma.user.findUnique({ where: { id: session.user.id }, include: { assignedBrands: true } });
+      if (!dealer?.assignedBrands.some(ab => ab.brandId === model.brandId)) {
+        throw new Error("Non autorisé");
+      }
+    }
+  }
+
+  await prisma.model.update({ where: { id }, data: { isNew: !isNew } });
   revalidatePath("/admin/modeles");
   revalidatePath("/");
 }
@@ -35,8 +53,6 @@ export async function deleteModel(id: string) {
   revalidatePath("/admin/modeles");
   revalidatePath("/");
 }
-
-import { auth } from "@/lib/auth";
 
 export async function createModel(formData: FormData) {
   const session = await auth();

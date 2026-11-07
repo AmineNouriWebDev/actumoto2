@@ -72,9 +72,11 @@ h3,
         align-items: center;
     }
     
-    .header-container > .nav-links:last-child {
+    .header-container > .header-burger-container,
+    .header-container > div:last-child {
         justify-self: end;
         display: flex;
+        justify-content: flex-end;
     }
     
     .header-container > div:nth-child(2) {
@@ -172,6 +174,18 @@ h3,
 @media (min-width: 1024px) {
     .main-header-logo {
         width: 220px;
+    }
+}
+
+.header-search-container {
+    display: flex;
+    align-items: center;
+}
+
+@media (min-width: 1024px) {
+    .header-search-container {
+        justify-self: start;
+        width: 100%;
     }
 }
 
@@ -296,6 +310,45 @@ h3,
         gap: 1.5rem; /* gap desktop */
         width: 100%;
         box-sizing: border-box;
+      }
+
+      /* =========================================== */
+      /* HOME BRANDS SECTION BACKGROUND              */
+      /* =========================================== */
+      .home-brands-background-wrapper {
+        position: relative;
+        width: 100%;
+        background-color: #9199a1;
+        background-image: url('/img/background-desktop.webp');
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: cover;
+        background-attachment: fixed;
+        padding-bottom: 3rem;
+      }
+
+      @media (max-width: 767px) {
+        .home-brands-background-wrapper {
+          background-image: url('/img/background-mobile.webp');
+          background-size: cover;
+          background-position: center center;
+          background-attachment: fixed;
+          padding-bottom: 2rem;
+        }
+      }
+
+      .home-brands-background-wrapper .brand-logo-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+      }
+
+      .home-brands-background-wrapper .brand-logo-card:hover {
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 8px 25px rgba(220, 38, 38, 0.2);
+        transform: translateY(-5px);
       }
 
       /* =========================================== */
@@ -1116,15 +1169,18 @@ h3,
       /* Desktop */
       @media (min-width: 768px) {
         .hero-section {
-          height: calc(100vh - 80px);
+          height: auto;
+          min-height: auto;
           max-height: none;
           margin-top: 0;
-          width: 100vw;
+          width: 100%;
           position: relative;
-          left: 50%;
-          right: 50%;
-          margin-left: -50vw;
-          margin-right: -50vw;
+          left: auto;
+          right: auto;
+          margin-left: 0;
+          margin-right: 0;
+          padding: 1.5rem 0;
+          background-color: #f8fafc;
         }
 
         .carousel-slide {
