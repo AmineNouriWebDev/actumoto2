@@ -12,6 +12,7 @@ export default function NewModelsSection({ models }: NewModelsSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
 
   const checkScroll = () => {
     if (!scrollRef.current) return;
@@ -34,6 +35,30 @@ export default function NewModelsSection({ models }: NewModelsSectionProps) {
       window.removeEventListener("resize", checkScroll);
     };
   }, [models]);
+
+  // Défilement automatique uniquement sur Desktop avec pause au survol
+  useEffect(() => {
+    if (!models || models.length <= 1) return;
+
+    const interval = setInterval(() => {
+      // Uniquement sur Desktop (>= 768px) et si non survolé
+      if (typeof window === "undefined" || window.innerWidth < 768) return;
+      if (isHovered) return;
+
+      if (!scrollRef.current) return;
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+
+      // Si on arrive vers la fin, on revient doucement au début
+      if (scrollLeft + clientWidth >= scrollWidth - 20) {
+        scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        const cardWidth = 360;
+        scrollRef.current.scrollBy({ left: cardWidth, behavior: "smooth" });
+      }
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [models, isHovered]);
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -62,7 +87,11 @@ export default function NewModelsSection({ models }: NewModelsSectionProps) {
         </div>
 
         {/* Zone Carrousel / Glissement */}
-        <div className="relative group/carousel">
+        <div
+          className="relative group/carousel"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
           {/* Petite flèche Desktop Gauche */}
           {canScrollLeft && (
             <button

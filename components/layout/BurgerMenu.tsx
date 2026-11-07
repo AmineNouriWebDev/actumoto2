@@ -232,26 +232,25 @@ export default function BurgerMenu({
                 </span>
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2.5">
                 {categories.map((cat, idx) => (
                   <Link
                     key={cat.id || idx}
                     href={`/categories/${encodeURIComponent(cat.name)}`}
                     onClick={closeMenu}
-                    className="flex flex-col items-center justify-center p-2 rounded-xl bg-gray-50 hover:bg-white border border-gray-200 hover:border-red-500 hover:shadow-md transition-all duration-200 group text-center"
+                    className="flex items-center justify-center p-2 rounded-xl bg-white hover:bg-red-50/50 border border-gray-200 hover:border-red-500 hover:shadow-md transition-all duration-200 group"
+                    title={cat.name}
+                    aria-label={cat.name}
                   >
-                    {/* Conteneur blanc pour contraste parfait sur les icônes noires */}
-                    <div className="w-full h-10 flex items-center justify-center mb-1.5 bg-white rounded-lg p-1 border border-gray-100 shadow-2xs">
+                    {/* Icône agrandie contenant déjà le nom de la catégorie */}
+                    <div className="w-full h-14 sm:h-16 flex items-center justify-center p-1">
                       <img
                         src={cleanImgSrc(cat.logo)}
                         alt={cat.name}
-                        className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-200"
+                        className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-200"
                         loading="lazy"
                       />
                     </div>
-                    <span className="text-[11px] font-bold text-gray-800 group-hover:text-red-600 transition-colors truncate w-full">
-                      {cat.name}
-                    </span>
                   </Link>
                 ))}
               </div>
