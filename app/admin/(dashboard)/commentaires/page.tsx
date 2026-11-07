@@ -33,7 +33,8 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
     where: whereClause,
     include: {
       user: true,
-      model: { include: { brand: true } }
+      model: { include: { brand: true } },
+      brand: true,
     },
     orderBy: { createdAt: "desc" },
     take: 500, // Limite raisonnable
@@ -83,7 +84,7 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
               <tr>
                 <th>Statut</th>
                 <th>Utilisateur</th>
-                <th>Moto</th>
+                <th>Moto / Marque</th>
                 <th>Note</th>
                 <th>Commentaire</th>
                 <th>Date</th>
@@ -104,7 +105,15 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
                     <strong>{review.user.name || "Anonyme"}</strong><br />
                     <span style={{ fontSize: "0.85em", color: "#6b7280" }}>{review.user.email}</span>
                   </td>
-                  <td>{review.model.brand.name} {review.model.name}</td>
+                  <td>
+                    {review.model ? (
+                      <span>🏍️ {review.model.brand.name} {review.model.name}</span>
+                    ) : review.brand ? (
+                      <span style={{ fontWeight: 600, color: "#dc2626" }}>🏷️ Marque {review.brand.name}</span>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
                   <td>⭐ {review.rating}/5</td>
                   <td style={{ maxWidth: "300px", whiteSpace: "normal" }}>
                     {review.comment ? review.comment : <em style={{ color: "#9ca3af" }}>Aucun texte</em>}

@@ -65,12 +65,16 @@ export default async function Home() {
 
       {/* 2. ZONE SHOWROOM TOP (HAUT DE L'IMAGE AVEC LES MOTOS) */}
       <div className="w-full overflow-hidden bg-[#9199a1]">
-        <img
-          src="/img/background-desktop-top.webp"
-          alt="Showroom Motos Actumoto"
-          className="w-full h-auto block"
-          loading="eager"
-        />
+        <picture className="w-full block">
+          <source media="(max-width: 767px)" srcSet="/img/background-mobile-top.webp" />
+          <source media="(min-width: 768px)" srcSet="/img/background-desktop-top.webp" />
+          <img
+            src="/img/background-desktop-top.webp"
+            alt="Showroom Motos Actumoto"
+            className="w-full h-auto block"
+            loading="eager"
+          />
+        </picture>
       </div>
 
       {/* 3. SECTION NOUVEAUTÉS (FOND BLANC) */}

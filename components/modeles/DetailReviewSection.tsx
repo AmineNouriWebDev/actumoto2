@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import { addReview } from "@/lib/client-actions/reviews";
 import { toast } from "react-toastify";
 
@@ -11,11 +12,18 @@ export default function DetailReviewSection({ modelId, isLoggedIn, existingRevie
   const [review, setReview] = useState(existingReview?.comment || "");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false); 
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleRequireLogin = () => {
+    const targetUrl = pathname || (typeof window !== "undefined" ? window.location.pathname : "");
+    router.push(`/connexion?callbackUrl=${encodeURIComponent(targetUrl)}&needLogin=1`);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoggedIn) {
-      toast.error("Vous devez être connecté pour soumettre un avis.");
+      handleRequireLogin();
       return;
     }
     if (rating === 0 && review.trim() === "") {
@@ -33,6 +41,10 @@ export default function DetailReviewSection({ modelId, isLoggedIn, existingRevie
       setIsSubmitted(true);
     }
   };
+
+  const loginRedirectUrl = `/connexion?callbackUrl=${encodeURIComponent(
+    pathname || (typeof window !== "undefined" ? window.location.pathname : "")
+  )}&needLogin=1`;
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 mt-8 mb-8">
@@ -60,7 +72,13 @@ export default function DetailReviewSection({ modelId, isLoggedIn, existingRevie
                     type="button"
                     onMouseEnter={() => setHoverRating(star)}
                     onMouseLeave={() => setHoverRating(0)}
-                    onClick={() => setRating(star)}
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        handleRequireLogin();
+                        return;
+                      }
+                      setRating(star);
+                    }}
                     style={{
                       background: "none",
                       border: "none",
@@ -88,6 +106,11 @@ export default function DetailReviewSection({ modelId, isLoggedIn, existingRevie
               <textarea
                 value={review}
                 onChange={(e) => setReview(e.target.value)}
+                onFocus={() => {
+                  if (!isLoggedIn) {
+                    handleRequireLogin();
+                  }
+                }}
                 placeholder="Partagez votre expérience avec cette moto..."
                 style={{
                   width: "100%",
@@ -102,27 +125,46 @@ export default function DetailReviewSection({ modelId, isLoggedIn, existingRevie
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              style={{
-                background: "#ff0000",
-                color: "#fff",
-                border: "none",
-                padding: "0.75rem 1.5rem",
-                borderRadius: "8px",
-                fontWeight: 600,
-                cursor: isLoading ? "not-allowed" : "pointer",
-                transition: "opacity 0.2s",
-                opacity: isLoading ? 0.7 : 1
-              }}
-            >
-              {isLoading ? "Envoi en cours..." : (existingReview ? "Modifier mon avis" : "Envoyer mon avis")}
-            </button>
+            {isLoggedIn ? (
+              <button
+                type="submit"
+                disabled={isLoading}
+                style={{
+                  background: "#ff0000",
+                  color: "#fff",
+                  border: "none",
+                  padding: "0.75rem 1.5rem",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  cursor: isLoading ? "not-allowed" : "pointer",
+                  transition: "opacity 0.2s",
+                  opacity: isLoading ? 0.7 : 1
+                }}
+              >
+                {isLoading ? "Envoi en cours..." : (existingReview ? "Modifier mon avis" : "Envoyer mon avis")}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleRequireLogin}
+                style={{
+                  background: "#ff0000",
+                  color: "#fff",
+                  border: "none",
+                  padding: "0.75rem 1.5rem",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.2s"
+                }}
+              >
+                Se connecter pour donner mon avis
+              </button>
+            )}
             
             {!isLoggedIn && (
               <p style={{ marginTop: "1rem", fontSize: "0.85rem", color: "#6b7280" }}>
-                <em>Vous devez être connecté pour laisser un avis. <a href="/connexion" style={{ color: "#ff0000", textDecoration: "underline" }}>Se connecter</a></em>
+                <em>Vous devez être connecté pour laisser un avis. <Link href={loginRedirectUrl} style={{ color: "#ff0000", textDecoration: "underline", fontWeight: 600 }}>Se connecter</Link></em>
               </p>
             )}
           </form>

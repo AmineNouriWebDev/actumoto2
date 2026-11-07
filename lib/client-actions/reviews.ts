@@ -36,6 +36,43 @@ export async function addReview(modelId: string, rating: number, comment: string
   return { success: true };
 }
 
+export async function addBrandReview(brandId: string, rating: number, comment: string) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Vous devez être connecté pour laisser un avis." };
+
+  if (rating < 0 || rating > 5) return { error: "La note doit être entre 0 et 5." };
+
+  const trimmedComment = comment.trim();
+  if (rating === 0 && !trimmedComment) {
+    return { error: "Veuillez laisser une note ou un commentaire." };
+  }
+
+  const isApproved = trimmedComment.length === 0;
+
+  await prisma.review.upsert({
+    where: {
+      userId_brandId: { userId: session.user.id, brandId }
+    },
+    update: {
+      rating,
+      comment: trimmedComment || null,
+      isApproved
+    },
+    create: {
+      userId: session.user.id,
+      brandId,
+      rating,
+      comment: trimmedComment || null,
+      isApproved
+    }
+  });
+
+  revalidatePath("/", "layout");
+  revalidatePath("/admin/commentaires");
+  revalidatePath("/marques", "layout");
+  return { success: true };
+}
+
 export async function rateModel(modelId: string, rating: number) {
   const session = await auth();
   if (!session?.user?.id) return { error: "Vous devez être connecté pour noter cette moto." };

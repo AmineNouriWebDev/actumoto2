@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   Menu,
@@ -47,6 +47,14 @@ export default function BurgerMenu({
   const [filterTab, setFilterTab] = useState<"category" | "price">("category");
   const [sliderPrice, setSliderPrice] = useState(30000);
   const router = useRouter();
+  const pathname = usePathname();
+
+  const loginUrl =
+    pathname &&
+    !pathname.startsWith("/connexion") &&
+    !pathname.startsWith("/inscription")
+      ? `/connexion?callbackUrl=${encodeURIComponent(pathname)}`
+      : "/connexion";
 
   useEffect(() => {
     setMounted(true);
@@ -171,7 +179,7 @@ export default function BurgerMenu({
               </div>
             ) : (
               <Link
-                href="/connexion"
+                href={loginUrl}
                 onClick={closeMenu}
                 className="flex items-center justify-between p-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all shadow-md group"
               >

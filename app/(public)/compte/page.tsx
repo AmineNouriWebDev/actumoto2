@@ -24,7 +24,8 @@ export default async function ClientDashboardPage() {
         include: {
           model: {
             include: { brand: true }
-          }
+          },
+          brand: true,
         },
         orderBy: { createdAt: "desc" }
       }
@@ -94,15 +95,25 @@ export default async function ClientDashboardPage() {
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                 {user.reviews.map((review) => {
-                  const reviewModelHref = review.model.hasDetailPage
-                    ? `/marques/${encodeURIComponent(review.model.brand.name)}/${encodeURIComponent(review.model.name)}`
-                    : `/marques/${encodeURIComponent(review.model.brand.name)}`;
+                  const targetTitle = review.model
+                    ? `${review.model.brand.name} ${review.model.name}`
+                    : review.brand
+                    ? `Marque ${review.brand.name}`
+                    : "Avis";
+
+                  const reviewHref = review.model
+                    ? review.model.hasDetailPage
+                      ? `/marques/${encodeURIComponent(review.model.brand.name)}/${encodeURIComponent(review.model.name)}`
+                      : `/marques/${encodeURIComponent(review.model.brand.name)}`
+                    : review.brand
+                    ? `/marques/${encodeURIComponent(review.brand.name)}`
+                    : "#";
 
                   return (
                     <div key={review.id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "12px", padding: "1.25rem" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem", flexWrap: "wrap", gap: "0.5rem" }}>
-                        <Link href={reviewModelHref} style={{ fontWeight: 700, color: "#fff", textDecoration: "none", fontSize: "1.1rem" }}>
-                          {review.model.brand.name} {review.model.name}
+                        <Link href={reviewHref} style={{ fontWeight: 700, color: "#fff", textDecoration: "none", fontSize: "1.1rem" }}>
+                          {targetTitle}
                         </Link>
                         {review.rating > 0 && (
                           <span style={{ color: "#eab308", fontWeight: 800, background: "rgba(234, 179, 8, 0.1)", padding: "0.25rem 0.75rem", borderRadius: "999px", fontSize: "0.9rem" }}>

@@ -20,6 +20,7 @@ model Brand {
   models        Model[]
   dealerContact DealerContact?
   dealerBrands  DealerBrand[]
+  reviews       Review[]
 }
 
 model Category {
@@ -280,19 +281,22 @@ model Favorite {
 }
 
 model Review {
-  id        String   @id @default(uuid())
-  rating    Int
-  comment   String?
-  userId    String
-  modelId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isApproved Boolean @default(false)
+  id         String   @id @default(uuid())
+  rating     Int      @default(0)
+  comment    String?
+  userId     String
+  modelId    String?
+  brandId    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isApproved Boolean  @default(false)
 
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  model Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model Model? @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  brand Brand? @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
   @@unique([userId, modelId])
+  @@unique([userId, brandId])
 }
 
 model QuotaRequest {

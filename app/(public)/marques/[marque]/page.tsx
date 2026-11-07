@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import ModelCard from "@/components/modeles/ModelCard";
 import Link from "next/link";
 import BrandContactsSection from "@/components/modeles/BrandContactsSection";
+import BrandReviewSection from "@/components/modeles/BrandReviewSection";
 import ComparateurBar from "@/components/modeles/ComparateurBar";
 import ComingSoonBanner from "@/components/modeles/ComingSoonBanner";
 
@@ -54,6 +55,20 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
   if (!brand) {
     notFound();
   }
+
+  const [approvedBrandReviews, existingUserBrandReview] = await Promise.all([
+    prisma.review.findMany({
+      where: { brandId: brand.id, isApproved: true },
+      include: { user: { select: { name: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
+    currentUserId
+      ? prisma.review.findUnique({
+          where: { userId_brandId: { userId: currentUserId, brandId: brand.id } },
+          select: { rating: true, comment: true },
+        })
+      : null,
+  ]);
 
   // Map to match the structure expected by ModelCard
   const models = brand.models.map((m) => {
@@ -130,6 +145,15 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
 
           {/* Brand contacts section */}
           <BrandContactsSection brand={brandName} />
+
+          {/* Section Avis et Commentaires sur la marque */}
+          <BrandReviewSection
+            brandId={brand.id}
+            brandName={brandName}
+            isLoggedIn={!!currentUserId}
+            existingReview={existingUserBrandReview}
+            approvedReviews={approvedBrandReviews}
+          />
         </div>
       </section>
 
