@@ -317,41 +317,36 @@ h3,
         box-sizing: border-box;
       }
 
-      /* =========================================== */
-      /* HOME NOUVEAUTES SECTION BACKGROUND          */
-      /* =========================================== */
-      .home-nouveautes-wrapper {
-        position: relative;
-        width: 100%;
-        background-color: #9199a1;
-        background-image: url('/img/background-desktop-bottom.webp');
-        background-repeat: no-repeat;
-        background-position: center top;
-        background-size: cover;
-      }
-
-      /* =========================================== */
-      /* HOME BRANDS SECTION BOTTOM BACKGROUND       */
-      /* =========================================== */
+      /* ============================================================ */
+      /* HOME NOUVEAUTES & BRANDS SECTIONS BACKGROUND                 */
+      /* Gris très clair satiné et brillant (sans image de fond)      */
+      /* ============================================================ */
+      .home-nouveautes-wrapper,
       .home-brands-bottom-wrapper,
       .home-brands-background-wrapper {
         position: relative;
         width: 100%;
-        background-color: #9199a1;
-        background-image: url('/img/background-desktop-bottom.jpeg');
+        background-color: #f1f4f8;
+        background-image: 
+          radial-gradient(ellipse 90% 60% at 50% 0%, rgba(255, 255, 255, 0.95), transparent 75%),
+          linear-gradient(135deg, #f8fafc 0%, #f1f5f9 22%, #ffffff 45%, #f8fafc 55%, #e8edf3 82%, #f1f4f8 100%);
         background-repeat: no-repeat;
-        background-position: center top;
-        background-size: cover;
-        /* Défilement naturel avec le contenu (suppression du background-attachment: fixed) */
+        background-size: 100% 100%;
+      }
+
+      .home-nouveautes-wrapper {
+        border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+      }
+
+      .home-brands-bottom-wrapper,
+      .home-brands-background-wrapper {
         padding-bottom: 3rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.8);
       }
 
       @media (max-width: 767px) {
         .home-brands-bottom-wrapper,
         .home-brands-background-wrapper {
-          background-image: url('/img/background-desktop-bottom.jpeg');
-          background-size: cover;
-          background-position: center top;
           padding-bottom: 2rem;
         }
       }

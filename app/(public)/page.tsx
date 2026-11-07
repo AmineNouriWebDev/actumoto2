@@ -63,7 +63,7 @@ export default async function Home() {
         </p>
       </section>
 
-      {/* 2. SECTION NOUVEAUTÉS (FOND SHOWROOM BOTTOM) */}
+      {/* 2. SECTION NOUVEAUTÉS (FOND GRIS CLAIR BRILLANT) */}
       <div className="home-nouveautes-wrapper">
         <NewModelsSection models={formattedNewModels} />
       </div>
@@ -82,7 +82,7 @@ export default async function Home() {
         </picture>
       </div>
 
-      {/* 4. SECTION MARQUES (BAS DU GARAGE AVEC DÉFILEMENT NATUREL) */}
+      {/* 4. SECTION MARQUES (FOND GRIS CLAIR BRILLANT) */}
       <div className="home-brands-bottom-wrapper">
         <BrandsGrid brands={brands} />
       </div>
