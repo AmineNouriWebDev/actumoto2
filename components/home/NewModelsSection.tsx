@@ -51,10 +51,6 @@ export default function NewModelsSection({ models }: NewModelsSectionProps) {
       <div className="container mx-auto px-4">
         {/* Titre de section stylisé identique à Toutes les marques */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600/10 border border-red-500/20 text-red-600 text-xs font-bold uppercase tracking-wider mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-red-600 animate-pulse" />
-            Nouveautés
-          </div>
           <h2 id="nouveautes-title" className="futurist-font text-xl md:text-2xl text-gray-900 mb-2">
             DERNIÈRES <span className="text-red-600">NOUVEAUTÉS</span> MOTO
           </h2>

@@ -65,29 +65,6 @@ export default async function Home() {
 
       {/* 2. ZONE BACKGROUND SHOWROOM (DU SLIDER JUSQU'À LA BANNIÈRE DU BAS) */}
       <div className="home-brands-background-wrapper">
-        {/* Social Media Mobile */}
-        <section className="py-4 lg:hidden" aria-label="Réseaux sociaux">
-          <div className="container mx-auto px-4">
-            <div className="social-bar" role="navigation" aria-label="Liens vers nos réseaux sociaux">
-              <a href="https://www.facebook.com/profile.php?id=61584281323170" className="social-btn facebook" aria-label="Facebook (lien)" target="_blank" rel="noreferrer">
-                <img src="/img/social/facebook.png" alt="Facebook actumoto.tn" />
-              </a>
-              <a href="https://www.instagram.com/actumoto.tn?stkn=MTRqNzhiczQ3aWFvNw==" className="social-btn instagram" aria-label="Instagram (lien)" target="_blank" rel="noreferrer">
-                <img src="/img/social/instagram.png" alt="Instagram actumoto.tn" />
-              </a>
-              <a href="https://www.youtube.com/@ActumotoTn" className="social-btn youtube" aria-label="YouTube (lien)" target="_blank" rel="noreferrer">
-                <img src="/img/social/youtube.png" alt="YouTube actumoto.tn" />
-              </a>
-              <a href="https://www.tiktok.com/@actumoto.tn?_r=1&_t=ZS-9AFrMJkO9jz" className="social-btn tiktok" aria-label="TikTok (lien)" target="_blank" rel="noreferrer">
-                <img src="/img/social/tiktok.png" alt="TikTok actumoto.tn" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* Navigation Catégories / Prix cachée (sera intégrée dans le menu nav plus tard) */}
-        {/* <CategoriesAndPrices categories={categories} /> */}
-
         {/* Section Nouveautés */}
         <NewModelsSection models={formattedNewModels} />
 
