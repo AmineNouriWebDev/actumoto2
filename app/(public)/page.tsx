@@ -63,7 +63,12 @@ export default async function Home() {
         </p>
       </section>
 
-      {/* 2. ZONE SHOWROOM TOP (HAUT DE L'IMAGE AVEC LES MOTOS) */}
+      {/* 2. SECTION NOUVEAUTÉS (FOND BLANC) */}
+      <div className="bg-white">
+        <NewModelsSection models={formattedNewModels} />
+      </div>
+
+      {/* 3. ZONE SHOWROOM TOP (HAUT DE L'IMAGE AVEC LES MOTOS) */}
       <div className="w-full overflow-hidden bg-[#9199a1]">
         <picture className="w-full block">
           <source media="(max-width: 767px)" srcSet="/img/background-mobile-top.webp" />
@@ -75,11 +80,6 @@ export default async function Home() {
             loading="eager"
           />
         </picture>
-      </div>
-
-      {/* 3. SECTION NOUVEAUTÉS (FOND BLANC) */}
-      <div className="bg-white">
-        <NewModelsSection models={formattedNewModels} />
       </div>
 
       {/* 4. SECTION MARQUES (BAS DU GARAGE AVEC DÉFILEMENT NATUREL) */}

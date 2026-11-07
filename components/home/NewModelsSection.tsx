@@ -112,12 +112,12 @@ export default function NewModelsSection({ models }: NewModelsSectionProps) {
                     href={modelHref}
                     className="group block text-center focus:outline-none"
                   >
-                    {/* Conteneur Image avec ratio uniforme 4:3 garanti pour tous les modèles */}
-                    <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gray-50 border border-gray-200/80 shadow-xs relative flex items-center justify-center p-2">
+                    {/* Conteneur Image avec ratio uniforme 4:3 garanti pour tous les modèles (sans cadre gris) */}
+                    <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden relative flex items-center justify-center">
                       <img
                         src={mainImage}
                         alt={`${brandName} ${model.name}`}
-                        className="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-full object-cover rounded-2xl transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"
                         onError={(e) => {
                           (e.currentTarget as HTMLImageElement).src =
