@@ -23,10 +23,11 @@ model Brand {
 }
 
 model Category {
-  id        String  @id @default(uuid())
-  name      String  @unique
-  logo      String
-  isVisible Boolean @default(true)
+  id         String  @id @default(uuid())
+  name       String  @unique
+  logo       String
+  isVisible  Boolean @default(true)
+  orderIndex Int     @default(0)
 
   models Model[]
 }
@@ -49,7 +50,7 @@ model Model {
   videoUrl      String?
 
   brand    Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  category Category? @relation(fields: [categoryId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   images    Image[]
   specs     Specs?

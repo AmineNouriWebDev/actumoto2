@@ -9,7 +9,7 @@ export default async function Header() {
     auth(),
     prisma.category.findMany({
       where: { isVisible: true },
-      orderBy: { name: "asc" },
+      orderBy: { orderIndex: "asc" },
       select: { id: true, name: true, logo: true, isVisible: true },
     }),
   ]);

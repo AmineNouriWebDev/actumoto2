@@ -9,7 +9,7 @@ export default async function Home() {
   const [slides, brands, categories, banner, settings, newModels] = await Promise.all([
     prisma.carouselSlide.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
     prisma.brand.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
-    prisma.category.findMany({ where: { isVisible: true } }),
+    prisma.category.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
     prisma.homepageBanner.findFirst({ where: { isVisible: true } }),
     prisma.siteSettings.findFirst(),
     prisma.model.findMany({
