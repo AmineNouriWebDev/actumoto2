@@ -314,3 +314,19 @@ model SiteSettings {
   id              String @id @default(uuid())
   carouselDelayMs Int    @default(4000)
 }
+
+model NouveauteItem {
+  id         String   @id @default(uuid())
+  title      String?
+  subtitle   String?
+  imageUrl   String
+  linkUrl    String?
+  price      Float?
+  promoPrice Float?
+  currency   String?  @default("DT")
+  orderIndex Int      @default(0)
+  isVisible  Boolean  @default(true)
+  modelId    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

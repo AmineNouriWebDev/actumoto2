@@ -6,13 +6,21 @@ import WelcomePopup from "@/components/home/WelcomePopup";
 import prisma from "@/lib/prisma";
 
 export default async function Home() {
-  const [slides, brands, categories, banner, settings, newModels] = await Promise.all([
+  const [slides, brands, categories, banner, settings, nouveautesItems] = await Promise.all([
     prisma.carouselSlide.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
     prisma.brand.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
     prisma.category.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
     prisma.homepageBanner.findFirst({ where: { isVisible: true } }),
     prisma.siteSettings.findFirst(),
-    prisma.model.findMany({
+    prisma.nouveauteItem.findMany({
+      where: { isVisible: true },
+      orderBy: { orderIndex: 'asc' },
+    }),
+  ]);
+
+  let displayedNouveautes = nouveautesItems;
+  if (displayedNouveautes.length === 0) {
+    const fallbackModels = await prisma.model.findMany({
       where: { isVisible: true, isNew: true },
       include: {
         brand: true,
@@ -21,15 +29,23 @@ export default async function Home() {
         specs: true,
       },
       orderBy: [{ orderIndex: 'asc' }, { name: 'asc' }],
-    }),
-  ]);
-
-  const formattedNewModels = newModels.map((m) => ({
-    ...m,
-    brand: m.brand.name,
-    category: m.category?.name,
-    images: m.images.map((img: any) => img.url),
-  }));
+    });
+    displayedNouveautes = fallbackModels.map((m, idx) => ({
+      id: m.id,
+      title: m.name,
+      subtitle: m.brand.name,
+      imageUrl: m.images[0]?.url || "/img/placeholder-moto.jpg",
+      linkUrl: `/marques/${encodeURIComponent(m.brand.name)}/${encodeURIComponent(m.name)}`,
+      price: m.price,
+      promoPrice: m.promoPrice,
+      currency: m.currency || "DT",
+      orderIndex: idx,
+      isVisible: true,
+      modelId: m.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
+  }
   return (
     <>
       <WelcomePopup />
@@ -69,7 +85,7 @@ export default async function Home() {
         <section className="home-glossy-showcase" aria-label="Nouveautés et Marques motos en Tunisie">
           {/* 2. SECTION NOUVEAUTÉS */}
           <div className="home-nouveautes-wrapper">
-            <NewModelsSection models={formattedNewModels} />
+            <NewModelsSection items={displayedNouveautes} />
           </div>
 
           {/* SÉPARATEUR CHROMÉ SUBTIL */}

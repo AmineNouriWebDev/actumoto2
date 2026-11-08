@@ -943,3 +943,51 @@
   cursor: not-allowed;
 }
 
+/* Nouveauté URL and Upload Form Extensions */
+.nouveaute-url-section {
+  margin-top: 0.75rem;
+  padding: 0.6rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+}
+
+.nouveaute-link-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  margin-bottom: 0.4rem;
+}
+
+.nouveaute-link-badge-clickable {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.nouveaute-link-badge-unclickable {
+  background: rgba(156, 163, 175, 0.15);
+  color: #9ca3af;
+  border: 1px solid rgba(156, 163, 175, 0.25);
+}
+
+.nouveaute-upload-dropzone {
+  border: 2px dashed #4b5563;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  background: rgba(31, 41, 55, 0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nouveaute-upload-dropzone:hover {
+  border-color: #dc2626;
+  background: rgba(220, 38, 38, 0.05);
+}
+
+

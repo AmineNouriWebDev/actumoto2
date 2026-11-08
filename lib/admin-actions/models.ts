@@ -32,7 +32,44 @@ export async function toggleModelIsNew(id: string, isNew: boolean) {
     }
   }
 
-  await prisma.model.update({ where: { id }, data: { isNew: !isNew } });
+  const nextState = !isNew;
+  await prisma.model.update({ where: { id }, data: { isNew: nextState } });
+
+  try {
+    if (nextState) {
+      const existing = await prisma.nouveauteItem.findFirst({ where: { modelId: id } });
+      if (!existing) {
+        const fullModel = await prisma.model.findUnique({
+          where: { id },
+          include: { brand: true, images: { orderBy: { orderIndex: "asc" } } },
+        });
+        if (fullModel) {
+          const count = await prisma.nouveauteItem.count();
+          await prisma.nouveauteItem.create({
+            data: {
+              title: fullModel.name,
+              subtitle: fullModel.brand?.name || null,
+              imageUrl: fullModel.images[0]?.url || "/img/placeholder-moto.jpg",
+              linkUrl: fullModel.brand?.name
+                ? `/marques/${encodeURIComponent(fullModel.brand.name)}/${encodeURIComponent(fullModel.name)}`
+                : null,
+              price: fullModel.price,
+              promoPrice: fullModel.promoPrice,
+              currency: fullModel.currency || "DT",
+              orderIndex: count,
+              modelId: fullModel.id,
+              isVisible: true,
+            },
+          });
+        }
+      }
+    } else {
+      await prisma.nouveauteItem.deleteMany({ where: { modelId: id } });
+    }
+  } catch (err) {
+    console.error("Error syncing NouveauteItem in toggleModelIsNew:", err);
+  }
+
   revalidatePath("/admin/modeles");
   revalidatePath("/admin/nouveautes");
   revalidatePath("/");
