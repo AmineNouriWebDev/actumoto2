@@ -10,6 +10,7 @@ const allNavItems = [
   { href: "/admin/marques", label: "Marques", icon: "🏷️", roles: ["ADMIN"] },
   { href: "/admin/categories", label: "Catégories", icon: "📑", roles: ["ADMIN"] },
   { href: "/admin/modeles", label: "Modèles", icon: "🏍️", roles: ["ADMIN", "DEALER"] },
+  { href: "/admin/nouveautes", label: "Nouveautés", icon: "✨", roles: ["ADMIN"] },
   { href: "/admin/occasion", label: "Occasions", icon: "🔄", roles: ["ADMIN", "DEALER"] },
   { href: "/admin/commentaires", label: "Commentaires", icon: "💬", roles: ["ADMIN"] },
   { href: "/admin/carrousel", label: "Carrousel", icon: "🖼️", roles: ["ADMIN"] },
@@ -37,7 +38,14 @@ export default function AdminSidebar({ role, pendingReviewsCount = 0 }: { role?:
   const SidebarContent = () => (
     <div className="sidebar-inner">
       <div className="sidebar-header">
-        <img src="/img/logo2.webp" alt="actumoto" className="sidebar-logo" />
+        <img
+          src="/img/logo-final.jpeg"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = "/img/logo2.webp";
+          }}
+          alt="actumoto"
+          className="sidebar-logo"
+        />
         <span className="sidebar-badge">Admin</span>
       </div>
 
@@ -85,7 +93,14 @@ export default function AdminSidebar({ role, pendingReviewsCount = 0 }: { role?:
         >
           ☰
         </button>
-        <img src="/img/logo2.webp" alt="actumoto" className="mobile-logo" />
+        <img
+          src="/img/logo-final.jpeg"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = "/img/logo2.webp";
+          }}
+          alt="actumoto"
+          className="mobile-logo"
+        />
       </div>
 
       {/* Mobile overlay */}

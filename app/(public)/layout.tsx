@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: "actumoto.tn",
     images: [
       {
-        url: "https://actumoto.tn/img/logo2.webp",
+        url: "https://actumoto.tn/img/logo-final.jpeg",
         width: 1200,
         height: 630,
         alt: "actumoto.tn Logo",

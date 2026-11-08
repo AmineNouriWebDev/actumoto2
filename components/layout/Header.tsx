@@ -4,6 +4,8 @@ import HeaderSearch from "@/components/layout/HeaderSearch";
 import BurgerMenu from "@/components/layout/BurgerMenu";
 import UserNavButton from "@/components/layout/UserNavButton";
 import prisma from "@/lib/prisma";
+import fs from "fs";
+import path from "path";
 
 export default async function Header() {
   const [session, categories] = await Promise.all([
@@ -19,6 +21,9 @@ export default async function Header() {
   const role = session?.user?.role;
   const dashboardUrl = (role === "ADMIN" || role === "DEALER") ? "/admin" : "/compte";
 
+  const hasLogo = fs.existsSync(path.join(process.cwd(), "public", "img", "logo-final.jpeg"));
+  const logoSrc = hasLogo ? "/img/logo-final.jpeg" : "/img/logo2.webp";
+
   return (
     <header className="header-futurist main-header" role="banner">
       <div className="w-full px-4 md:px-10 h-full">
@@ -33,7 +38,7 @@ export default async function Header() {
             <h1 className="sr-only">actumoto.tn - Concessionnaire moto Tunisie</h1>
             <Link href="/" aria-label="Retour à l'accueil actumoto.tn">
               <img
-                src="/img/logo2.webp"
+                src={logoSrc}
                 alt="actumoto.tn - Logo concessionnaire motos en Tunisie"
                 className="header-logo main-header-logo"
                 width={200}

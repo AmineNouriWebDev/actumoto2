@@ -34,6 +34,7 @@ export async function toggleModelIsNew(id: string, isNew: boolean) {
 
   await prisma.model.update({ where: { id }, data: { isNew: !isNew } });
   revalidatePath("/admin/modeles");
+  revalidatePath("/admin/nouveautes");
   revalidatePath("/");
 }
 

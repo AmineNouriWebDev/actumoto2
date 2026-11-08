@@ -118,7 +118,10 @@ export default function BurgerMenu({
             aria-label="Accueil actumoto.tn"
           >
             <img
-              src="/img/logo2.webp"
+              src="/img/logo-final.jpeg"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = "/img/logo2.webp";
+              }}
               alt="actumoto.tn"
               className="h-8 w-auto object-contain"
             />

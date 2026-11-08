@@ -34,44 +34,53 @@ export default async function Home() {
     <>
       <WelcomePopup />
       
-      {/* 1. SLIDER EN PREMIER */}
-      <HeroCarousel slides={slides} slideInterval={settings?.carouselDelayMs} />
+      {/* Flux d'accueil continu et harmonieux */}
+      <main className="home-main-flow">
+        {/* 1. SLIDER EN PREMIER */}
+        <HeroCarousel slides={slides} slideInterval={settings?.carouselDelayMs} />
 
-      {/* SECTION SEO - CONTENU OPTIMISÉ (visually hidden for SEO) */}
-      <section className="sr-only">
-        <h1>Comparateur de Prix Motos & Scooters en Tunisie</h1>
-        <h2>Motos Neuves au Meilleur Prix</h2>
-        <p>
-          Découvrez notre sélection complète de motos neuves en Tunisie.
-          Comparez les prix des plus grandes marques : Peugeot, CFMOTO, Suzuki,
-          Harley-Davidson et bien d'autres. Trouvez la moto de vos rêves au
-          meilleur prix sur actumoto.tn.
-        </p>
-        <h2>Scooters Tunisie - Électriques & Thermiques</h2>
-        <p>
-          Explorez notre large gamme de scooters en Tunisie : scooters
-          électriques écologiques, scooters thermiques économiques et scooters
-          de luxe. Consultez les prix actualisés et comparez facilement pour
-          trouver votre scooter idéal.
-        </p>
-        <p>
-          <strong>actumoto.tn</strong> est votre
-          <strong>comparateur de prix de motos et scooters N°1 en Tunisie</strong>. 
-          Accédez à des prix actualisés, des fiches techniques détaillées et
-          des coordonnées de concessionnaires officiels pour tous les modèles
-          disponibles sur le marché tunisien.
-        </p>
-      </section>
+        {/* SECTION SEO - CONTENU OPTIMISÉ (visually hidden for SEO) */}
+        <section className="sr-only">
+          <h1>Comparateur de Prix Motos & Scooters en Tunisie</h1>
+          <h2>Motos Neuves au Meilleur Prix</h2>
+          <p>
+            Découvrez notre sélection complète de motos neuves en Tunisie.
+            Comparez les prix des plus grandes marques : Peugeot, CFMOTO, Suzuki,
+            Harley-Davidson et bien d'autres. Trouvez la moto de vos rêves au
+            meilleur prix sur actumoto.tn.
+          </p>
+          <h2>Scooters Tunisie - Électriques & Thermiques</h2>
+          <p>
+            Explorez notre large gamme de scooters en Tunisie : scooters
+            électriques écologiques, scooters thermiques économiques et scooters
+            de luxe. Consultez les prix actualisés et comparez facilement pour
+            trouver votre scooter idéal.
+          </p>
+          <p>
+            <strong>actumoto.tn</strong> est votre
+            <strong>comparateur de prix de motos et scooters N°1 en Tunisie</strong>. 
+            Accédez à des prix actualisés, des fiches techniques détaillées et
+            des coordonnées de concessionnaires officiels pour tous les modèles
+            disponibles sur le marché tunisien.
+          </p>
+        </section>
 
-      {/* 2. SECTION NOUVEAUTÉS */}
-      <div className="home-nouveautes-wrapper">
-        <NewModelsSection models={formattedNewModels} />
-      </div>
+        {/* SHOWCASE LUXE GRIS BRILLANT : NOUVEAUTÉS & MARQUES */}
+        <section className="home-glossy-showcase" aria-label="Nouveautés et Marques motos en Tunisie">
+          {/* 2. SECTION NOUVEAUTÉS */}
+          <div className="home-nouveautes-wrapper">
+            <NewModelsSection models={formattedNewModels} />
+          </div>
 
-      {/* 4. SECTION MARQUES */}
-      <div className="home-brands-bottom-wrapper">
-        <BrandsGrid brands={brands} />
-      </div>
+          {/* SÉPARATEUR CHROMÉ SUBTIL */}
+          <div className="home-showcase-divider" aria-hidden="true" />
+
+          {/* 3. SECTION MARQUES */}
+          <div className="home-brands-bottom-wrapper">
+            <BrandsGrid brands={brands} />
+          </div>
+        </section>
+      </main>
 
       {/* SECTION BANNIÈRE DYNAMIQUE */}
       {banner && (

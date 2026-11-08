@@ -348,34 +348,127 @@ h3,
       }
 
       /* ============================================================ */
-      /* HOME NOUVEAUTES & BRANDS SECTIONS BACKGROUND                 */
-      /* Gris très clair satiné et brillant (sans image de fond)      */
+      /* HOME GLOSSY SHOWCASE — GRIS TITANE SOMBRE BRILLANT À LA MODE */
+      /* Effet carrosserie titane gunmetal / chrome liquide réfléchissant */
       /* ============================================================ */
-      .home-nouveautes-wrapper,
-      .home-brands-bottom-wrapper,
-      .home-brands-background-wrapper {
+      .home-glossy-showcase {
         position: relative;
         width: 100%;
-        background-color: #c8cdd4;
+        background-color: #38414c;
         background-image:
-          radial-gradient(ellipse 100% 55% at 50% 0%, rgba(255,255,255,0.65) 0%, transparent 70%),
-          radial-gradient(ellipse 70% 35% at 15% 60%, rgba(255,255,255,0.22) 0%, transparent 55%),
-          radial-gradient(ellipse 50% 25% at 85% 80%, rgba(170,180,195,0.3) 0%, transparent 50%),
-          linear-gradient(150deg,
-            #dde2e8 0%,
-            #c8cdd5 20%,
-            #d6dbe2 38%,
-            #bfc5cd 52%,
-            #cfd4dc 68%,
-            #c4cad2 82%,
-            #d1d6de 100%
+          /* Reflet spéculaire diagonal intense (faisceau chrome liquide) */
+          linear-gradient(130deg,
+            rgba(255, 255, 255, 0.55) 0%,
+            rgba(255, 255, 255, 0.08) 16%,
+            rgba(255, 255, 255, 0.65) 32%,
+            rgba(20, 24, 30, 0.35) 44%,
+            rgba(255, 255, 255, 0.75) 56%,
+            rgba(20, 24, 30, 0.40) 70%,
+            rgba(255, 255, 255, 0.50) 86%,
+            rgba(255, 255, 255, 0.15) 100%
+          ),
+          /* Contre-reflet lumineux croisé pour effet de galbe 3D */
+          linear-gradient(55deg,
+            rgba(255, 255, 255, 0.20) 0%,
+            transparent 35%,
+            rgba(255, 255, 255, 0.30) 50%,
+            transparent 65%,
+            rgba(255, 255, 255, 0.22) 100%
+          ),
+          /* Éclat lumineux supérieur (projecteur de showroom) */
+          radial-gradient(ellipse 110% 45% at 50% 0%, rgba(255, 255, 255, 0.70) 0%, transparent 60%),
+          /* Halos de brillance latéraux créant de la rondeur et de la profondeur */
+          radial-gradient(ellipse 75% 55% at 15% 50%, rgba(255, 255, 255, 0.30) 0%, transparent 55%),
+          radial-gradient(ellipse 80% 50% at 85% 75%, rgba(255, 255, 255, 0.28) 0%, transparent 50%),
+          radial-gradient(ellipse 90% 45% at 50% 100%, rgba(255, 255, 255, 0.22) 0%, transparent 60%),
+          /* Corps dégradé gris titane métallique sombre riche */
+          linear-gradient(165deg,
+            #5e6876 0%,
+            #444d5a 16%,
+            #6f7c8d 32%,
+            #2e353f 48%,
+            #525d6b 64%,
+            #232830 80%,
+            #414a56 100%
           );
         background-repeat: no-repeat;
         background-size: 100% 100%;
+        box-shadow:
+          inset 0 2px 0 rgba(255, 255, 255, 0.55),
+          inset 0 -2px 0 rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+      }
+
+      .home-glossy-showcase::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse 70% 40% at 50% 30%, rgba(255, 255, 255, 0.25) 0%, transparent 65%);
+        pointer-events: none;
       }
 
       .home-nouveautes-wrapper {
-        border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+        position: relative;
+        width: 100%;
+        background: transparent;
+        border: none;
+        padding-top: 1.25rem;
+      }
+
+      /* Typographie et éléments de contraste sur fond gris titane */
+      .home-glossy-showcase h3.futurist-font {
+        color: #ffffff !important;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+      }
+
+      .home-glossy-showcase .group:hover h3.futurist-font {
+        color: #ff3333 !important;
+      }
+
+      .home-glossy-showcase p.text-gray-800,
+      .home-glossy-showcase .text-gray-800 {
+        color: #e2e8f0 !important;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .home-glossy-showcase span.text-red-600 {
+        color: #ff3838 !important;
+        text-shadow: 0 0 12px rgba(255, 56, 56, 0.5);
+      }
+
+      /* Flèches de défilement sur fond sombre */
+      .home-glossy-showcase button[aria-label="Nouveauté précédente"],
+      .home-glossy-showcase button[aria-label="Nouveauté suivante"] {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important;
+        backdrop-filter: blur(8px) !important;
+      }
+
+      .home-glossy-showcase button[aria-label="Nouveauté précédente"]:hover,
+      .home-glossy-showcase button[aria-label="Nouveauté suivante"]:hover {
+        background: #dc2626 !important;
+        border-color: #dc2626 !important;
+        color: #ffffff !important;
+        box-shadow: 0 0 12px rgba(220, 38, 38, 0.6) !important;
+      }
+
+      .home-showcase-divider {
+        width: 85%;
+        max-width: 960px;
+        height: 1px;
+        margin: 2rem auto 1.5rem;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.75) 25%,
+          rgba(255, 255, 255, 1) 50%,
+          rgba(255, 255, 255, 0.75) 75%,
+          transparent 100%
+        );
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 1px 3px rgba(0, 0, 0, 0.6);
+        position: relative;
+        z-index: 2;
       }
 
       /* ============================================ */
@@ -451,7 +544,7 @@ h3,
       .home-brands-bottom-wrapper,
       .home-brands-background-wrapper {
         padding-bottom: 3rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.8);
+        border-top: none;
       }
 
       @media (max-width: 767px) {
@@ -476,6 +569,16 @@ h3,
         border: none !important;
         box-shadow: none !important;
         transform: translateY(-4px);
+      }
+
+      .home-glossy-showcase .brand-logo-img {
+        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 2px rgba(255, 255, 255, 0.6));
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .home-glossy-showcase .brand-logo-card:hover .brand-logo-img {
+        filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.9));
+        transform: scale(1.1) translateY(-4px);
       }
 
       /* =========================================== */
@@ -779,7 +882,7 @@ h3,
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: #f8fafc;
+        background: transparent;
         overflow: hidden;
         margin: 0;
         padding: 0;
@@ -1175,7 +1278,7 @@ h3,
         transition:
           opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
           visibility 0.8s;
-        background-color: #f8fafc;
+        background-color: transparent;
         overflow: hidden;
         margin: 0;
         padding: 0;
@@ -1307,7 +1410,7 @@ h3,
           margin-left: 0;
           margin-right: 0;
           padding: 1.5rem 0;
-          background-color: #f8fafc;
+          background-color: transparent;
         }
 
         .carousel-slide {

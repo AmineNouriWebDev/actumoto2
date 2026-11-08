@@ -62,7 +62,10 @@ function RegisterForm() {
       <div className="auth-card">
         <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
           <img
-            src="/img/logo2.webp"
+            src="/img/logo-final.jpeg"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = "/img/logo2.webp";
+            }}
             alt="actumoto"
             style={{
               height: "45px",

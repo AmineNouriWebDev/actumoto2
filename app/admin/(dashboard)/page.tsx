@@ -53,6 +53,7 @@ export default async function AdminDashboard() {
   const quickActions = [
     { label: "Ajouter une Marque", href: "/admin/marques/nouvelle", icon: "➕" },
     { label: "Ajouter un Modèle", href: "/admin/modeles/nouveau", icon: "🏍️" },
+    { label: "Gérer les Nouveautés", href: "/admin/nouveautes", icon: "✨" },
     { label: "Gérer le Carrousel", href: "/admin/carrousel", icon: "🖼️" },
     { label: "Modifier la Popup", href: "/admin/popup", icon: "📢" },
     { label: "Gérer les Utilisateurs", href: "/admin/utilisateurs", icon: "👥" },
