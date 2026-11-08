@@ -864,81 +864,8 @@ h3,
       }
 
       /* =========================================== */
-      /* HERO SECTION - MODIFICATIONS APPLIQUÉES */
+      /* HERO HEADER STYLES (Défini ci-dessous dans la section CAROUSEL) */
       /* =========================================== */
-      .hero-section {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: transparent;
-        overflow: hidden;
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      .hero-image-container {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .hero-image {
-        width: auto;
-        height: auto;
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-      }
-
-      /* Mobile: image centrée sans marge avec header */
-      @media (max-width: 767px) {
-        .hero-section {
-          padding: 0;
-          margin-top: 0; /* Collé au header */
-          margin-left: 0;
-          margin-right: 0;
-          height: 50vh;
-        }
-
-        .hero-image-container {
-          margin-top: 0; /* Pas de marge supplémentaire */
-          width: 100%;
-          margin: 0;
-          padding: 0;
-          height: 100%;
-        }
-
-        .hero-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover; /* Remplit les 50vh avec l'image carrée */
-        }
-      }
-
-      /* Desktop: image centrée avec conteneur limité */
-      @media (min-width: 768px) {
-        .hero-section {
-          padding: 0;
-          margin-top: 0; /* Collé au header */
-          margin-left: 0;
-          margin-right: 0;
-        }
-
-        .hero-image-container {
-          max-width: 1200px;
-          width: 95%;
-          margin: 0 auto; /* Pas de marge verticale */
-          height: 100%;
-        }
-
-        .hero-image {
-          max-height: 100%;
-          border-radius: 12px;
-        }
-      }
 
       /* =========================================== */
       /* SECTION ACCESSOIRES - MODIFICATIONS APPLIQUÉES */
@@ -1238,9 +1165,57 @@ h3,
         border: 0;
       }
 
-      /* =========================================== */
-      /* CAROUSEL STYLES */
-      /* =========================================== */
+      /* ============================================================ */
+      /* HERO HEADER PLEIN ÉCRAN IMMERSIF (DESKTOP & MOBILE)          */
+      /* ============================================================ */
+
+      .hero-section {
+        position: relative;
+        width: 100%;
+        width: 100vw;
+        max-width: 100%;
+        /* Occupe exactement toute la hauteur de l'écran sous le header (80px) */
+        height: calc(100vh - 80px);
+        height: calc(100dvh - 80px);
+        min-height: calc(100dvh - 80px);
+        max-height: calc(100dvh - 80px);
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        background-color: #0b0d11;
+        box-sizing: border-box;
+      }
+
+      @media (max-width: 767px) {
+        .hero-section {
+          height: calc(100vh - 80px);
+          height: calc(100dvh - 80px);
+          min-height: calc(100dvh - 80px);
+          max-height: calc(100dvh - 80px);
+          margin: 0;
+          padding: 0;
+        }
+      }
+
+      @media (min-width: 768px) {
+        .hero-section {
+          height: calc(100vh - 80px);
+          height: calc(100dvh - 80px);
+          min-height: calc(100dvh - 80px);
+          max-height: calc(100dvh - 80px);
+          margin: 0;
+          padding: 0;
+        }
+      }
+
+      @media (min-width: 1200px) {
+        .hero-section {
+          height: calc(100vh - 80px);
+          height: calc(100dvh - 80px);
+          min-height: calc(100dvh - 80px);
+          max-height: calc(100dvh - 80px);
+        }
+      }
 
       .carousel-container {
         position: relative;
@@ -1253,53 +1228,39 @@ h3,
       }
 
       .carousel-track {
-        display: flex;
-        height: 100%;
+        position: relative;
         width: 100%;
+        height: 100%;
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
 
       .carousel-slide {
-        min-width: 100%;
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        position: absolute;
-        top: 0;
-        left: 0;
         opacity: 0;
         visibility: hidden;
         transition:
           opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
           visibility 0.8s;
-        background-color: transparent;
+        background-color: #0b0d11;
         overflow: hidden;
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        z-index: 0;
       }
 
       .carousel-slide.active {
         opacity: 1;
         visibility: visible;
-        z-index: 1;
-      }
-
-      .carousel-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-        transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        margin: 0;
-        padding: 0;
-        display: block;
-        max-width: 100%;
-        max-height: 100%;
+        z-index: 2;
       }
 
       .carousel-slide picture {
@@ -1308,12 +1269,32 @@ h3,
         display: block;
       }
 
+      .carousel-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        transition: transform 8s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+
+      .carousel-slide.active .carousel-image {
+        animation: gentleHeroZoom 12s infinite alternate ease-in-out;
+      }
+
+      @keyframes gentleHeroZoom {
+        0% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(1.04);
+        }
+      }
+
       .carousel-slide-link {
         width: 100%;
         height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: block;
         text-decoration: none;
         cursor: pointer;
         margin: 0;
@@ -1321,123 +1302,154 @@ h3,
         box-sizing: border-box;
       }
 
-      .carousel-slide-link:hover .carousel-image {
-        transform: scale(1.02);
+      /* Flèches de navigation latérales */
+      .carousel-nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 15;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(10, 12, 16, 0.55);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      .carousel-slide.active .carousel-image {
-        transform: scale(1);
-        animation: gentleZoom 8s infinite alternate;
+      .carousel-nav-btn:hover {
+        background: #dc2626;
+        border-color: #ef4444;
+        color: #ffffff;
+        transform: translateY(-50%) scale(1.08);
+        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.55);
       }
 
-      @keyframes gentleZoom {
-        0% {
-          transform: scale(1);
+      .carousel-nav-btn.prev-btn {
+        left: 20px;
+      }
+
+      .carousel-nav-btn.next-btn {
+        right: 20px;
+      }
+
+      @media (max-width: 767px) {
+        .carousel-nav-btn {
+          display: none !important;
         }
-        100% {
-          transform: scale(1.05);
-        }
       }
 
+      /* Puces / Indicateurs */
       .carousel-indicators {
         position: absolute;
-        bottom: 20px;
+        bottom: 42px;
         left: 0;
         right: 0;
         display: flex;
         justify-content: center;
-        gap: 10px;
-        z-index: 10;
+        align-items: center;
+        gap: 8px;
+        z-index: 15;
         margin: 0;
         padding: 0;
       }
 
-      .indicator {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
+      .indicator-pill {
+        width: 10px;
+        height: 10px;
+        border-radius: 9999px;
         background: rgba(255, 255, 255, 0.5);
+        border: none;
         cursor: pointer;
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        transform: scale(0.8);
-        margin: 0;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         padding: 0;
       }
 
-      .indicator.active {
-        background: #ff0000;
-        transform: scale(1.2);
-        box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+      .indicator-pill:hover {
+        background: rgba(255, 255, 255, 0.9);
       }
 
-      .indicator:hover {
-        background: rgba(255, 255, 255, 0.8);
-        transform: scale(1.1);
+      .indicator-pill.active {
+        width: 32px;
+        height: 10px;
+        background: #dc2626;
+        box-shadow: 0 0 12px rgba(220, 38, 38, 0.8);
       }
 
-      /* Responsive adjustments */
-      /* Mobile */
       @media (max-width: 767px) {
-        .hero-section {
-          height: 50vh;
-          margin-top: 0;
-        }
-
         .carousel-indicators {
-          bottom: 15px;
-          gap: 8px;
-        }
-
-        .indicator {
-          width: 10px;
-          height: 10px;
-        }
-      }
-
-      /* Desktop */
-      @media (min-width: 768px) {
-        .hero-section {
-          height: auto;
-          min-height: auto;
-          max-height: none;
-          margin-top: 0;
-          width: 100%;
-          position: relative;
-          left: auto;
-          right: auto;
-          margin-left: 0;
-          margin-right: 0;
-          padding: 1.5rem 0;
-          background-color: transparent;
-        }
-
-        .carousel-slide {
-          transition:
-            opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
-            visibility 1s;
-        }
-      }
-
-      /* Large Desktop */
-      @media (min-width: 1200px) {
-        .hero-section {
-          max-height: none;
-        }
-      }
-
-      /* Small mobile */
-      @media (max-width: 480px) {
-        .hero-section {
-          height: 50vh;
-        }
-
-        .carousel-indicators {
+          bottom: 38px;
           gap: 6px;
         }
 
-        .indicator {
+        .indicator-pill {
           width: 8px;
           height: 8px;
+        }
+
+        .indicator-pill.active {
+          width: 24px;
+          height: 8px;
+        }
+      }
+
+      /* Bouton indicateur pour défiler vers le bas (Scroll down indicator) */
+      .hero-scroll-down-btn {
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 15;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.85);
+        cursor: pointer;
+        padding: 4px 12px;
+        transition: color 0.25s ease;
+      }
+
+      .hero-scroll-down-btn:hover {
+        color: #ffffff;
+      }
+
+      .hero-scroll-down-btn .scroll-text {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.8);
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+        margin-bottom: 2px;
+      }
+
+      .hero-scroll-down-btn .scroll-icon {
+        width: 22px;
+        height: 22px;
+        color: #ff3333;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9));
+        animation: heroBounce 2s infinite;
+      }
+
+      @keyframes heroBounce {
+        0%, 20%, 50%, 80%, 100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(6px);
+        }
+        60% {
+          transform: translateY(3px);
         }
       }
 
