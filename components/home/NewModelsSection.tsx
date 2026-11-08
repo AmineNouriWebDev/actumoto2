@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 
 interface NewModelsSectionProps {
   models: any[];
@@ -124,6 +124,14 @@ export default function NewModelsSection({ models }: NewModelsSectionProps) {
                             "/img/placeholder-moto.jpg";
                         }}
                       />
+                      {/* Badge NOUVEAU */}
+                      <div
+                        className="nouveau-badge"
+                        aria-label="Nouveau modèle"
+                      >
+                        <Sparkles className="nouveau-badge-icon" aria-hidden="true" />
+                        <span>NOUVEAU</span>
+                      </div>
                     </div>
 
                     {/* Nom du modèle en dessous de l'image */}

@@ -30,7 +30,22 @@ html {
 
 body {
   font-family: "Rajdhani", sans-serif;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background-color: #c8cdd4;
+  background-image:
+    radial-gradient(ellipse 120% 60% at 50% 0%, rgba(255,255,255,0.55) 0%, transparent 65%),
+    radial-gradient(ellipse 80% 40% at 20% 50%, rgba(255,255,255,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 30% at 80% 70%, rgba(180,190,200,0.25) 0%, transparent 55%),
+    linear-gradient(160deg,
+      #dde1e7 0%,
+      #c5cad2 15%,
+      #d8dde4 30%,
+      #bec4cc 45%,
+      #d0d5dd 60%,
+      #c2c8d0 75%,
+      #cdd2da 90%,
+      #bfc5cd 100%
+    );
+  background-attachment: fixed;
 }
 
 h1,
@@ -254,7 +269,22 @@ h3,
 
       body {
         font-family: "Rajdhani", sans-serif;
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        background-color: #c8cdd4;
+        background-image:
+          radial-gradient(ellipse 120% 60% at 50% 0%, rgba(255,255,255,0.55) 0%, transparent 65%),
+          radial-gradient(ellipse 80% 40% at 20% 50%, rgba(255,255,255,0.18) 0%, transparent 60%),
+          radial-gradient(ellipse 60% 30% at 80% 70%, rgba(180,190,200,0.25) 0%, transparent 55%),
+          linear-gradient(160deg,
+            #dde1e7 0%,
+            #c5cad2 15%,
+            #d8dde4 30%,
+            #bec4cc 45%,
+            #d0d5dd 60%,
+            #c2c8d0 75%,
+            #cdd2da 90%,
+            #bfc5cd 100%
+          );
+        background-attachment: fixed;
       }
 
       h1,
@@ -326,10 +356,20 @@ h3,
       .home-brands-background-wrapper {
         position: relative;
         width: 100%;
-        background-color: #f1f4f8;
-        background-image: 
-          radial-gradient(ellipse 90% 60% at 50% 0%, rgba(255, 255, 255, 0.95), transparent 75%),
-          linear-gradient(135deg, #f8fafc 0%, #f1f5f9 22%, #ffffff 45%, #f8fafc 55%, #e8edf3 82%, #f1f4f8 100%);
+        background-color: #c8cdd4;
+        background-image:
+          radial-gradient(ellipse 100% 55% at 50% 0%, rgba(255,255,255,0.65) 0%, transparent 70%),
+          radial-gradient(ellipse 70% 35% at 15% 60%, rgba(255,255,255,0.22) 0%, transparent 55%),
+          radial-gradient(ellipse 50% 25% at 85% 80%, rgba(170,180,195,0.3) 0%, transparent 50%),
+          linear-gradient(150deg,
+            #dde2e8 0%,
+            #c8cdd5 20%,
+            #d6dbe2 38%,
+            #bfc5cd 52%,
+            #cfd4dc 68%,
+            #c4cad2 82%,
+            #d1d6de 100%
+          );
         background-repeat: no-repeat;
         background-size: 100% 100%;
       }
@@ -337,6 +377,76 @@ h3,
       .home-nouveautes-wrapper {
         border-bottom: 1px solid rgba(226, 232, 240, 0.6);
       }
+
+      /* ============================================ */
+      /* BADGE "NOUVEAU" SUR LES CARTES MODÈLES       */
+      /* ============================================ */
+      .nouveau-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px 4px 7px;
+        background: linear-gradient(135deg, #e00000 0%, #ff3333 50%, #cc0000 100%);
+        color: #ffffff;
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.6rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        border-radius: 20px;
+        box-shadow:
+          0 2px 8px rgba(220, 0, 0, 0.45),
+          0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+        z-index: 10;
+        pointer-events: none;
+        overflow: hidden;
+        animation: nouveau-pulse 2.4s ease-in-out infinite;
+      }
+
+      .nouveau-badge::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -60%;
+        width: 40%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+        animation: nouveau-shimmer 2.4s ease-in-out infinite;
+      }
+
+      .nouveau-badge-icon {
+        width: 10px;
+        height: 10px;
+        flex-shrink: 0;
+      }
+
+      @keyframes nouveau-pulse {
+        0%, 100% { box-shadow: 0 2px 8px rgba(220,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.2) inset; }
+        50% { box-shadow: 0 3px 14px rgba(220,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.3) inset; }
+      }
+
+      @keyframes nouveau-shimmer {
+        0%   { left: -60%; }
+        60%  { left: 120%; }
+        100% { left: 120%; }
+      }
+
+      @media (min-width: 768px) {
+        .nouveau-badge {
+          font-size: 0.65rem;
+          padding: 5px 12px 5px 8px;
+          top: 12px;
+          left: 12px;
+        }
+        .nouveau-badge-icon {
+          width: 11px;
+          height: 11px;
+        }
+      }
+
+
 
       .home-brands-bottom-wrapper,
       .home-brands-background-wrapper {

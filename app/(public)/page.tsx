@@ -63,26 +63,12 @@ export default async function Home() {
         </p>
       </section>
 
-      {/* 2. SECTION NOUVEAUTÉS (FOND GRIS CLAIR BRILLANT) */}
+      {/* 2. SECTION NOUVEAUTÉS */}
       <div className="home-nouveautes-wrapper">
         <NewModelsSection models={formattedNewModels} />
       </div>
 
-      {/* 3. ZONE SHOWROOM TOP (HAUT DE L'IMAGE AVEC LES MOTOS) */}
-      <div className="w-full overflow-hidden bg-[#9199a1]">
-        <picture className="w-full block">
-          <source media="(max-width: 767px)" srcSet="/img/background-mobile-top.webp" />
-          <source media="(min-width: 768px)" srcSet="/img/background-desktop-top.webp" />
-          <img
-            src="/img/background-desktop-top.webp"
-            alt="Showroom Motos Actumoto"
-            className="w-full h-auto block"
-            loading="eager"
-          />
-        </picture>
-      </div>
-
-      {/* 4. SECTION MARQUES (FOND GRIS CLAIR BRILLANT) */}
+      {/* 4. SECTION MARQUES */}
       <div className="home-brands-bottom-wrapper">
         <BrandsGrid brands={brands} />
       </div>
