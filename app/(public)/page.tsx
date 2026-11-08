@@ -55,6 +55,20 @@ export default async function Home() {
         {/* 1. SLIDER EN PREMIER */}
         <HeroCarousel slides={slides} slideInterval={settings?.carouselDelayMs} />
 
+        {/* SÉPARATION : IMAGE SHOWROOM TOP ENTRE LE CAROUSEL ET LES NOUVEAUTÉS */}
+        <div className="w-full overflow-hidden leading-none block bg-[#889898]">
+          <picture className="w-full block">
+            <source media="(max-width: 767px)" srcSet="/img/background-mobile-top.webp" />
+            <source media="(min-width: 768px)" srcSet="/img/background-desktop-top.webp" />
+            <img
+              src="/img/background-desktop-top.webp"
+              alt="Showroom Motos Actumoto"
+              className="w-full h-auto block select-none pointer-events-none"
+              loading="eager"
+            />
+          </picture>
+        </div>
+
         {/* SECTION SEO - CONTENU OPTIMISÉ (visually hidden for SEO) */}
         <section className="sr-only">
           <h1>Comparateur de Prix Motos & Scooters en Tunisie</h1>
