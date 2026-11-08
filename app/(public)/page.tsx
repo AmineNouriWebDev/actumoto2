@@ -55,18 +55,14 @@ export default async function Home() {
         {/* 1. SLIDER EN PREMIER */}
         <HeroCarousel slides={slides} slideInterval={settings?.carouselDelayMs} />
 
-        {/* SÉPARATION : IMAGE SHOWROOM TOP ENTRE LE CAROUSEL ET LES NOUVEAUTÉS */}
+        {/* SÉPARATION : IMAGE SHOWROOM TOP (FORMAT PANORAMIQUE SUR MOBILE ET DESKTOP) */}
         <div className="w-full overflow-hidden leading-none block bg-[#889898]">
-          <picture className="w-full block">
-            <source media="(max-width: 767px)" srcSet="/img/background-mobile-top.webp" />
-            <source media="(min-width: 768px)" srcSet="/img/background-desktop-top.webp" />
-            <img
-              src="/img/background-desktop-top.webp"
-              alt="Showroom Motos Actumoto"
-              className="w-full h-auto block select-none pointer-events-none"
-              loading="eager"
-            />
-          </picture>
+          <img
+            src="/img/background-desktop-top.webp"
+            alt="Showroom Motos Actumoto"
+            className="w-full h-auto block select-none pointer-events-none"
+            loading="eager"
+          />
         </div>
 
         {/* SECTION SEO - CONTENU OPTIMISÉ (visually hidden for SEO) */}
