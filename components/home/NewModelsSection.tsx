@@ -136,12 +136,12 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
               // Card Inner Content
               const cardContent = (
                 <>
-                  {/* Conteneur Image avec ratio uniforme 4:3 garanti (sans cadre gris) */}
-                  <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden relative flex items-center justify-center bg-gray-900/40">
+                  {/* Conteneur Image avec ratio uniforme 4:3 et fond 100% transparent pour laisser apparaître le fond métallique de la page d'accueil */}
+                  <div className="w-full aspect-[4/3] relative flex items-center justify-center bg-transparent">
                     <img
                       src={mainImage}
                       alt={subtitle ? `${subtitle} ${title}` : title}
-                      className={`w-full h-full object-cover rounded-2xl ${
+                      className={`w-full h-full object-contain drop-shadow-[0_10px_16px_rgba(0,0,0,0.4)] ${
                         isClickable
                           ? "transition-transform duration-500 group-hover:scale-105"
                           : ""

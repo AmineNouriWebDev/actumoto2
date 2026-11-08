@@ -431,6 +431,12 @@ h3,
         text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
       }
 
+      .home-glossy-showcase p.text-gray-700,
+      .home-glossy-showcase p.text-gray-500 {
+        color: #cbd5e1 !important;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+      }
+
       .home-glossy-showcase span.text-red-600 {
         color: #ff3838 !important;
         text-shadow: 0 0 12px rgba(255, 56, 56, 0.5);
