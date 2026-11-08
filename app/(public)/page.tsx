@@ -12,10 +12,12 @@ export default async function Home() {
     prisma.category.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
     prisma.homepageBanner.findFirst({ where: { isVisible: true } }),
     prisma.siteSettings.findFirst(),
-    prisma.nouveauteItem.findMany({
-      where: { isVisible: true },
-      orderBy: { orderIndex: 'asc' },
-    }),
+    (prisma as any).nouveauteItem
+      ? prisma.nouveauteItem.findMany({
+          where: { isVisible: true },
+          orderBy: { orderIndex: 'asc' },
+        })
+      : Promise.resolve([]),
   ]);
 
   let displayedNouveautes = nouveautesItems;
@@ -55,16 +57,6 @@ export default async function Home() {
         {/* 1. SLIDER EN PREMIER */}
         <HeroCarousel slides={slides} slideInterval={settings?.carouselDelayMs} />
 
-        {/* SÉPARATION : IMAGE SHOWROOM TOP (FORMAT PANORAMIQUE SUR MOBILE ET DESKTOP) */}
-        <div className="w-full overflow-hidden leading-none block bg-[#889898]">
-          <img
-            src="/img/background-desktop-top.webp"
-            alt="Showroom Motos Actumoto"
-            className="w-full h-auto block select-none pointer-events-none"
-            loading="eager"
-          />
-        </div>
-
         {/* SECTION SEO - CONTENU OPTIMISÉ (visually hidden for SEO) */}
         <section className="sr-only">
           <h1>Comparateur de Prix Motos & Scooters en Tunisie</h1>
@@ -91,20 +83,19 @@ export default async function Home() {
           </p>
         </section>
 
-        {/* SHOWCASE LUXE GRIS BRILLANT : NOUVEAUTÉS & MARQUES */}
-        <section className="home-glossy-showcase" aria-label="Nouveautés et Marques motos en Tunisie">
-          {/* 2. SECTION NOUVEAUTÉS */}
+        {/* 2. SECTION NOUVEAUTÉS */}
+        <section className="home-nouveautes-section" aria-label="Nouveautés motos en Tunisie">
           <div className="home-nouveautes-wrapper">
             <NewModelsSection items={displayedNouveautes} />
           </div>
+        </section>
 
-          {/* SÉPARATEUR CHROMÉ SUBTIL */}
-          <div className="home-showcase-divider" aria-hidden="true" />
+        {/* SÉPARATEUR CHROMÉ SUBTIL */}
+        <div className="home-showcase-divider" aria-hidden="true" />
 
-          {/* 3. SECTION MARQUES */}
-          <div className="home-brands-bottom-wrapper">
-            <BrandsGrid brands={brands} />
-          </div>
+        {/* 3. SECTION MARQUES : MUR INDUSTRIEL RÉPÉTÉ AVEC PLAQUES MÉTALLIQUES */}
+        <section className="home-brands-section" aria-label="Marques motos en Tunisie">
+          <BrandsGrid brands={brands} />
         </section>
       </main>
 

@@ -299,112 +299,116 @@ h3,
       /* Header augmenté et centré */
 
       .brand-logo-card {
-        background: transparent;
-        padding: 1rem;
+        background: transparent !important;
+        padding: 0 !important;
         position: relative;
-        overflow: hidden;
+        overflow: visible;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        height: 140px;
+        height: auto !important;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 12px;
-        border: none;
-        box-shadow: none;
+        border: none !important;
+        box-shadow: none !important;
         box-sizing: border-box;
-        /* Desktop flexible: se comporte comme minmax(200px, 1fr) */
-        flex: 1 1 200px;
-        min-width: 200px;
+        /* Desktop flexible */
+        flex: 1 1 180px;
+        min-width: 0;
       }
 
-      .brand-logo-card:hover {
-        transform: translateY(-4px);
-        background: transparent;
-        box-shadow: none;
+      /* Plaque métallique sous chaque logo (ratio natif 940x618 = 1.521:1) */
+      .brand-plaque-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 940 / 618;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55));
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .brand-logo-card:hover .brand-plaque-container {
+        transform: translateY(-5px) scale(1.04);
+        filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 10px rgba(255, 255, 255, 0.35));
+      }
+
+      .brand-plaque-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .brand-plaque-content {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 11% 14%; /* Zone intérieure sécurisée évitant vis et biseaux métalliques */
+        box-sizing: border-box;
       }
 
       .brand-logo-img {
-        width: 180px !important;
-        height: 80px !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        width: auto !important;
+        height: auto !important;
         object-fit: contain;
-        filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.15));
-        transition: all 0.3s ease;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+        transition: transform 0.3s ease;
       }
 
       .brand-logo-card:hover .brand-logo-img {
-        filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.3));
-        transform: scale(1.1);
+        transform: scale(1.08);
       }
 
       /* Flex-based brands grid: centre toujours la dernière rangée */
       .brands-grid {
         display: flex;
         flex-wrap: wrap;
-        justify-content: center; /* centre la ligne incomplète */
+        justify-content: center;
         align-items: center;
-        gap: 1.5rem; /* gap desktop */
+        gap: 1.5rem;
         width: 100%;
         box-sizing: border-box;
       }
 
       /* ============================================================ */
-      /* HOME GLOSSY SHOWCASE — GRIS TITANE SOMBRE BRILLANT À LA MODE */
-      /* Effet carrosserie titane gunmetal / chrome liquide réfléchissant */
+      /* FOND GLOBAL DE LA PAGE D'ACCUEIL — MUR RÉPÉTÉ SOUS TOUTES LES SECTIONS */
       /* ============================================================ */
-      .home-glossy-showcase {
+      .home-main-flow {
         position: relative;
         width: 100%;
-        background-color: #38414c;
-        background-image:
-          /* Reflet spéculaire diagonal intense (faisceau chrome liquide) */
-          linear-gradient(130deg,
-            rgba(255, 255, 255, 0.55) 0%,
-            rgba(255, 255, 255, 0.08) 16%,
-            rgba(255, 255, 255, 0.65) 32%,
-            rgba(20, 24, 30, 0.35) 44%,
-            rgba(255, 255, 255, 0.75) 56%,
-            rgba(20, 24, 30, 0.40) 70%,
-            rgba(255, 255, 255, 0.50) 86%,
-            rgba(255, 255, 255, 0.15) 100%
-          ),
-          /* Contre-reflet lumineux croisé pour effet de galbe 3D */
-          linear-gradient(55deg,
-            rgba(255, 255, 255, 0.20) 0%,
-            transparent 35%,
-            rgba(255, 255, 255, 0.30) 50%,
-            transparent 65%,
-            rgba(255, 255, 255, 0.22) 100%
-          ),
-          /* Éclat lumineux supérieur (projecteur de showroom) */
-          radial-gradient(ellipse 110% 45% at 50% 0%, rgba(255, 255, 255, 0.70) 0%, transparent 60%),
-          /* Halos de brillance latéraux créant de la rondeur et de la profondeur */
-          radial-gradient(ellipse 75% 55% at 15% 50%, rgba(255, 255, 255, 0.30) 0%, transparent 55%),
-          radial-gradient(ellipse 80% 50% at 85% 75%, rgba(255, 255, 255, 0.28) 0%, transparent 50%),
-          radial-gradient(ellipse 90% 45% at 50% 100%, rgba(255, 255, 255, 0.22) 0%, transparent 60%),
-          /* Corps dégradé gris titane métallique sombre riche */
-          linear-gradient(165deg,
-            #5e6876 0%,
-            #444d5a 16%,
-            #6f7c8d 32%,
-            #2e353f 48%,
-            #525d6b 64%,
-            #232830 80%,
-            #414a56 100%
-          );
-        background-repeat: no-repeat;
-        background-size: 100% 100%;
-        box-shadow:
-          inset 0 2px 0 rgba(255, 255, 255, 0.55),
-          inset 0 -2px 0 rgba(0, 0, 0, 0.5);
-        overflow: hidden;
+        background-color: #3d3229;
+        background-image: url('/img/bg-section-marques.jpeg');
+        background-repeat: repeat;
+        background-position: center top;
+        background-size: 560px auto;
+        min-height: 100vh;
       }
 
-      .home-glossy-showcase::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(ellipse 70% 40% at 50% 30%, rgba(255, 255, 255, 0.25) 0%, transparent 65%);
-        pointer-events: none;
+      @media (max-width: 767px) {
+        .home-main-flow {
+          background-size: 340px auto;
+        }
+      }
+
+      /* Sections intérieures sur fond transparent pour laisser transparaître le mur */
+      .home-nouveautes-section,
+      .home-glossy-showcase,
+      .home-brands-section,
+      .home-brands-wall-section {
+        position: relative;
+        width: 100%;
+        background: transparent !important;
+        box-shadow: none !important;
       }
 
       .home-nouveautes-wrapper {
@@ -412,51 +416,52 @@ h3,
         width: 100%;
         background: transparent;
         border: none;
-        padding-top: 1.25rem;
+        padding-top: 1.5rem;
+        padding-bottom: 1rem;
       }
 
-      /* Typographie et éléments de contraste sur fond gris titane */
-      .home-glossy-showcase h3.futurist-font {
+      /* Typographie et éléments de contraste sur fond de mur */
+      .home-main-flow h3.futurist-font {
         color: #ffffff !important;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85), 0 1px 3px rgba(0, 0, 0, 0.9);
       }
 
-      .home-glossy-showcase .group:hover h3.futurist-font {
+      .home-main-flow .group:hover h3.futurist-font {
         color: #ff3333 !important;
       }
 
-      .home-glossy-showcase p.text-gray-800,
-      .home-glossy-showcase .text-gray-800 {
+      .home-main-flow p.text-gray-800,
+      .home-main-flow .text-gray-800 {
+        color: #f1f5f9 !important;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+      }
+
+      .home-main-flow p.text-gray-700,
+      .home-main-flow p.text-gray-500 {
         color: #e2e8f0 !important;
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
       }
 
-      .home-glossy-showcase p.text-gray-700,
-      .home-glossy-showcase p.text-gray-500 {
-        color: #cbd5e1 !important;
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-      }
-
-      .home-glossy-showcase span.text-red-600 {
+      .home-main-flow span.text-red-600 {
         color: #ff3838 !important;
-        text-shadow: 0 0 12px rgba(255, 56, 56, 0.5);
+        text-shadow: 0 0 12px rgba(255, 56, 56, 0.6), 0 1px 3px rgba(0, 0, 0, 0.9);
       }
 
-      /* Flèches de défilement sur fond sombre */
-      .home-glossy-showcase button[aria-label="Nouveauté précédente"],
-      .home-glossy-showcase button[aria-label="Nouveauté suivante"] {
-        background: rgba(255, 255, 255, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      /* Flèches de défilement sur le mur */
+      .home-main-flow button[aria-label="Nouveauté précédente"],
+      .home-main-flow button[aria-label="Nouveauté suivante"] {
+        background: rgba(0, 0, 0, 0.55) !important;
+        border: 1px solid rgba(255, 255, 255, 0.35) !important;
         color: #ffffff !important;
         backdrop-filter: blur(8px) !important;
       }
 
-      .home-glossy-showcase button[aria-label="Nouveauté précédente"]:hover,
-      .home-glossy-showcase button[aria-label="Nouveauté suivante"]:hover {
+      .home-main-flow button[aria-label="Nouveauté précédente"]:hover,
+      .home-main-flow button[aria-label="Nouveauté suivante"]:hover {
         background: #dc2626 !important;
         border-color: #dc2626 !important;
         color: #ffffff !important;
-        box-shadow: 0 0 12px rgba(220, 38, 38, 0.6) !important;
+        box-shadow: 0 0 14px rgba(220, 38, 38, 0.7) !important;
       }
 
       .home-showcase-divider {
@@ -547,44 +552,22 @@ h3,
 
 
 
-      .home-brands-bottom-wrapper,
-      .home-brands-background-wrapper {
-        padding-bottom: 3rem;
-        border-top: none;
+      /* ============================================================ */
+      /* SECTION MARQUES — PLAQUES MÉTAL SUR LE MUR CONTINU           */
+      /* ============================================================ */
+      .home-brands-section,
+      .home-brands-wall-section {
+        position: relative;
+        width: 100%;
+        background: transparent !important;
+        padding: 2.5rem 0 3.5rem;
       }
 
       @media (max-width: 767px) {
-        .home-brands-bottom-wrapper,
-        .home-brands-background-wrapper {
-          padding-bottom: 2rem;
+        .home-brands-section,
+        .home-brands-wall-section {
+          padding: 1.5rem 0 2.5rem;
         }
-      }
-
-      .home-brands-bottom-wrapper .brand-logo-card,
-      .home-brands-background-wrapper .brand-logo-card {
-        background: transparent !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        border: none !important;
-        box-shadow: none !important;
-      }
-
-      .home-brands-bottom-wrapper .brand-logo-card:hover,
-      .home-brands-background-wrapper .brand-logo-card:hover {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        transform: translateY(-4px);
-      }
-
-      .home-glossy-showcase .brand-logo-img {
-        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 2px rgba(255, 255, 255, 0.6));
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .home-glossy-showcase .brand-logo-card:hover .brand-logo-img {
-        filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.9));
-        transform: scale(1.1) translateY(-4px);
       }
 
       /* =========================================== */
@@ -1129,25 +1112,26 @@ h3,
 
         /* 3 items per row on mobile, accounting for two gaps of 0.5rem => 1rem total */
         .brands-grid {
-          gap: 0.5rem;
-          padding: 0; /* padding handled by container */
+          gap: 0.6rem;
+          padding: 0;
           justify-content: center;
         }
 
         .brand-logo-card {
-          /* force exactly 3 items per row */
-          flex: 0 0 calc((100% - 1rem) / 3);
-          max-width: calc((100% - 1rem) / 3);
-          min-width: 0; /* allow shrinking on small screens */
-          padding: 0.8rem;
-          height: 100px;
+          /* force exactly 3 plaques per row on mobile */
+          flex: 0 0 calc((100% - 1.2rem) / 3);
+          max-width: calc((100% - 1.2rem) / 3);
+          min-width: 0;
+          padding: 0 !important;
+          height: auto !important;
           margin: 0;
         }
 
         .brand-logo-img {
-          width: 100px !important;
-          height: 50px !important;
-          max-width: 100%;
+          width: auto !important;
+          height: auto !important;
+          max-width: 100% !important;
+          max-height: 100% !important;
         }
       }
 
@@ -1158,22 +1142,28 @@ h3,
         }
 
         .brands-grid {
-          gap: 0.3rem;
+          gap: 0.45rem;
           justify-content: center;
         }
 
         .brand-logo-card {
-          /* 3 items per row with two gaps of 0.3rem => 0.6rem total */
-          flex: 0 0 calc((100% - 0.6rem) / 3);
-          max-width: calc((100% - 0.6rem) / 3);
-          min-width: 0; /* allow shrinking on very small screens */
-          padding: 0.5rem;
-          height: 90px;
+          /* 3 plaques per row with two gaps of 0.45rem */
+          flex: 0 0 calc((100% - 0.9rem) / 3);
+          max-width: calc((100% - 0.9rem) / 3);
+          min-width: 0;
+          padding: 0 !important;
+          height: auto !important;
+        }
+
+        .brand-plaque-content {
+          padding: 9% 11%;
         }
 
         .brand-logo-img {
-          width: 90px !important;
-          height: 45px !important;
+          width: auto !important;
+          height: auto !important;
+          max-width: 100% !important;
+          max-height: 100% !important;
         }
 
         .hero-image {
@@ -1195,18 +1185,19 @@ h3,
         }
 
         .brand-logo-card {
-          /* 5 items per row - force width so they stay tight when only 3 remain */
+          /* 5 items per row */
           flex: 0 0 calc(20% - 0.8rem);
           max-width: calc(20% - 0.8rem);
-          padding: 0.8rem;
-          height: 100px;
+          padding: 0 !important;
+          height: auto !important;
           margin: 0;
         }
 
         .brand-logo-img {
-          width: 140px !important;
-          height: 60px !important;
-          max-width: 100%;
+          width: auto !important;
+          height: auto !important;
+          max-width: 100% !important;
+          max-height: 100% !important;
         }
       }
 
@@ -1221,15 +1212,16 @@ h3,
           /* 6 items per row */
           flex: 0 0 calc(16.666% - 1.25rem);
           max-width: calc(16.666% - 1.25rem);
-          padding: 0.8rem;
-          height: 100px;
+          padding: 0 !important;
+          height: auto !important;
           margin: 0;
         }
 
         .brand-logo-img {
-          width: 180px !important;
-          height: 80px !important;
-          max-width: 100%;
+          width: auto !important;
+          height: auto !important;
+          max-width: 100% !important;
+          max-height: 100% !important;
         }
       }
 
