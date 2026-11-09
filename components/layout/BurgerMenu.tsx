@@ -30,6 +30,7 @@ interface BurgerMenuProps {
   isLoggedIn: boolean;
   dashboardUrl: string;
   categories: CategoryItem[];
+  isHome?: boolean;
 }
 
 function cleanImgSrc(src?: string | null): string {
@@ -41,6 +42,7 @@ export default function BurgerMenu({
   isLoggedIn,
   dashboardUrl,
   categories,
+  isHome = false,
 }: BurgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -358,15 +360,31 @@ export default function BurgerMenu({
   return (
     <>
       {/* Bouton Burger dans le Header (Mobile & Desktop) */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white hover:text-red-400 flex items-center justify-center transition-all duration-300 shadow-sm cursor-pointer group"
-        aria-label="Ouvrir le menu"
-        aria-expanded={isOpen}
-      >
-        <Menu className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
-      </button>
+      {isHome ? (
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="w-12 h-12 md:w-14 md:h-14 xl:w-[58px] xl:h-[58px] flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer filter drop-shadow(0 2px 6px rgba(0,0,0,0.6)) shrink-0"
+          aria-label="Ouvrir le menu"
+          aria-expanded={isOpen}
+        >
+          <img
+            src="/img/header-bouton-menu-burger.webp"
+            alt="Menu"
+            className="w-full h-full object-contain pointer-events-none select-none"
+          />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white hover:text-red-400 flex items-center justify-center transition-all duration-300 shadow-sm cursor-pointer group"
+          aria-label="Ouvrir le menu"
+          aria-expanded={isOpen}
+        >
+          <Menu className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
+        </button>
+      )}
 
       {/* Rendu via Portal pour s'affranchir du backdrop-filter du header et être au-dessus du slider */}
       {mounted && createPortal(drawerContent, document.body)}

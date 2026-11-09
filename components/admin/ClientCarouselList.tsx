@@ -2,7 +2,13 @@
 
 import { useTransition, useState } from "react";
 import { CarouselSlide } from "@prisma/client";
-import { updateSlideOrder, toggleSlideVisibility, deleteSlide, updateCarouselDelay } from "@/lib/admin-actions/carousel";
+import {
+  updateSlideOrder,
+  toggleSlideVisibility,
+  deleteSlide,
+  updateCarouselDelay,
+  toggleCarouselVisibility,
+} from "@/lib/admin-actions/carousel";
 import ConfirmForm from "./ConfirmForm";
 import SortableGrid from "./SortableGrid";
 import { verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -12,11 +18,36 @@ import { toast } from "react-toastify";
 interface ClientCarouselListProps {
   initialSlides: CarouselSlide[];
   initialDelayMs: number;
+  initialVisible?: boolean;
 }
 
-export default function ClientCarouselList({ initialSlides, initialDelayMs }: ClientCarouselListProps) {
+export default function ClientCarouselList({
+  initialSlides,
+  initialDelayMs,
+  initialVisible = true,
+}: ClientCarouselListProps) {
   const [isPending, startTransition] = useTransition();
   const [delaySec, setDelaySec] = useState(initialDelayMs / 1000);
+  const [isVisible, setIsVisible] = useState(initialVisible);
+
+  const handleToggleVisibility = () => {
+    const nextVal = !isVisible;
+    setIsVisible(nextVal);
+    startTransition(async () => {
+      try {
+        await toggleCarouselVisibility(nextVal);
+        toast.success(
+          nextVal
+            ? "Carrousel affiché sur la page d'accueil !"
+            : "Carrousel masqué de la page d'accueil !",
+          { theme: "dark" }
+        );
+      } catch (err: any) {
+        setIsVisible(!nextVal); // Revert en cas d'erreur
+        toast.error("Erreur lors de la mise à jour", { theme: "dark" });
+      }
+    });
+  };
 
   const handleReorder = (newItems: CarouselSlide[]) => {
     startTransition(async () => {
@@ -38,6 +69,56 @@ export default function ClientCarouselList({ initialSlides, initialDelayMs }: Cl
       {/* Settings section */}
       <div className="admin-card" style={{ marginBottom: "1.5rem" }}>
         <h2 className="admin-card-title">⚙️ Paramètres du carrousel</h2>
+
+        {/* Option Afficher / Masquer sur la page d'accueil */}
+        <div
+          className="toggle-row"
+          style={{
+            padding: "0.5rem 0",
+            marginBottom: "1.25rem",
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <label
+            className="toggle-label"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+              cursor: isPending ? "wait" : "pointer",
+            }}
+          >
+            <div className="toggle-checkbox-wrap">
+              <input
+                type="checkbox"
+                checked={isVisible}
+                onChange={handleToggleVisibility}
+                disabled={isPending}
+                className="toggle-checkbox"
+              />
+              <div className="toggle-slider" />
+            </div>
+            <div>
+              <div
+                className="toggle-text-title"
+                style={{ color: "#ffffff", fontWeight: 700, fontSize: "0.95rem" }}
+              >
+                {isVisible
+                  ? "🟢 Carrousel visible sur la page d'accueil"
+                  : "🔴 Carrousel masqué de la page d'accueil"}
+              </div>
+              <div
+                className="toggle-text-sub"
+                style={{ color: "#9ca3af", fontSize: "0.8rem", marginTop: "2px" }}
+              >
+                {isVisible
+                  ? "Le slider Hero Header est actuellement actif et affiché sur l'accueil."
+                  : "Le slider est complètement masqué sur la page d'accueil (le site commence directement par les nouveautés)."}
+              </div>
+            </div>
+          </label>
+        </div>
+
         <form onSubmit={handleDelayUpdate} style={{ display: "flex", gap: "1rem", alignItems: "flex-end" }}>
           <div className="form-group" style={{ marginBottom: 0 }}>
             <label>Temps entre chaque slide (en secondes)</label>

@@ -6,9 +6,10 @@ import ClientCarouselList from "@/components/admin/ClientCarouselList";
 export default async function AdminCarouselPage() {
   const slides = await prisma.carouselSlide.findMany({ orderBy: { orderIndex: "asc" } });
   
-  // Fetch delay setting
+  // Fetch delay and visibility settings
   const settings = await prisma.siteSettings.findFirst();
   const carouselDelayMs = settings?.carouselDelayMs || 4000;
+  const carouselVisible = (settings as any)?.carouselVisible !== false;
 
   async function handleCreate(formData: FormData) {
     "use server";
@@ -23,10 +24,17 @@ export default async function AdminCarouselPage() {
           <h1 className="admin-page-title">Carrousel</h1>
           <p className="admin-page-subtitle">{slides.length} slides ({slides.filter(s => s.isVisible).length} actifs)</p>
         </div>
+        <div className={`badge ${carouselVisible ? "badge-green" : "badge-red"}`} style={{ padding: "0.4rem 1rem", fontSize: "0.875rem" }}>
+          {carouselVisible ? "🟢 Visible sur l'accueil" : "🔴 Masqué de l'accueil"}
+        </div>
       </div>
 
       {/* List and Settings */}
-      <ClientCarouselList initialSlides={slides} initialDelayMs={carouselDelayMs} />
+      <ClientCarouselList
+        initialSlides={slides}
+        initialDelayMs={carouselDelayMs}
+        initialVisible={carouselVisible}
+      />
 
       {/* Add new slide */}
       <div className="admin-card">

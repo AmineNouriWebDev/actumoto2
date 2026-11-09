@@ -48,14 +48,19 @@ export default async function Home() {
       updatedAt: new Date(),
     }));
   }
+
+  const isCarouselVisible = (settings as any)?.carouselVisible !== false;
+
   return (
     <>
       <WelcomePopup />
       
       {/* Flux d'accueil continu et harmonieux */}
       <main className="home-main-flow">
-        {/* 1. SLIDER EN PREMIER */}
-        <HeroCarousel slides={slides} slideInterval={settings?.carouselDelayMs} />
+        {/* 1. SLIDER EN PREMIER (SI ACTIVÉ DANS L'ADMINISTRATION) */}
+        {isCarouselVisible && (
+          <HeroCarousel slides={slides} slideInterval={settings?.carouselDelayMs} />
+        )}
 
         {/* SECTION SEO - CONTENU OPTIMISÉ (visually hidden for SEO) */}
         <section className="sr-only">

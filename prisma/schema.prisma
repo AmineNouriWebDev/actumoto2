@@ -311,8 +311,9 @@ model QuotaRequest {
 }
 
 model SiteSettings {
-  id              String @id @default(uuid())
-  carouselDelayMs Int    @default(4000)
+  id              String  @id @default(uuid())
+  carouselDelayMs Int     @default(4000)
+  carouselVisible Boolean @default(true)
 }
 
 model NouveauteItem {

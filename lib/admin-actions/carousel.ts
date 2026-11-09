@@ -71,11 +71,39 @@ export async function updateSlideOrder(slides: { id: string; orderIndex: number 
 }
 
 export async function updateCarouselDelay(delayMs: number) {
+  try {
+    await prisma.$executeRawUnsafe(
+      'ALTER TABLE "SiteSettings" ADD COLUMN IF NOT EXISTS "carouselVisible" BOOLEAN NOT NULL DEFAULT true;'
+    );
+  } catch (e) {}
+
   const settings = await prisma.siteSettings.findFirst();
   if (settings) {
     await prisma.siteSettings.update({ where: { id: settings.id }, data: { carouselDelayMs: delayMs } });
   } else {
-    await prisma.siteSettings.create({ data: { carouselDelayMs: delayMs } });
+    await prisma.siteSettings.create({ data: { carouselDelayMs: delayMs, carouselVisible: true } });
+  }
+  revalidatePath("/admin/carrousel");
+  revalidatePath("/");
+}
+
+export async function toggleCarouselVisibility(visible: boolean) {
+  try {
+    await prisma.$executeRawUnsafe(
+      'ALTER TABLE "SiteSettings" ADD COLUMN IF NOT EXISTS "carouselVisible" BOOLEAN NOT NULL DEFAULT true;'
+    );
+  } catch (e) {}
+
+  const settings = await prisma.siteSettings.findFirst();
+  if (settings) {
+    await prisma.siteSettings.update({
+      where: { id: settings.id },
+      data: { carouselVisible: visible },
+    });
+  } else {
+    await prisma.siteSettings.create({
+      data: { carouselDelayMs: 4000, carouselVisible: visible },
+    });
   }
   revalidatePath("/admin/carrousel");
   revalidatePath("/");

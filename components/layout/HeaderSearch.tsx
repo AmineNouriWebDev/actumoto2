@@ -32,12 +32,13 @@ function cleanImgSrc(src?: string | null): string {
   return src.startsWith("./") ? src.substring(1) : src;
 }
 
-export default function HeaderSearch() {
+export default function HeaderSearch({ isHome = false }: { isHome?: boolean }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isDesktopOpen, setIsDesktopOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -116,6 +117,237 @@ export default function HeaderSearch() {
   const hasModels = results && results.models.length > 0;
   const hasNoResults =
     results && !hasBrands && !hasModels && query.trim().length >= 2 && !isLoading;
+
+  if (isHome) {
+    return (
+      <div ref={containerRef} className="relative flex items-center">
+        {/* Desktop: Bouton métallique + barre de recherche extensible */}
+        <div className="hidden lg:flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setIsDesktopOpen(!isDesktopOpen);
+              if (!isDesktopOpen) setTimeout(() => inputRef.current?.focus(), 100);
+            }}
+            className="w-12 h-12 md:w-14 md:h-14 xl:w-[58px] xl:h-[58px] flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer filter drop-shadow(0 2px 6px rgba(0,0,0,0.6)) shrink-0"
+            aria-label="Rechercher"
+            title="Rechercher"
+          >
+            <img
+              src="/img/header-bouton-recherche.webp"
+              alt="Rechercher"
+              className="w-full h-full object-contain pointer-events-none select-none"
+            />
+          </button>
+
+          {/* Barre extensible au clic */}
+          <div
+            className={`transition-all duration-300 ease-out overflow-hidden flex items-center ${
+              isDesktopOpen
+                ? "w-[240px] xl:w-[280px] opacity-100"
+                : "w-0 opacity-0 pointer-events-none"
+            }`}
+          >
+            <div className="flex items-center w-full bg-[#18130f]/90 border border-[#8a5d3b]/70 focus-within:border-[#e06a28] rounded-xl px-3 py-1.5 backdrop-blur-md shadow-inner">
+              <Search className="w-4 h-4 text-amber-200/60 shrink-0" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => {
+                  if (query.trim().length >= 2) setIsOpen(true);
+                }}
+                placeholder="Rechercher moto, marque..."
+                className="w-full bg-transparent border-none outline-none text-white text-xs xl:text-sm px-2 placeholder-amber-100/40 font-sans"
+                aria-label="Recherche instantanée"
+              />
+              {isLoading && (
+                <Loader2 className="w-3.5 h-3.5 text-amber-400 animate-spin shrink-0" />
+              )}
+              {!isLoading && query && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery("");
+                    setResults(null);
+                    setIsOpen(false);
+                    inputRef.current?.focus();
+                  }}
+                  className="text-amber-200/60 hover:text-white p-0.5"
+                  aria-label="Effacer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile / Tablet: Bouton métallique ouvrant le panneau flottant */}
+        <div className="lg:hidden flex items-center">
+          <button
+            type="button"
+            onClick={() => {
+              setIsMobileOpen(!isMobileOpen);
+              setTimeout(() => inputRef.current?.focus(), 100);
+            }}
+            className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer filter drop-shadow(0 2px 6px rgba(0,0,0,0.6)) shrink-0"
+            aria-label="Ouvrir la recherche"
+          >
+            <img
+              src="/img/header-bouton-recherche.webp"
+              alt="Rechercher"
+              className="w-full h-full object-contain pointer-events-none select-none"
+            />
+          </button>
+        </div>
+
+        {/* Mobile Input Drawer */}
+        {isMobileOpen && (
+          <div className="lg:hidden absolute top-full left-0 mt-2 w-[280px] sm:w-[320px] bg-[#18130f]/95 border border-[#8a5d3b]/80 rounded-xl p-2 shadow-2xl z-50 backdrop-blur-md">
+            <div className="flex items-center w-full bg-black/40 border border-[#8a5d3b]/50 rounded-lg px-2.5 py-1.5">
+              <Search className="w-4 h-4 text-amber-200/60 shrink-0" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Rechercher moto, marque..."
+                className="w-full bg-transparent border-none outline-none text-white text-xs px-2 placeholder-amber-100/40 font-sans"
+                autoFocus
+              />
+              {isLoading && (
+                <Loader2 className="w-3.5 h-3.5 text-amber-400 animate-spin shrink-0" />
+              )}
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery("");
+                    setResults(null);
+                  }}
+                  className="text-amber-200/60 hover:text-white p-0.5"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Dropdown résultats */}
+        {isOpen && (hasBrands || hasModels || hasNoResults) && (
+          <div className="absolute top-full left-0 mt-2 w-[320px] sm:w-[380px] xl:w-[440px] max-w-[90vw] bg-[#140f0c]/98 backdrop-blur-xl border border-[#8a5d3b]/70 rounded-2xl shadow-2xl overflow-hidden z-50 text-white animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="max-h-[70vh] overflow-y-auto p-2 divide-y divide-[#8a5d3b]/30 scrollbar-thin scrollbar-thumb-[#8a5d3b]">
+              {/* Section Marques */}
+              {hasBrands && (
+                <div className="pb-2 mb-1">
+                  <div className="text-[10px] font-semibold tracking-wider text-amber-200/70 uppercase px-2 py-1 flex items-center justify-between">
+                    <span>Marques</span>
+                    <span className="text-amber-500 font-mono">{results.brands.length}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5 mt-1">
+                    {results.brands.map((b) => (
+                      <button
+                        key={b.name}
+                        type="button"
+                        onClick={() => handleSelect(b.href)}
+                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-black/40 hover:bg-amber-950/40 border border-[#8a5d3b]/30 hover:border-amber-500/60 transition-all text-left group cursor-pointer"
+                      >
+                        {b.logo ? (
+                          <img
+                            src={cleanImgSrc(b.logo)}
+                            alt={b.name}
+                            className="w-7 h-5 object-contain bg-white/10 rounded px-1"
+                          />
+                        ) : (
+                          <div className="w-7 h-5 rounded bg-gray-700 flex items-center justify-center text-[10px] font-bold">
+                            {b.name.substring(0, 2)}
+                          </div>
+                        )}
+                        <span className="text-xs font-semibold text-gray-200 group-hover:text-amber-400 transition-colors truncate">
+                          {b.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Section Modèles */}
+              {hasModels && (
+                <div className="pt-2">
+                  <div className="text-[10px] font-semibold tracking-wider text-amber-200/70 uppercase px-2 py-1 flex items-center justify-between">
+                    <span>Modèles de motos</span>
+                    <span className="text-amber-500 font-mono">{results.models.length}</span>
+                  </div>
+                  <div className="space-y-1 mt-1">
+                    {results.models.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => handleSelect(m.href)}
+                        className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-amber-950/40 border border-transparent hover:border-[#8a5d3b]/40 transition-all text-left group cursor-pointer"
+                      >
+                        <div className="w-12 h-12 rounded-lg bg-black/40 border border-[#8a5d3b]/30 overflow-hidden shrink-0 flex items-center justify-center">
+                          {m.image ? (
+                            <img
+                              src={cleanImgSrc(m.image)}
+                              alt={m.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          ) : (
+                            <span className="text-[9px] text-gray-500">Pas d'image</span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-800/60">
+                              {m.brand}
+                            </span>
+                          </div>
+                          <h4 className="text-xs font-semibold text-gray-100 group-hover:text-amber-300 transition-colors truncate">
+                            {m.name}
+                          </h4>
+                        </div>
+                        <div className="text-right shrink-0">
+                          {m.price ? (
+                            <span className="text-xs font-bold text-amber-400 whitespace-nowrap">
+                              {m.price.toLocaleString("fr-FR")} {m.currency}
+                            </span>
+                          ) : (
+                            <span className="text-[11px] text-gray-400">N.C.</span>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Aucun résultat */}
+              {hasNoResults && (
+                <div className="p-4 text-center">
+                  <p className="text-xs text-gray-400">
+                    Aucune moto ou marque trouvée pour{" "}
+                    <span className="text-amber-400 font-semibold">« {query} »</span>
+                  </p>
+                  <Link
+                    href="/modeles"
+                    onClick={() => setIsOpen(false)}
+                    className="mt-2 inline-flex items-center gap-1 text-[11px] text-amber-400 hover:text-amber-300 underline"
+                  >
+                    Voir tout le catalogue de motos <ExternalLink className="w-3 h-3" />
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className="relative w-full max-w-[280px] xl:max-w-[340px]">

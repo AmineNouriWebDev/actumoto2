@@ -133,15 +133,33 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
               );
               const linkTarget = isClickable ? item.linkUrl!.trim() : undefined;
 
-              // Card Inner Content
+              // Card Inner Content : TOUT (moto, badge, nom et prix) est intégré à l'intérieur de la plaque métallique
               const cardContent = (
-                <>
-                  {/* Conteneur Image avec ratio uniforme 4:3 et fond 100% transparent pour laisser apparaître le fond métallique de la page d'accueil */}
-                  <div className="w-full aspect-[4/3] relative flex items-center justify-center bg-transparent">
+                <div className="nouveaute-plaque-container relative w-full aspect-square flex flex-col justify-between overflow-hidden">
+                  {/* Plaque métallique en fond */}
+                  <img
+                    src="/img/background-nouveaute.webp"
+                    alt=""
+                    className="nouveaute-plaque-bg absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
+                    aria-hidden="true"
+                    loading="lazy"
+                  />
+
+                  {/* Badge NOUVEAU en haut à gauche */}
+                  <div
+                    className="nouveau-badge"
+                    aria-label="Nouveau modèle"
+                  >
+                    <Sparkles className="nouveau-badge-icon" aria-hidden="true" />
+                    <span>NOUVEAU</span>
+                  </div>
+
+                  {/* Zone moto : occupe un maximum d'espace au centre/haut de la plaque */}
+                  <div className="relative z-[2] w-full flex-1 flex items-center justify-center pt-[10%] px-[5%] pb-[1%] min-h-0">
                     <img
                       src={mainImage}
                       alt={subtitle ? `${subtitle} ${title}` : title}
-                      className={`w-full h-full object-contain drop-shadow-[0_10px_16px_rgba(0,0,0,0.4)] ${
+                      className={`w-full h-full max-h-[92%] object-contain drop-shadow-[0_12px_22px_rgba(0,0,0,0.55)] ${
                         isClickable
                           ? "transition-transform duration-500 group-hover:scale-105"
                           : ""
@@ -152,53 +170,43 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
                           "/img/placeholder-moto.jpg";
                       }}
                     />
-                    {/* Badge NOUVEAU */}
-                    <div
-                      className="nouveau-badge"
-                      aria-label="Nouveau modèle"
-                    >
-                      <Sparkles className="nouveau-badge-icon" aria-hidden="true" />
-                      <span>NOUVEAU</span>
-                    </div>
                   </div>
 
-                  {/* Nom & Infos en dessous de l'image */}
-                  <div className="mt-3 px-1">
-                    <h3
-                      className={`futurist-font text-base sm:text-lg text-gray-900 ${
-                        isClickable
-                          ? "group-hover:text-red-600 transition-colors"
-                          : ""
-                      } uppercase tracking-wide truncate`}
-                    >
-                      {title}
-                    </h3>
-
-                    {/* Sous-titre ou Marque si présent et différent du titre */}
+                  {/* Nom & Prix à l'intérieur de la plaque en bas */}
+                  <div className="relative z-[3] w-full px-5 sm:px-6 pb-[6%] pt-1 text-center select-none">
+                    {/* Marque ou Sous-titre si présent et différent du titre */}
                     {subtitle && subtitle !== title && (
-                      <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mt-0.5">
+                      <p className="nouveaute-subtitle text-[0.65rem] sm:text-xs font-bold uppercase tracking-widest leading-tight truncate">
                         {subtitle}
                       </p>
                     )}
 
-                    {/* Prix ou En arrivage */}
-                    <div className="mt-1">
+                    {/* Titre du modèle */}
+                    <h3
+                      className={`nouveaute-title futurist-font text-sm sm:text-base md:text-lg font-black uppercase tracking-wider leading-tight truncate ${
+                        isClickable
+                          ? "transition-colors duration-200"
+                          : ""
+                      }`}
+                    >
+                      {title}
+                    </h3>
+
+                    {/* Prix ou En arrivage sans "À partir de" */}
+                    <div className="mt-0.5">
                       {hasPrice && effectivePrice ? (
-                        <p className="text-sm sm:text-base font-bold text-gray-800">
-                          À partir de{" "}
-                          <span className="text-red-600 font-extrabold text-base sm:text-lg">
-                            {effectivePrice.toLocaleString("fr-FR")}{" "}
-                            {item.currency || "DT"}
-                          </span>
+                        <p className="nouveaute-price text-sm sm:text-base md:text-lg font-black tracking-wide leading-tight">
+                          {effectivePrice.toLocaleString("fr-FR")}{" "}
+                          {item.currency || "DT"}
                         </p>
                       ) : (
-                        <p className="text-sm sm:text-base font-extrabold text-red-600 uppercase tracking-wide">
+                        <p className="nouveaute-price text-xs sm:text-sm md:text-base font-black uppercase tracking-wide leading-tight">
                           En arrivage
                         </p>
                       )}
                     </div>
                   </div>
-                </>
+                </div>
               );
 
               return (
