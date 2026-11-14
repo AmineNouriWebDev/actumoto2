@@ -7,31 +7,35 @@ import prisma from "@/lib/prisma";
 
 export default async function Home() {
   const [slides, brands, categories, banner, settings, nouveautesItems] = await Promise.all([
-    prisma.carouselSlide.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
-    prisma.brand.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
-    prisma.category.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }),
-    prisma.homepageBanner.findFirst({ where: { isVisible: true } }),
-    prisma.siteSettings.findFirst(),
+    prisma.carouselSlide.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }).catch(() => []),
+    prisma.brand.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }).catch(() => []),
+    prisma.category.findMany({ where: { isVisible: true }, orderBy: { orderIndex: 'asc' } }).catch(() => []),
+    prisma.homepageBanner.findFirst({ where: { isVisible: true } }).catch(() => null),
+    prisma.siteSettings.findFirst().catch(() => null),
     (prisma as any).nouveauteItem
-      ? prisma.nouveauteItem.findMany({
-          where: { isVisible: true },
-          orderBy: { orderIndex: 'asc' },
-        })
+      ? prisma.nouveauteItem
+          .findMany({
+            where: { isVisible: true },
+            orderBy: { orderIndex: 'asc' },
+          })
+          .catch(() => [])
       : Promise.resolve([]),
   ]);
 
   let displayedNouveautes = nouveautesItems;
   if (displayedNouveautes.length === 0) {
-    const fallbackModels = await prisma.model.findMany({
-      where: { isVisible: true, isNew: true },
-      include: {
-        brand: true,
-        category: true,
-        images: { orderBy: { orderIndex: 'asc' } },
-        specs: true,
-      },
-      orderBy: [{ orderIndex: 'asc' }, { name: 'asc' }],
-    });
+    const fallbackModels = await prisma.model
+      .findMany({
+        where: { isVisible: true, isNew: true },
+        include: {
+          brand: true,
+          category: true,
+          images: { orderBy: { orderIndex: 'asc' } },
+          specs: true,
+        },
+        orderBy: [{ orderIndex: 'asc' }, { name: 'asc' }],
+      })
+      .catch(() => []);
     displayedNouveautes = fallbackModels.map((m, idx) => ({
       id: m.id,
       title: m.name,
