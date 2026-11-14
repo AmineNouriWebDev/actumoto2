@@ -24,8 +24,8 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
   const session = await auth();
   const currentUserId = session?.user?.id;
 
-  const brand = await prisma.brand.findUnique({
-    where: { name: brandName },
+  const brand = await prisma.brand.findFirst({
+    where: { name: { equals: brandName, mode: "insensitive" } },
     include: {
       models: {
         where: { isVisible: true },
