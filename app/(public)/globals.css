@@ -458,8 +458,8 @@ h3,
         width: 100%;
         background: transparent;
         border: none;
-        padding-top: 1.5rem;
-        padding-bottom: 1rem;
+        padding-top: 1rem;
+        padding-bottom: 0;
       }
 
       /* Typographie et éléments de contraste sur fond de mur */
@@ -574,6 +574,32 @@ h3,
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) !important;
       }
 
+      /* Positionnement du badge NOUVEAU dans la plaque pour ne pas cacher la vis */
+      .nouveaute-plaque-container .nouveau-badge {
+        top: 40px;
+        left: 14px;
+      }
+
+      @media (min-width: 768px) {
+        .nouveaute-plaque-container .nouveau-badge {
+          top: 60px;
+          left: 16px;
+        }
+      }
+
+      /* Carrousel en bas de page (à la place de la bannière accessoires) */
+      .hero-section.hero-carousel-bottom {
+        height: 50vh !important;
+        min-height: 320px;
+      }
+
+      @media (min-width: 768px) {
+        .hero-section.hero-carousel-bottom {
+          height: 580px !important;
+          min-height: 500px;
+        }
+      }
+
       /* ============================================ */
       /* BADGE "NOUVEAU" SUR LES CARTES MODÈLES       */
       /* ============================================ */
@@ -652,13 +678,13 @@ h3,
         position: relative;
         width: 100%;
         background: transparent !important;
-        padding: 2.5rem 0 3.5rem;
+        padding: 0.5rem 0 3rem;
       }
 
       @media (max-width: 767px) {
         .home-brands-section,
         .home-brands-wall-section {
-          padding: 1.5rem 0 2.5rem;
+          padding: 0.5rem 0 2rem;
         }
       }
 
@@ -1895,11 +1921,11 @@ h3,
       }
 
       .section-back-btn {
-        position: fixed;
-        top: 120px;
+        position: absolute;
+        top: 100px;
         right: 2rem;
         background: rgba(255, 255, 255, 0.95);
-        color: #000;
+        color: #b22222;
         border: 2px solid #b22222;
         border-radius: 50%;
         width: 60px;
@@ -1964,7 +1990,7 @@ h3,
         }
 
         .section-back-btn {
-          top: 110px;
+          top: 90px;
           right: 1rem;
           width: 50px;
           height: 50px;
@@ -1987,7 +2013,7 @@ h3,
         }
 
         .section-back-btn {
-          top: 105px;
+          top: 86px;
           right: 0.75rem;
           width: 45px;
           height: 45px;

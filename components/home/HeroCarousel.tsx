@@ -20,9 +20,13 @@ function cleanImgSrc(src?: string | null): string {
 export default function HeroCarousel({
   slides,
   slideInterval = 4500,
+  variant = "top",
+  showScrollDown = true,
 }: {
   slides: Slide[];
   slideInterval?: number;
+  variant?: "top" | "bottom";
+  showScrollDown?: boolean;
 }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -91,7 +95,7 @@ export default function HeroCarousel({
   return (
     <section
       ref={containerRef}
-      className="hero-section"
+      className={`hero-section ${variant === "bottom" ? "hero-carousel-bottom" : ""}`}
       aria-label="Catalogue moto Tunisie - Nouveautés et modèles"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
@@ -189,16 +193,18 @@ export default function HeroCarousel({
           </div>
         )}
 
-        {/* Bouton indicateur pour défiler vers le bas */}
-        <button
-          type="button"
-          onClick={handleScrollDown}
-          className="hero-scroll-down-btn"
-          aria-label="Défiler vers les nouveautés"
-        >
-          <span className="scroll-text">Découvrir</span>
-          <ChevronDown className="scroll-icon" />
-        </button>
+        {/* Bouton indicateur pour défiler vers le bas (uniquement si showScrollDown et variant top) */}
+        {showScrollDown && variant !== "bottom" && (
+          <button
+            type="button"
+            onClick={handleScrollDown}
+            className="hero-scroll-down-btn"
+            aria-label="Défiler vers les nouveautés"
+          >
+            <span className="scroll-text">Découvrir</span>
+            <ChevronDown className="scroll-icon" />
+          </button>
+        )}
       </div>
     </section>
   );

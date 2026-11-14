@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export interface NouveauteItemProp {
   id: string;
@@ -29,41 +29,77 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Défilement automatique uniquement sur Desktop toutes les 3s (pause au survol)
+  // Boucle infinie : on triple la liste si au moins 2 éléments pour un carrousel sans fin
+  const loopItems =
+    displayList.length >= 2
+      ? [...displayList, ...displayList, ...displayList]
+      : displayList;
+
+  // Défilement automatique continu en boucle sans fin (pause au survol souris)
   useEffect(() => {
-    if (!displayList || displayList.length <= 3) return;
+    if (!displayList || displayList.length <= 1) return;
 
     const interval = setInterval(() => {
-      // Uniquement sur Desktop (>= 768px) et si non survolé
-      if (typeof window === "undefined" || window.innerWidth < 768) return;
+      // Pause si l'utilisateur survole la section avec la souris
       if (isHovered) return;
 
-      if (!scrollRef.current) return;
       const container = scrollRef.current;
-      const { scrollLeft, scrollWidth, clientWidth } = container;
+      if (!container) return;
 
-      // Si on arrive vers la fin, on revient doucement au début
-      if (scrollLeft + clientWidth >= scrollWidth - 20) {
-        container.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        const card = container.firstElementChild as HTMLElement;
-        const step = card ? card.offsetWidth + 24 : clientWidth / 3;
-        container.scrollBy({ left: step, behavior: "smooth" });
+      const cards = container.children;
+      const n = displayList.length;
+
+      // Calcul de la largeur d'un cycle complet (N cartes)
+      if (cards.length >= 2 * n && cards[n] && cards[0]) {
+        const singleSetWidth =
+          (cards[n] as HTMLElement).offsetLeft - (cards[0] as HTMLElement).offsetLeft;
+
+        // Dès qu'on dépasse le premier set, on recule instantanément d'exactement 1 set sans que l'utilisateur ne le voie
+        if (singleSetWidth > 0 && container.scrollLeft >= singleSetWidth - 5) {
+          container.scrollTo({
+            left: container.scrollLeft - singleSetWidth,
+            behavior: "instant" as ScrollBehavior,
+          });
+        }
       }
+
+      // Largeur d'un pas d'avancement = largeur d'une carte + espacement
+      const firstCard = cards[0] as HTMLElement;
+      const isDesktop = typeof window !== "undefined" && window.innerWidth >= 768;
+      const gap = isDesktop ? 24 : 16;
+      const step = firstCard
+        ? firstCard.offsetWidth + gap
+        : container.clientWidth / (isDesktop ? 3 : 1);
+
+      container.scrollBy({ left: step, behavior: "smooth" });
     }, 3000);
 
     return () => clearInterval(interval);
   }, [displayList, isHovered]);
 
-  const scroll = (direction: "left" | "right") => {
-    if (!scrollRef.current) return;
+  // Gestion du défilement manuel (swipe tactile / trackpad) pour maintenir la boucle infinie
+  const handleScroll = () => {
     const container = scrollRef.current;
-    const card = container.firstElementChild as HTMLElement;
-    const isDesktop = typeof window !== "undefined" && window.innerWidth >= 768;
-    const gap = isDesktop ? 24 : 16;
-    const step = card ? card.offsetWidth + gap : container.clientWidth / (isDesktop ? 3 : 1);
-    const offset = direction === "left" ? -step : step;
-    container.scrollBy({ left: offset, behavior: "smooth" });
+    if (!container || displayList.length <= 1) return;
+    const cards = container.children;
+    const n = displayList.length;
+    if (cards.length >= 2 * n && cards[n] && cards[0]) {
+      const singleSetWidth =
+        (cards[n] as HTMLElement).offsetLeft - (cards[0] as HTMLElement).offsetLeft;
+      if (singleSetWidth > 0) {
+        if (container.scrollLeft >= 2 * singleSetWidth) {
+          container.scrollTo({
+            left: container.scrollLeft - singleSetWidth,
+            behavior: "instant" as ScrollBehavior,
+          });
+        } else if (container.scrollLeft <= 0) {
+          container.scrollTo({
+            left: singleSetWidth,
+            behavior: "instant" as ScrollBehavior,
+          });
+        }
+      }
+    }
   };
 
   if (!displayList || displayList.length === 0) {
@@ -71,7 +107,7 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
   }
 
   return (
-    <section className="py-6 relative" aria-labelledby="nouveautes-title">
+    <section className="pt-2 pb-0 relative" aria-labelledby="nouveautes-title">
       <div className="container mx-auto px-4">
         {/* Titre masqué visuellement (conservé pour le SEO) */}
         <h2 id="nouveautes-title" className="sr-only">
@@ -84,17 +120,18 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          {/* Rail de défilement : 1 modèle sur mobile, 3 sur desktop */}
+          {/* Rail de défilement : 1 modèle sur mobile, 3 sur desktop en boucle continue */}
           <div
             ref={scrollRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory py-2 px-1"
+            onScroll={handleScroll}
+            className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory py-2 px-1"
             style={{
               scrollbarWidth: "none",
               msOverflowStyle: "none",
               WebkitOverflowScrolling: "touch",
             }}
           >
-            {displayList.map((item, idx) => {
+            {loopItems.map((item, idx) => {
               // Extraction des informations
               const title = item.title || item.name || "Nouveauté";
               const subtitle =
@@ -211,7 +248,7 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
 
               return (
                 <div
-                  key={item.id || idx}
+                  key={`${item.id || "item"}-${idx}`}
                   className="w-full md:w-[calc((100%-3rem)/3)] flex-shrink-0 snap-center md:snap-start"
                 >
                   {isClickable && linkTarget ? (
@@ -234,30 +271,6 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
               );
             })}
           </div>
-
-          {/* Deux petites flèches simples en bas (Desktop uniquement si > 3 items) */}
-          {displayList.length > 3 && (
-            <div className="hidden md:flex items-center justify-center gap-2.5 mt-6">
-              <button
-                type="button"
-                onClick={() => scroll("left")}
-                className="w-9 h-9 rounded-lg bg-gray-100 hover:bg-red-600 text-gray-700 hover:text-white border border-gray-200 hover:border-red-600 flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-red-500"
-                aria-label="Nouveauté précédente"
-                title="Précédent"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => scroll("right")}
-                className="w-9 h-9 rounded-lg bg-gray-100 hover:bg-red-600 text-gray-700 hover:text-white border border-gray-200 hover:border-red-600 flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-red-500"
-                aria-label="Nouveauté suivante"
-                title="Suivant"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </section>

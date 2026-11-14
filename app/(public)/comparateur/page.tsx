@@ -117,7 +117,7 @@ export default function ComparateurPage() {
       <section className="pt-24 pb-12 relative min-h-[60vh]" role="main">
         <div className="container mx-auto px-4">
           {/* Header actions */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 pr-16 md:pr-20">
             <div />
             <div className="flex flex-wrap gap-3">
               <Link

@@ -10,6 +10,7 @@ export default async function AdminCarouselPage() {
   const settings = await prisma.siteSettings.findFirst();
   const carouselDelayMs = settings?.carouselDelayMs || 4000;
   const carouselVisible = (settings as any)?.carouselVisible !== false;
+  const carouselBottomVisible = (settings as any)?.carouselBottomVisible === true;
 
   async function handleCreate(formData: FormData) {
     "use server";
@@ -24,8 +25,13 @@ export default async function AdminCarouselPage() {
           <h1 className="admin-page-title">Carrousel</h1>
           <p className="admin-page-subtitle">{slides.length} slides ({slides.filter(s => s.isVisible).length} actifs)</p>
         </div>
-        <div className={`badge ${carouselVisible ? "badge-green" : "badge-red"}`} style={{ padding: "0.4rem 1rem", fontSize: "0.875rem" }}>
-          {carouselVisible ? "🟢 Visible sur l'accueil" : "🔴 Masqué de l'accueil"}
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          <div className={`badge ${carouselVisible ? "badge-green" : "badge-red"}`} style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
+            {carouselVisible ? "🟢 Carrousel Haut : Actif" : "🔴 Carrousel Haut : Masqué"}
+          </div>
+          <div className={`badge ${carouselBottomVisible ? "badge-green" : "badge-secondary"}`} style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
+            {carouselBottomVisible ? "🟢 Carrousel Bas : Actif" : "⚪ Carrousel Bas : Inactif"}
+          </div>
         </div>
       </div>
 
@@ -34,6 +40,7 @@ export default async function AdminCarouselPage() {
         initialSlides={slides}
         initialDelayMs={carouselDelayMs}
         initialVisible={carouselVisible}
+        initialBottomVisible={carouselBottomVisible}
       />
 
       {/* Add new slide */}
@@ -41,6 +48,27 @@ export default async function AdminCarouselPage() {
         <h2 className="admin-card-title">+ Ajouter un Slide</h2>
         <form action={handleCreate}>
           <div className="admin-form-grid">
+            <div className="form-group span-2">
+              <label>Emplacement sur la page d'accueil *</label>
+              <select
+                name="position"
+                defaultValue="TOP"
+                style={{
+                  background: "white",
+                  color: "black",
+                  padding: "0.5rem",
+                  borderRadius: "0.375rem",
+                  border: "1px solid #d1d5db",
+                  fontWeight: 600,
+                  fontSize: "0.9rem"
+                }}
+              >
+                <option value="TOP">⬆️ En haut (Hero Header principal)</option>
+                <option value="BOTTOM">⬇️ En bas (À la place de la bannière du bas)</option>
+                <option value="BOTH">↕️ En haut et en bas (Les deux carrousels)</option>
+              </select>
+              <span className="form-hint">Choisissez dans quel(s) carrousel(s) ce slide doit défiler</span>
+            </div>
             <div className="form-group span-2">
               <label>Image Desktop * <span className="form-dim-hint">(recommandé : 1920×600px)</span></label>
               <input type="file" name="imageDesktopFile" accept="image/*" required style={{ background: "white", color: "black", padding: "0.4rem" }} />

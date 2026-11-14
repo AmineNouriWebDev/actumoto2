@@ -53,7 +53,15 @@ export default async function Home() {
     }));
   }
 
-  const isCarouselVisible = (settings as any)?.carouselVisible !== false;
+  const isCarouselTopVisible = (settings as any)?.carouselVisible !== false;
+  const isCarouselBottomVisible = (settings as any)?.carouselBottomVisible === true;
+
+  const topSlides = slides.filter(
+    (s: any) => (s.position || "TOP") === "TOP" || s.position === "BOTH"
+  );
+  const bottomSlides = slides.filter(
+    (s: any) => s.position === "BOTTOM" || s.position === "BOTH"
+  );
 
   return (
     <>
@@ -61,9 +69,14 @@ export default async function Home() {
       
       {/* Flux d'accueil continu et harmonieux */}
       <main className="home-main-flow">
-        {/* 1. SLIDER EN PREMIER (SI ACTIVÉ DANS L'ADMINISTRATION) */}
-        {isCarouselVisible && (
-          <HeroCarousel slides={slides} slideInterval={settings?.carouselDelayMs} />
+        {/* 1. SLIDER EN HAUT (SI ACTIVÉ DANS L'ADMINISTRATION) */}
+        {isCarouselTopVisible && topSlides.length > 0 && (
+          <HeroCarousel
+            slides={topSlides}
+            slideInterval={settings?.carouselDelayMs}
+            variant="top"
+            showScrollDown={true}
+          />
         )}
 
         {/* SECTION SEO - CONTENU OPTIMISÉ (visually hidden for SEO) */}
@@ -99,33 +112,25 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* SÉPARATEUR CHROMÉ SUBTIL */}
-        <div className="home-showcase-divider" aria-hidden="true" />
-
         {/* 3. SECTION MARQUES : MUR INDUSTRIEL RÉPÉTÉ AVEC PLAQUES MÉTALLIQUES */}
         <section className="home-brands-section" aria-label="Marques motos en Tunisie">
           <BrandsGrid brands={brands} />
         </section>
       </main>
 
-      {/* SECTION BANNIÈRE DYNAMIQUE */}
-      {banner && (
+      {/* SECTION DU BAS : CARROUSEL BAS (SI ACTIVÉ DANS L'ADMINISTRATION, SINON MASQUÉ) */}
+      {isCarouselBottomVisible && bottomSlides.length > 0 && (
         <section 
           className="accessories-section-wrapper bg-black" 
-          aria-labelledby="accessoires-title"
+          aria-label="Carrousel inférieur"
           style={{ margin: 0, padding: 0, display: "flex", flexDirection: "column", width: "100%", overflow: "hidden" }}
         >
-          <div className="accessories-image-container w-full" style={{ margin: 0, padding: 0, backgroundColor: "#000" }}>
-            <picture style={{ display: "block", width: "100%", height: "100%", margin: 0, padding: 0 }}>
-              <source media="(max-width: 767px)" srcSet={banner.imageMobile || banner.imageDesktop} />
-              <img
-                src={banner.imageDesktop}
-                alt={banner.altText || 'Bannière actumoto'}
-                className="accessories-image"
-                style={{ display: "block", width: "100%", height: "100%", objectFit: "cover", margin: 0, padding: 0 }}
-              />
-            </picture>
-          </div>
+          <HeroCarousel
+            slides={bottomSlides}
+            slideInterval={settings?.carouselDelayMs}
+            variant="bottom"
+            showScrollDown={false}
+          />
         </section>
       )}
     </>

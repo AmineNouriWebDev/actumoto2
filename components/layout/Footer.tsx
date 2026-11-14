@@ -56,10 +56,10 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Mobile Layout (< 768px) : Alignés au même niveau (FB sur IG à gauche, Copyright au milieu, YT sur TikTok à droite) */}
-        <div className="flex md:hidden items-center justify-between gap-2 w-full">
-          {/* Gauche : Facebook sur Instagram */}
-          <div className="flex flex-col gap-2 shrink-0">
+        {/* Mobile Layout (< 768px) : Alignés côte à côte (FB & IG à gauche, Copyright au milieu, YT & TikTok à droite) */}
+        <div className="flex md:hidden items-center justify-between gap-1.5 w-full">
+          {/* Gauche : Facebook & Instagram côte à côte */}
+          <div className="flex items-center gap-1.5 shrink-0">
             <a
               href="https://www.facebook.com/profile.php?id=61584281323170"
               className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all"
@@ -81,14 +81,14 @@ export default function Footer() {
           </div>
 
           {/* Milieu : Copyright au même niveau */}
-          <div className="text-center px-2 flex-1">
-            <p className="text-xs text-gray-300 leading-relaxed font-medium">
+          <div className="text-center px-1 flex-1">
+            <p className="text-[0.68rem] leading-tight text-gray-300 font-medium">
               Copyright © 2026 actumoto.tn<br />Tous droits réservés
             </p>
           </div>
 
-          {/* Droite : YouTube sur TikTok */}
-          <div className="flex flex-col gap-2 shrink-0">
+          {/* Droite : YouTube & TikTok côte à côte */}
+          <div className="flex items-center gap-1.5 shrink-0">
             <a
               href="https://www.youtube.com/@ActumotoTn"
               className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all"
