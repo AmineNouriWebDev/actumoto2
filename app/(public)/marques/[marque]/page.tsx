@@ -5,6 +5,7 @@ import ModelCard from "@/components/modeles/ModelCard";
 import Link from "next/link";
 import BrandContactsSection from "@/components/modeles/BrandContactsSection";
 import BrandReviewSection from "@/components/modeles/BrandReviewSection";
+import BrandBannerSection from "@/components/modeles/BrandBannerSection";
 import ComparateurBar from "@/components/modeles/ComparateurBar";
 import ComingSoonBanner from "@/components/modeles/ComingSoonBanner";
 
@@ -55,6 +56,31 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
   if (!brand) {
     notFound();
   }
+
+  // Récupérer les bannières spécifiques à cette marque
+  let brandBanners: any[] = [];
+  try {
+    brandBanners = await prisma.brandBanner.findMany({
+      where: { brandId: brand.id, isVisible: true },
+      orderBy: { orderIndex: "asc" },
+    });
+  } catch (err) {
+    try {
+      brandBanners = await prisma.$queryRawUnsafe<any[]>(
+        'SELECT * FROM "BrandBanner" WHERE "brandId" = $1 AND "isVisible" = true ORDER BY "orderIndex" ASC;',
+        brand.id
+      );
+    } catch (e) {
+      brandBanners = [];
+    }
+  }
+
+  const topBanners = brandBanners.filter(
+    (b: any) => (b.position || "TOP") === "TOP" || b.position === "BOTH"
+  );
+  const bottomBanners = brandBanners.filter(
+    (b: any) => b.position === "BOTTOM" || b.position === "BOTH"
+  );
 
   const [approvedBrandReviews, existingUserBrandReview] = await Promise.all([
     prisma.review.findMany({
@@ -110,7 +136,16 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
         ←
       </Link>
 
-      <section className="pt-28 pb-8 relative" role="main">
+      {/* BANNIÈRE HAUT OU CARROUSEL (PLEINE LARGEUR) */}
+      {topBanners.length > 0 && (
+        <BrandBannerSection
+          banners={topBanners}
+          position="top"
+          brandName={brandName}
+        />
+      )}
+
+      <section className={`${topBanners.length > 0 ? "pt-6" : "pt-28"} pb-8 relative`} role="main">
         <div className="container mx-auto px-4">
           {/* SEO hidden title */}
           <div className="sr-only">
@@ -143,7 +178,7 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
             </div>
           )}
 
-          {/* Brand contacts section */}
+          {/* Brand contacts section (avec carte Google Maps interactive) */}
           <BrandContactsSection brand={brandName} />
 
           {/* Section Avis et Commentaires sur la marque */}
@@ -156,6 +191,15 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
           />
         </div>
       </section>
+
+      {/* BANNIÈRE BAS OU CARROUSEL (PLEINE LARGEUR, SOUS LES COMMENTAIRES) */}
+      {bottomBanners.length > 0 && (
+        <BrandBannerSection
+          banners={bottomBanners}
+          position="bottom"
+          brandName={brandName}
+        />
+      )}
 
       {/* Floating comparator bar */}
       <ComparateurBar />

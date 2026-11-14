@@ -120,9 +120,13 @@ export async function updateBrand(id: string, formData: FormData) {
     create: { brandId: id, phones, emails, website, facebook, instagram, youtube, tiktok, showroomAddress, showroomLocation, salesParts: salesParts as any },
   });
 
-  revalidatePath("/admin/marques");
-  revalidatePath(`/admin/marques/${id}`);
-  revalidatePath("/");
+  try {
+    revalidatePath("/admin/marques");
+    revalidatePath(`/admin/marques/${id}`);
+    revalidatePath(`/marques/${encodeURIComponent(name)}`);
+    revalidatePath(`/marques/${name}`);
+    revalidatePath("/");
+  } catch (e) {}
 }
 
 export async function updateBrandOrder(updates: { id: string; orderIndex: number }[]) {

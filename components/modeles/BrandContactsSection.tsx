@@ -5,13 +5,73 @@ interface BrandContactsSectionProps {
   brand: string;
 }
 
+function getMapsInfo(address?: string | null, location?: string | null) {
+  const cleanAddr = (address || "").trim();
+  const cleanLoc = (location || "").trim();
+
+  if (!cleanAddr && !cleanLoc) return null;
+
+  // 1. Déterminer l'URL d'ouverture directe Google Maps
+  let openUrl = "";
+  if (cleanLoc.startsWith("http")) {
+    openUrl = cleanLoc;
+  } else if (cleanLoc) {
+    openUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanLoc)}`;
+  } else {
+    const query = cleanAddr + (cleanAddr.toLowerCase().includes("tunis") ? "" : ", Tunisie");
+    openUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  }
+
+  // 2. Déterminer la requête ou le centre pour l'iframe Google Maps embed
+  let embedQuery = "";
+  const coordRegex = /^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/;
+  if (coordRegex.test(cleanLoc)) {
+    embedQuery = cleanLoc;
+  } else if (cleanLoc.includes("google.com/maps") || cleanLoc.includes("maps.google.com")) {
+    try {
+      const urlObj = new URL(cleanLoc);
+      const q = urlObj.searchParams.get("q");
+      if (q) {
+        embedQuery = q;
+      } else {
+        const atMatch = cleanLoc.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (atMatch) {
+          embedQuery = `${atMatch[1]},${atMatch[2]}`;
+        }
+      }
+    } catch (e) {}
+  }
+
+  if (!embedQuery) {
+    if (cleanAddr) {
+      embedQuery = cleanAddr + (cleanAddr.toLowerCase().includes("tunis") ? "" : ", Tunisie");
+    } else if (cleanLoc && !cleanLoc.startsWith("http")) {
+      embedQuery = cleanLoc + (cleanLoc.toLowerCase().includes("tunis") ? "" : ", Tunisie");
+    } else {
+      embedQuery = cleanAddr || "Tunisie";
+    }
+  }
+
+  const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(embedQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+
+  return {
+    embedUrl,
+    openUrl,
+    displayAddress: cleanAddr || (coordRegex.test(cleanLoc) ? `Coordonnées GPS : ${cleanLoc}` : cleanLoc),
+  };
+}
+
 export default async function BrandContactsSection({ brand }: BrandContactsSectionProps) {
   const brandData = await prisma.brand.findUnique({
     where: { name: brand },
     include: { dealerContact: true }
   });
   
-  const staticContact = (dealersContacts as any)[brand];
+  // Recherche statique (insensible à la casse)
+  const staticKey = Object.keys(dealersContacts).find(
+    (k) => k.toLowerCase() === brand.toLowerCase()
+  );
+  const staticContact = staticKey ? (dealersContacts as any)[staticKey] : null;
   const dbContact = brandData?.dealerContact;
 
   if (!dbContact && !staticContact) return null;
@@ -29,46 +89,45 @@ export default async function BrandContactsSection({ brand }: BrandContactsSecti
     salesParts: (dbContact?.salesParts && (dbContact.salesParts as any[]).length > 0) ? dbContact.salesParts : staticContact?.dealers,
   };
 
-  let displayMode = staticContact?.addressDisplayMode || (contacts.showroomLocation ? "maps" : "text");
+  const mapsInfo = getMapsInfo(contacts.showroomAddress, contacts.showroomLocation);
 
   return (
     <div className="brand-contacts-wrapper">
       <div className="brand-contacts">
         <h2 className="contacts-title futurist-font">Concessionnaire {brand}</h2>
         
-        {/* Address */}
-        {contacts.showroomAddress && (
-          displayMode === "maps" && contacts.showroomLocation ? (
-            <div className="contact-item maps-item">
+        {/* Adresse & Carte Google Maps */}
+        {mapsInfo && (
+          <div className="contact-item maps-item">
+            <div className="w-full">
+              {mapsInfo.displayAddress && (
+                <div className="flex items-center gap-2 mb-3 text-white font-medium">
+                  <span className="text-xl">📍</span>
+                  <span>{mapsInfo.displayAddress}</span>
+                </div>
+              )}
               <div className="maps-container">
                 <iframe
                   className="maps-iframe"
                   loading="lazy"
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(contacts.showroomAddress + ", Tunisia")}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                  src={mapsInfo.embedUrl}
                   style={{ border: 0 }}
-                  aria-label={`Google Maps - ${contacts.showroomAddress}`}
+                  aria-label={`Google Maps - ${mapsInfo.displayAddress}`}
                 />
                 <a
-                  href={contacts.showroomLocation}
+                  href={mapsInfo.openUrl}
                   className="maps-link-open"
                   target="_blank"
                   rel="noopener noreferrer"
                   title="Ouvrir dans Google Maps"
                 >
-                  <span>📍 Voir sur Google Maps</span>
+                  <span>📍 Ouvrir dans Google Maps</span>
                 </a>
               </div>
             </div>
-          ) : (
-            <div className="contact-item">
-              <div className="contact-icon">📍</div>
-              <div className="contact-details">
-                <div className="contact-line">{contacts.showroomAddress}</div>
-              </div>
-            </div>
-          )
+          </div>
         )}
 
         {/* Phones */}
@@ -148,19 +207,21 @@ export default async function BrandContactsSection({ brand }: BrandContactsSecti
             <div className="dealers-grid">
               {(contacts.salesParts as any[]).map((dealer: any, i: number) => (
                 <div key={i} className="dealer-card">
-                  <div className="dealer-card-name">{dealer.name}</div>
-                  {dealer.city && <div className="dealer-card-city">{dealer.city}</div>}
-                  {dealer.address && <div className="dealer-card-address">{dealer.address}</div>}
-                  <div className="dealer-card-footer">
-                    {dealer.phone && (
-                      <a href={`tel:${dealer.phone}`} className="dealer-card-phone">{dealer.phone}</a>
-                    )}
-                    {dealer.mapUrl && (
-                      <a href={dealer.mapUrl} className="dealer-card-map-link" target="_blank" rel="noopener noreferrer">
-                        📍 Carte
+                  <div className="dealer-name">{dealer.name}</div>
+                  {dealer.city && <div className="dealer-city">{dealer.city}</div>}
+                  {dealer.address && <div className="dealer-address">{dealer.address}</div>}
+                  {dealer.phone && (
+                    <div className="dealer-phone">
+                      <a href={`tel:${dealer.phone}`}>{dealer.phone}</a>
+                    </div>
+                  )}
+                  {dealer.mapUrl && (
+                    <div className="dealer-map">
+                      <a href={dealer.mapUrl} target="_blank" rel="noopener noreferrer">
+                        📍 Voir sur la carte
                       </a>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

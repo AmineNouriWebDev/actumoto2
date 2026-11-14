@@ -21,6 +21,7 @@ model Brand {
   dealerContact DealerContact?
   dealerBrands  DealerBrand[]
   reviews       Review[]
+  banners       BrandBanner[]
 }
 
 model Category {
@@ -142,6 +143,24 @@ model HomepageBanner {
   imageMobile  String?
   altText      String?
   isVisible    Boolean @default(true)
+}
+
+model BrandBanner {
+  id           String   @id @default(uuid())
+  brandId      String
+  imageDesktop String
+  imageMobile  String?
+  title        String?
+  link         String?
+  altText      String?
+  position     String   @default("TOP") // TOP, BOTTOM, BOTH
+  orderIndex   Int      @default(0)
+  isVisible    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
 }
 
 enum Role {

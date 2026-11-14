@@ -2,13 +2,16 @@ import prisma from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { updateBrand } from "@/lib/admin-actions/brands";
+import { getBrandBanners } from "@/lib/admin-actions/brand-banners";
 import BrandDealersEditor from "@/components/admin/BrandDealersEditor";
+import BrandBannersEditor from "@/components/admin/BrandBannersEditor";
 
 export default async function EditBrandPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const brand = await prisma.brand.findUnique({ where: { id }, include: { dealerContact: true } });
   if (!brand) notFound();
   const dc = brand.dealerContact;
+  const banners = await getBrandBanners(id);
 
   async function handleUpdate(formData: FormData) {
     "use server";
@@ -73,12 +76,12 @@ export default async function EditBrandPage({ params }: { params: Promise<{ id: 
             </div>
             <div className="form-group">
               <label>Adresse Showroom</label>
-              <input type="text" name="showroomAddress" defaultValue={dc?.showroomAddress || ""} />
+              <input type="text" name="showroomAddress" defaultValue={dc?.showroomAddress || ""} placeholder="Ex: Complexe International, City Center III, Tunis 1082" />
             </div>
             <div className="form-group span-2">
-              <label>Localisation du Showroom (Google Maps)</label>
-              <input type="text" name="showroomLocation" defaultValue={dc?.showroomLocation || ""} placeholder="URL Google Maps OU Coordonnées (ex: 34.7398, 10.7600)" />
-              <span className="form-hint">Collez un lien direct Google Maps, ou tapez des coordonnées GPS pour générer la carte automatiquement.</span>
+              <label>Localisation du Showroom (Google Maps ou Coordonnées GPS)</label>
+              <input type="text" name="showroomLocation" defaultValue={dc?.showroomLocation || ""} placeholder="Coordonnées GPS (ex: 36.8065, 10.1815) OU Lien Google Maps" />
+              <span className="form-hint">Tapez l'adresse écrite ci-dessus, des coordonnées GPS ou un lien Google Maps : la carte s'affichera automatiquement sur la page de la marque.</span>
             </div>
           </div>
           <div style={{ borderTop: "1px solid #374151", paddingTop: "1rem", marginTop: "0.5rem" }}>
@@ -108,9 +111,16 @@ export default async function EditBrandPage({ params }: { params: Promise<{ id: 
 
         <div className="admin-form-actions">
           <Link href="/admin/marques" className="btn-secondary">Annuler</Link>
-          <button type="submit" className="btn-primary">💾 Enregistrer les modifications</button>
+          <button type="submit" className="btn-primary">💾 Enregistrer les informations de la marque</button>
         </div>
       </form>
+
+      {/* Section Gestion des bannières de la marque */}
+      <BrandBannersEditor
+        brandId={id}
+        brandName={brand.name}
+        initialBanners={banners}
+      />
     </div>
   );
 }
