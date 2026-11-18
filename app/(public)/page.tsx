@@ -1,4 +1,5 @@
 import HeroCarousel from "@/components/home/HeroCarousel";
+import BottomCarouselSection from "@/components/home/BottomCarouselSection";
 import BrandsGrid from "@/components/home/BrandsGrid";
 import NewModelsSection from "@/components/home/NewModelsSection";
 // import CategoriesAndPrices from "@/components/home/CategoriesAndPrices";
@@ -116,23 +117,20 @@ export default async function Home() {
         <section className="home-brands-section" aria-label="Marques motos en Tunisie">
           <BrandsGrid brands={brands} />
         </section>
-      </main>
 
-      {/* SECTION DU BAS : CARROUSEL BAS (SI ACTIVÉ DANS L'ADMINISTRATION, SINON MASQUÉ) */}
-      {isCarouselBottomVisible && bottomSlides.length > 0 && (
-        <section 
-          className="accessories-section-wrapper bg-black" 
-          aria-label="Carrousel inférieur"
-          style={{ margin: 0, padding: 0, display: "flex", flexDirection: "column", width: "100%", overflow: "hidden" }}
-        >
-          <HeroCarousel
-            slides={bottomSlides}
-            slideInterval={settings?.carouselDelayMs}
-            variant="bottom"
-            showScrollDown={false}
-          />
-        </section>
-      )}
+        {/* 4. SECTION DU BAS : CARROUSEL BAS DÉFILANT SUR LE MÊME MUR INDUSTRIEL */}
+        {isCarouselBottomVisible && bottomSlides.length > 0 && (
+          <section 
+            className="home-bottom-carousel-section" 
+            aria-label="Carrousel inférieur"
+          >
+            <BottomCarouselSection
+              slides={bottomSlides}
+              slideInterval={settings?.carouselDelayMs}
+            />
+          </section>
+        )}
+      </main>
     </>
   );
 }

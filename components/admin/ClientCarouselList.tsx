@@ -10,6 +10,7 @@ import {
   toggleCarouselVisibility,
   toggleCarouselBottomVisibility,
   updateSlidePosition,
+  updateSlideBadge,
 } from "@/lib/admin-actions/carousel";
 import ConfirmForm from "./ConfirmForm";
 import SortableGrid from "./SortableGrid";
@@ -92,6 +93,24 @@ export default function ClientCarouselList({
         );
       } catch (err) {
         toast.error("Erreur lors du changement d'emplacement", { theme: "dark" });
+      }
+    });
+  };
+
+  const handleBadgeChange = (slideId: string, newBadge: string) => {
+    const trimmed = newBadge.trim();
+    setSlides((prev) =>
+      prev.map((s) => (s.id === slideId ? { ...s, badgeText: trimmed || null } : s))
+    );
+    startTransition(async () => {
+      try {
+        await updateSlideBadge(slideId, trimmed || null);
+        toast.success(
+          trimmed ? `Étiquette rouge enregistrée : "${trimmed}"` : "Étiquette rouge supprimée",
+          { theme: "dark" }
+        );
+      } catch (err) {
+        toast.error("Erreur lors de la mise à jour de l'étiquette", { theme: "dark" });
       }
     });
   };
@@ -343,10 +362,66 @@ export default function ClientCarouselList({
                         ? "⬇️ Carrousel Bas"
                         : "↕️ Haut & Bas"}
                     </span>
+
+                    {/* Étiquette rouge si configurée */}
+                    {(slide as any).badgeText && (
+                      <span
+                        style={{
+                          padding: "0.15rem 0.6rem",
+                          borderRadius: "9999px",
+                          fontSize: "0.72rem",
+                          fontWeight: 800,
+                          background: "linear-gradient(135deg, #e00000 0%, #ff3333 50%, #cc0000 100%)",
+                          color: "#ffffff",
+                          boxShadow: "0 2px 6px rgba(220, 0, 0, 0.4)",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                        }}
+                      >
+                        🏷️ {(slide as any).badgeText}
+                      </span>
+                    )}
                   </div>
 
                   {slide.link && <div style={{ color: "#93c5fd", fontSize: "0.8rem", marginBottom: "0.25rem" }}>🔗 {slide.link}</div>}
                   <div style={{ color: "#6b7280", fontSize: "0.72rem", wordBreak: "break-all" }}>{slide.imageDesktop}</div>
+
+                  {/* Champ d'édition directe de l'étiquette rouge */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem", flexWrap: "wrap" }}>
+                    <span style={{ fontSize: "0.75rem", color: "#9ca3af", fontWeight: 600 }}>🏷️ Étiquette rouge :</span>
+                    <input
+                      type="text"
+                      key={`${slide.id}-${(slide as any).badgeText || ""}`}
+                      defaultValue={(slide as any).badgeText || ""}
+                      placeholder="Ex: NOUVEAU, PROMO..."
+                      onBlur={(e) => {
+                        const val = e.target.value.trim();
+                        if (val !== ((slide as any).badgeText || "")) {
+                          handleBadgeChange(slide.id, val);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          (e.target as HTMLInputElement).blur();
+                        }
+                      }}
+                      style={{
+                        padding: "0.2rem 0.5rem",
+                        fontSize: "0.75rem",
+                        borderRadius: "0.25rem",
+                        border: "1px solid #4b5563",
+                        background: "#111827",
+                        color: "white",
+                        width: "160px",
+                      }}
+                      title="Tapez le texte et appuyez sur Entrée pour enregistrer"
+                    />
+                    <span style={{ fontSize: "0.68rem", color: "#6b7280" }}>
+                      (Appuyez sur Entrée ou cliquez ailleurs pour valider)
+                    </span>
+                  </div>
 
                   {/* Boutons de changement d'emplacement */}
                   <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginTop: "0.5rem" }}>

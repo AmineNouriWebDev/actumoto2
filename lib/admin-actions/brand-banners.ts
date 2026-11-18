@@ -206,3 +206,4 @@ export async function deleteBrandBanner(id: string, brandId: string) {
     }
   } catch (e) {}
 }
+

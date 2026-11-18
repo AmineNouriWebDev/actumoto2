@@ -20,6 +20,9 @@ export async function createSlide(formData: FormData) {
     await prisma.$executeRawUnsafe(
       'ALTER TABLE "CarouselSlide" ADD COLUMN IF NOT EXISTS "position" TEXT NOT NULL DEFAULT \'TOP\';'
     );
+    await prisma.$executeRawUnsafe(
+      'ALTER TABLE "CarouselSlide" ADD COLUMN IF NOT EXISTS "badgeText" TEXT;'
+    );
   } catch (e) {}
 
   const desktopFile = formData.get("imageDesktopFile") as File;
@@ -27,6 +30,7 @@ export async function createSlide(formData: FormData) {
   const title = (formData.get("title") as string || "").trim() || null;
   const alt = (formData.get("alt") as string || "").trim() || null;
   const link = (formData.get("link") as string || "").trim() || null;
+  const badgeText = (formData.get("badgeText") as string || "").trim() || null;
   const position = ((formData.get("position") as string) || "TOP").toUpperCase();
 
   if (!desktopFile || desktopFile.size === 0) return { error: "Image desktop requise." };
@@ -57,13 +61,14 @@ export async function createSlide(formData: FormData) {
         orderIndex: newOrderIndex,
         isVisible: true,
         position: position as any,
+        badgeText,
       },
     });
   } catch (err: any) {
     // Fallback robuste par SQL direct si le client Prisma en mémoire n'a pas encore rechargé le schéma
     const id = crypto.randomUUID();
     await prisma.$executeRawUnsafe(
-      'INSERT INTO "CarouselSlide" ("id", "imageDesktop", "imageMobile", "title", "alt", "link", "orderIndex", "isVisible", "position") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);',
+      'INSERT INTO "CarouselSlide" ("id", "imageDesktop", "imageMobile", "title", "alt", "link", "orderIndex", "isVisible", "position", "badgeText") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);',
       id,
       imageDesktop,
       imageMobile,
@@ -72,7 +77,8 @@ export async function createSlide(formData: FormData) {
       link,
       newOrderIndex,
       true,
-      position
+      position,
+      badgeText
     );
   }
   revalidatePath("/admin/carrousel");
@@ -85,6 +91,7 @@ export async function updateSlide(id: string, formData: FormData) {
   const title = (formData.get("title") as string || "").trim() || null;
   const alt = (formData.get("alt") as string || "").trim() || null;
   const link = (formData.get("link") as string || "").trim() || null;
+  const badgeText = (formData.get("badgeText") as string || "").trim() || null;
   const orderIndex = parseInt(formData.get("orderIndex") as string || "0");
   const position = ((formData.get("position") as string) || "TOP").toUpperCase();
 
@@ -99,11 +106,12 @@ export async function updateSlide(id: string, formData: FormData) {
         link,
         orderIndex,
         position: position as any,
+        badgeText,
       },
     });
   } catch (err: any) {
     await prisma.$executeRawUnsafe(
-      'UPDATE "CarouselSlide" SET "imageDesktop" = $1, "imageMobile" = $2, "title" = $3, "alt" = $4, "link" = $5, "orderIndex" = $6, "position" = $7 WHERE "id" = $8;',
+      'UPDATE "CarouselSlide" SET "imageDesktop" = $1, "imageMobile" = $2, "title" = $3, "alt" = $4, "link" = $5, "orderIndex" = $6, "position" = $7, "badgeText" = $8 WHERE "id" = $9;',
       imageDesktop.trim(),
       imageMobile,
       title,
@@ -111,8 +119,77 @@ export async function updateSlide(id: string, formData: FormData) {
       link,
       orderIndex,
       position,
+      badgeText,
       id
     );
+  }
+  revalidatePath("/admin/carrousel");
+  revalidatePath("/");
+}
+
+export async function updateSlideBadge(id: string, badgeText: string | null) {
+  const text = (badgeText || "").trim() || null;
+  try {
+    await prisma.$executeRawUnsafe(
+      'ALTER TABLE "CarouselSlide" ADD COLUMN IF NOT EXISTS "badgeText" TEXT;'
+    );
+  } catch (e) {}
+
+  try {
+    await prisma.carouselSlide.update({
+      where: { id },
+      data: { badgeText: text },
+    });
+  } catch (err: any) {
+    await prisma.$executeRawUnsafe(
+      'UPDATE "CarouselSlide" SET "badgeText" = $1 WHERE "id" = $2;',
+      text,
+      id
+    );
+  }
+  revalidatePath("/admin/carrousel");
+  revalidatePath("/");
+}
+
+export async function updateSlideDetails(
+  id: string,
+  data: {
+    title?: string | null;
+    alt?: string | null;
+    link?: string | null;
+    badgeText?: string | null;
+    position?: string;
+  }
+) {
+  try {
+    await prisma.$executeRawUnsafe(
+      'ALTER TABLE "CarouselSlide" ADD COLUMN IF NOT EXISTS "badgeText" TEXT;'
+    );
+  } catch (e) {}
+
+  const updateData: any = {};
+  if (data.title !== undefined) updateData.title = data.title ? data.title.trim() : null;
+  if (data.alt !== undefined) updateData.alt = data.alt ? data.alt.trim() : null;
+  if (data.link !== undefined) updateData.link = data.link ? data.link.trim() : null;
+  if (data.badgeText !== undefined) updateData.badgeText = data.badgeText ? data.badgeText.trim() : null;
+  if (data.position !== undefined) updateData.position = data.position.toUpperCase();
+
+  try {
+    await prisma.carouselSlide.update({
+      where: { id },
+      data: updateData,
+    });
+  } catch (err: any) {
+    const fields = Object.keys(updateData);
+    if (fields.length > 0) {
+      const setClause = fields.map((f, i) => `"${f}" = $${i + 1}`).join(", ");
+      const values = fields.map((f) => updateData[f]);
+      values.push(id);
+      await prisma.$executeRawUnsafe(
+        `UPDATE "CarouselSlide" SET ${setClause} WHERE "id" = $${values.length};`,
+        ...values
+      );
+    }
   }
   revalidatePath("/admin/carrousel");
   revalidatePath("/");

@@ -86,7 +86,12 @@ export default async function AdminCarouselPage() {
               <label>Texte alternatif</label>
               <input type="text" name="alt" placeholder="Description de l'image" />
             </div>
-            <div className="form-group span-2">
+            <div className="form-group">
+              <label>Étiquette rouge / Badge <span className="form-dim-hint">(ex: NOUVEAU, PROMO...)</span></label>
+              <input type="text" name="badgeText" placeholder="Texte libre à afficher sur le badge rouge" />
+              <span className="form-hint">S'affiche en haut à gauche de la plaque métallique</span>
+            </div>
+            <div className="form-group">
               <label>Lien (optionnel)</label>
               <input type="url" name="link" placeholder="https://..." />
             </div>
