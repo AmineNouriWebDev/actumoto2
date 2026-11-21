@@ -111,12 +111,12 @@ export default function BurgerMenu({
         role="dialog"
         aria-label="Menu"
       >
-        {/* En-tête du Drawer : Logo actumoto à gauche + bouton X à droite */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/70">
+        {/* En-tête du Drawer : Fond noir pour le logo qui s'étend jusqu'au bouton X */}
+        <div className="flex items-center justify-between pl-5 pr-4 py-3.5 border-b border-neutral-900 bg-black">
           <Link
             href="/"
             onClick={closeMenu}
-            className="flex items-center"
+            className="flex items-center flex-1 h-full"
             aria-label="Accueil actumoto.tn"
           >
             <img
@@ -125,13 +125,13 @@ export default function BurgerMenu({
                 (e.currentTarget as HTMLImageElement).src = "/img/logo2.webp";
               }}
               alt="actumoto.tn"
-              className="h-8 w-auto object-contain"
+              className="h-8 sm:h-9 w-auto object-contain"
             />
           </Link>
           <button
             type="button"
             onClick={closeMenu}
-            className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-red-600 text-gray-500 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm"
+            className="w-9 h-9 rounded-xl bg-neutral-800 hover:bg-red-600 text-gray-300 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm ml-3 shrink-0"
             aria-label="Fermer le menu"
           >
             <X className="w-5 h-5" />
@@ -140,13 +140,8 @@ export default function BurgerMenu({
 
         {/* Corps déroulant du Drawer */}
         <div className="flex-1 overflow-y-auto px-5 py-5 space-y-6 scrollbar-thin scrollbar-thumb-gray-300">
-          {/* SECTION 1 : LIENS DE NAVIGATION (CONNEXION EN PREMIER, PUIS OCCASION) */}
-          <section aria-label="Navigation principale" className="space-y-2.5">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
-              Navigation
-            </h3>
-
-            {/* 1. Bouton Connexion / Mon Compte EN PREMIER */}
+          {/* SECTION 1 : CONNEXION / MON ESPACE */}
+          <section aria-label="Compte utilisateur" className="space-y-2.5">
             {isLoggedIn ? (
               <div className="flex items-center gap-2">
                 <Link
@@ -204,26 +199,9 @@ export default function BurgerMenu({
                 <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-1 transition-all" />
               </Link>
             )}
-
-            {/* 2. Bouton Motos d'Occasion EN SECOND */}
-            <Link
-              href="/occasion"
-              onClick={closeMenu}
-              className="flex items-center justify-between p-3.5 rounded-xl bg-gray-50 hover:bg-red-50/80 border border-gray-200 hover:border-red-500/50 text-gray-900 transition-all group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-red-100 text-red-600 border border-red-200 flex items-center justify-center group-hover:scale-105 transition-transform">
-                  <Tag className="w-4 h-4" />
-                </div>
-                <span className="font-bold text-sm text-gray-900 group-hover:text-red-600 transition-colors">
-                  Motos d'Occasion
-                </span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all" />
-            </Link>
           </section>
 
-          {/* SECTION 2 : FILTRER PAR (DEUX ONGLETS : PAR CATÉGORIE / PAR PRIX) */}
+          {/* SECTION 2 : FILTRER PAR (CATÉGORIE / PRIX) */}
           <section aria-label="Filtres" className="space-y-3">
             <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
               Filtrer par :
@@ -241,7 +219,7 @@ export default function BurgerMenu({
                 }`}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
-                Par catégorie
+                Catégorie
               </button>
               <button
                 type="button"
@@ -253,7 +231,7 @@ export default function BurgerMenu({
                 }`}
               >
                 <Sliders className="w-3.5 h-3.5" />
-                Par prix
+                Prix
               </button>
             </div>
 
@@ -330,6 +308,25 @@ export default function BurgerMenu({
                 </div>
               </div>
             )}
+          </section>
+
+          {/* SECTION 3 : MOTOS D'OCCASION (APRÈS LES FILTRES, JUSTE AVANT CONTACT & SUPPORT) */}
+          <section aria-label="Motos d'occasion">
+            <Link
+              href="/occasion"
+              onClick={closeMenu}
+              className="flex items-center justify-between p-3.5 rounded-xl bg-gray-50 hover:bg-red-50/80 border border-gray-200 hover:border-red-500/50 text-gray-900 transition-all group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-red-100 text-red-600 border border-red-200 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Tag className="w-4 h-4" />
+                </div>
+                <span className="font-bold text-sm text-gray-900 group-hover:text-red-600 transition-colors">
+                  Motos d'Occasion
+                </span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all" />
+            </Link>
           </section>
         </div>
 

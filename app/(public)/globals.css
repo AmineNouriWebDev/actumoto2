@@ -588,25 +588,25 @@ h3,
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) !important;
       }
 
-      /* Positionnement du badge NOUVEAU dans la plaque pour ne pas cacher la vis */
+      /* Positionnement du badge NOUVEAU en haut de la plaque, décalé vers la droite pour libérer la vis */
       .nouveaute-plaque-container .nouveau-badge {
-        top: 40px;
-        left: 14px;
+        top: 14px;
+        left: 48px;
         background: #000000 !important;
         color: #ffffff !important;
       }
 
       @media (min-width: 768px) {
         .nouveaute-plaque-container .nouveau-badge {
-          top: 60px;
-          left: 16px;
+          top: 16px;
+          left: 54px;
         }
       }
 
       /* Badge sur la plaque du carrousel bas (5 plaques sur desktop) */
       .bottom-carousel-plaque.nouveaute-plaque-container .nouveau-badge {
-        top: 36px !important;
-        left: 14px !important;
+        top: 14px !important;
+        left: 48px !important;
         font-size: 0.65rem !important;
         padding: 4px 10px !important;
         background: #000000 !important;
@@ -621,16 +621,16 @@ h3,
 
       @media (min-width: 768px) {
         .bottom-carousel-plaque.nouveaute-plaque-container .nouveau-badge {
-          top: 40px !important;
-          left: 14px !important;
+          top: 14px !important;
+          left: 42px !important;
           font-size: 0.68rem !important;
         }
       }
 
       @media (min-width: 1024px) {
         .bottom-carousel-plaque.nouveaute-plaque-container .nouveau-badge {
-          top: 32px !important;
-          left: 12px !important;
+          top: 12px !important;
+          left: 34px !important;
           font-size: 0.62rem !important;
           padding: 3px 9px !important;
         }
