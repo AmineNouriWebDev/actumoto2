@@ -2,6 +2,7 @@
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { notifyAdminNewComment } from "@/lib/n8n";
 
 export async function addReview(modelId: string, rating: number, comment: string) {
   const session = await auth();
@@ -29,6 +30,37 @@ export async function addReview(modelId: string, rating: number, comment: string
       isApproved
     }
   });
+
+  // Notifier l'administrateur via n8n/Telegram dès qu'un commentaire est en attente de validation
+  if (trimmedComment.length > 0) {
+    try {
+      const [model, user] = await Promise.all([
+        prisma.model.findUnique({
+          where: { id: modelId },
+          include: { brand: { select: { name: true } } },
+        }),
+        prisma.user.findUnique({
+          where: { id: session.user.id },
+          select: { name: true, email: true },
+        }),
+      ]);
+
+      const targetName = model ? `${model.brand?.name || ""} ${model.name}`.trim() : "Modèle";
+      const authorName = user?.name || session.user.name || "Client";
+      const authorEmail = user?.email || session.user.email || "";
+
+      notifyAdminNewComment({
+        authorName,
+        authorEmail,
+        targetType: "model",
+        targetName,
+        rating,
+        comment: trimmedComment,
+      }).catch((err) => console.error("Notification n8n error:", err));
+    } catch (notifErr) {
+      console.error("Failed to prepare comment notification:", notifErr);
+    }
+  }
 
   revalidatePath("/", "layout");
   revalidatePath("/compte", "page");
@@ -66,6 +98,37 @@ export async function addBrandReview(brandId: string, rating: number, comment: s
       isApproved
     }
   });
+
+  // Notifier l'administrateur via n8n/Telegram dès qu'un commentaire est en attente de validation
+  if (trimmedComment.length > 0) {
+    try {
+      const [brand, user] = await Promise.all([
+        prisma.brand.findUnique({
+          where: { id: brandId },
+          select: { name: true },
+        }),
+        prisma.user.findUnique({
+          where: { id: session.user.id },
+          select: { name: true, email: true },
+        }),
+      ]);
+
+      const targetName = brand ? `Marque ${brand.name}` : "Marque";
+      const authorName = user?.name || session.user.name || "Client";
+      const authorEmail = user?.email || session.user.email || "";
+
+      notifyAdminNewComment({
+        authorName,
+        authorEmail,
+        targetType: "brand",
+        targetName,
+        rating,
+        comment: trimmedComment,
+      }).catch((err) => console.error("Notification n8n error:", err));
+    } catch (notifErr) {
+      console.error("Failed to prepare brand comment notification:", notifErr);
+    }
+  }
 
   revalidatePath("/", "layout");
   revalidatePath("/admin/commentaires");

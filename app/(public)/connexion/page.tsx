@@ -24,12 +24,19 @@ function LoginForm() {
       ? rawCallback
       : "/";
   const needLogin = searchParams.get("needLogin") === "1";
+  const reason = searchParams.get("reason");
 
   useEffect(() => {
     if (needLogin) {
-      toast.info("Vous devez être connecté pour soumettre un avis.");
+      if (reason === "rating") {
+        toast.info("Veuillez vous connecter pour noter cette moto.");
+      } else if (reason === "favorite") {
+        toast.info("Veuillez vous connecter pour sauvegarder cette moto dans vos favoris.");
+      } else {
+        toast.info("Vous devez être connecté pour continuer.");
+      }
     }
-  }, [needLogin]);
+  }, [needLogin, reason]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +107,11 @@ function LoginForm() {
           >
             <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
             <span>
-              Vous devez être connecté pour déposer un avis. Connectez-vous ci-dessous pour être redirigé directement.
+              {reason === "rating"
+                ? "Vous devez être connecté pour noter cette moto. Connectez-vous ci-dessous pour être redirigé vers la page."
+                : reason === "favorite"
+                ? "Vous devez être connecté pour sauvegarder cette moto dans vos favoris. Connectez-vous ci-dessous pour être redirigé vers la page."
+                : "Vous devez être connecté pour déposer un avis. Connectez-vous ci-dessous pour être redirigé directement."}
             </span>
           </div>
         )}

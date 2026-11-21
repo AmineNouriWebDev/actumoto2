@@ -41,7 +41,7 @@ export default function BrandReviewSection({
 
   const handleRequireLogin = () => {
     const targetUrl = pathname || `/marques/${encodeURIComponent(brandName)}`;
-    router.push(`/connexion?callbackUrl=${encodeURIComponent(targetUrl)}&needLogin=1`);
+    router.push(`/connexion?callbackUrl=${encodeURIComponent(targetUrl)}&needLogin=1&reason=review`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,7 +69,7 @@ export default function BrandReviewSection({
 
   const loginRedirectUrl = `/connexion?callbackUrl=${encodeURIComponent(
     pathname || `/marques/${encodeURIComponent(brandName)}`
-  )}&needLogin=1`;
+  )}&needLogin=1&reason=review`;
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 mt-10 mb-12">

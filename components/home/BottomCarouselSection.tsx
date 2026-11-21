@@ -201,9 +201,8 @@ export default function BottomCarouselSection({
                   {slide.title ? (
                     <div className="relative z-[3] w-full px-3 sm:px-4 pb-[6%] pt-1 text-center select-none">
                       <h3
-                        className={`nouveaute-title futurist-font text-xs sm:text-sm font-black uppercase tracking-wider leading-tight truncate ${
-                          isClickable ? "transition-colors duration-200" : ""
-                        }`}
+                        style={{ color: "#000000" }}
+                        className="nouveaute-title futurist-font text-xs sm:text-sm font-black uppercase tracking-wider leading-tight truncate text-black"
                       >
                         {slide.title}
                       </h3>

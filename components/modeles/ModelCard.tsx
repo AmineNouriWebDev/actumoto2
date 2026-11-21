@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { formatSpecification } from "@/lib/formatters";
 import Link from "next/link";
 import { toggleFavorite } from "@/lib/client-actions/favorites";
@@ -47,6 +48,8 @@ interface ModelCardProps {
 }
 
 export default function ModelCard({ model, brand, index, isLoggedIn = false }: ModelCardProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const cardRef = useRef<HTMLDivElement>(null);
   const specsRef = useRef<HTMLDivElement>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -210,10 +213,12 @@ export default function ModelCard({ model, brand, index, isLoggedIn = false }: M
     e.stopPropagation();
 
     if (!isLoggedIn) {
-      toast.info("Veuillez vous connecter pour noter cette moto.", {
-        position: "top-right",
-        autoClose: 3500,
-      });
+      const targetUrl =
+        pathname ||
+        (typeof window !== "undefined"
+          ? window.location.pathname + window.location.search
+          : `/marques/${encodeURIComponent(brand)}`);
+      router.push(`/connexion?callbackUrl=${encodeURIComponent(targetUrl)}&needLogin=1&reason=rating`);
       return;
     }
 
@@ -273,10 +278,12 @@ export default function ModelCard({ model, brand, index, isLoggedIn = false }: M
     e.stopPropagation();
 
     if (!isLoggedIn) {
-      toast.info("Veuillez vous connecter pour sauvegarder cette moto dans vos favoris.", {
-        position: "top-right",
-        autoClose: 3500,
-      });
+      const targetUrl =
+        pathname ||
+        (typeof window !== "undefined"
+          ? window.location.pathname + window.location.search
+          : `/marques/${encodeURIComponent(brand)}`);
+      router.push(`/connexion?callbackUrl=${encodeURIComponent(targetUrl)}&needLogin=1&reason=favorite`);
       return;
     }
 

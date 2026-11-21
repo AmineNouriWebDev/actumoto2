@@ -17,7 +17,7 @@ export default function DetailReviewSection({ modelId, isLoggedIn, existingRevie
 
   const handleRequireLogin = () => {
     const targetUrl = pathname || (typeof window !== "undefined" ? window.location.pathname : "");
-    router.push(`/connexion?callbackUrl=${encodeURIComponent(targetUrl)}&needLogin=1`);
+    router.push(`/connexion?callbackUrl=${encodeURIComponent(targetUrl)}&needLogin=1&reason=review`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,7 +44,7 @@ export default function DetailReviewSection({ modelId, isLoggedIn, existingRevie
 
   const loginRedirectUrl = `/connexion?callbackUrl=${encodeURIComponent(
     pathname || (typeof window !== "undefined" ? window.location.pathname : "")
-  )}&needLogin=1`;
+  )}&needLogin=1&reason=review`;
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 mt-8 mb-8">

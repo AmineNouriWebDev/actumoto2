@@ -166,7 +166,7 @@ export default function ComparateurPage() {
                         const mainImage = m.images?.[0] || m.image;
                         const isBestPrice = m.price !== null && m.price !== undefined && m.price === bestValues.price && fullModels.length > 1;
                         return (
-                          <th key={i} className="min-w-[150px] sm:min-w-[250px] relative">
+                          <th key={i} className="min-w-[160px] sm:min-w-[260px] relative text-center">
                             <button
                               className="remove-btn"
                               onClick={() => removeModel(m.brand, m.itemReferenceName)}
@@ -179,6 +179,9 @@ export default function ComparateurPage() {
                                 src={mainImage ? mainImage.replace(/^\.\//, "/") : "/img/placeholder-moto.jpg"}
                                 alt={m.name}
                                 className="model-img"
+                                width={240}
+                                height={180}
+                                loading="lazy"
                                 onError={(e) => { e.currentTarget.src = "/img/placeholder-moto.jpg"; }}
                               />
                             </div>

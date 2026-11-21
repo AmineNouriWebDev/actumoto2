@@ -218,11 +218,8 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
 
                     {/* Titre du modèle */}
                     <h3
-                      className={`nouveaute-title futurist-font text-sm sm:text-base md:text-lg font-black uppercase tracking-wider leading-tight truncate ${
-                        isClickable
-                          ? "transition-colors duration-200"
-                          : ""
-                      }`}
+                      style={{ color: "#000000" }}
+                      className="nouveaute-title futurist-font text-sm sm:text-base md:text-lg font-black uppercase tracking-wider leading-tight truncate text-black"
                     >
                       {title}
                     </h3>

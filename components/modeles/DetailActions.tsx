@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { toggleFavorite as toggleFavoriteAction } from "@/lib/client-actions/favorites";
 import { rateModel } from "@/lib/client-actions/reviews";
 import { toast } from "react-toastify";
@@ -30,6 +31,8 @@ export default function DetailActions({
   initialTotalRatings = 0,
   isLoggedIn = false,
 }: DetailActionsProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [isCompared, setIsCompared] = useState(false);
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [isLoadingFav, setIsLoadingFav] = useState(false);
@@ -111,10 +114,12 @@ export default function DetailActions({
 
   const handleToggleFavorite = async () => {
     if (!isLoggedIn) {
-      toast.info("Veuillez vous connecter pour sauvegarder cette moto dans vos favoris.", {
-        position: "top-right",
-        autoClose: 3500,
-      });
+      const targetUrl =
+        pathname ||
+        (typeof window !== "undefined"
+          ? window.location.pathname + window.location.search
+          : `/marques/${encodeURIComponent(brandName)}/${encodeURIComponent(modelName)}`);
+      router.push(`/connexion?callbackUrl=${encodeURIComponent(targetUrl)}&needLogin=1&reason=favorite`);
       return;
     }
 
@@ -149,10 +154,12 @@ export default function DetailActions({
     e.stopPropagation();
 
     if (!isLoggedIn) {
-      toast.info("Veuillez vous connecter pour noter cette moto.", {
-        position: "top-right",
-        autoClose: 3500,
-      });
+      const targetUrl =
+        pathname ||
+        (typeof window !== "undefined"
+          ? window.location.pathname + window.location.search
+          : `/marques/${encodeURIComponent(brandName)}/${encodeURIComponent(modelName)}`);
+      router.push(`/connexion?callbackUrl=${encodeURIComponent(targetUrl)}&needLogin=1&reason=rating`);
       return;
     }
 
