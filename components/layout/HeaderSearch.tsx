@@ -134,7 +134,7 @@ export default function HeaderSearch({ isHome = false }: { isHome?: boolean }) {
             title="Rechercher"
           >
             <img
-              src="/img/header-bouton-recherche.webp"
+              src="/img/header-bouton-recherche-version2.webp"
               alt="Rechercher"
               className="w-full h-full object-contain pointer-events-none select-none"
             />
@@ -196,7 +196,7 @@ export default function HeaderSearch({ isHome = false }: { isHome?: boolean }) {
             aria-label="Ouvrir la recherche"
           >
             <img
-              src="/img/header-bouton-recherche.webp"
+              src="/img/header-bouton-recherche-version2.webp"
               alt="Rechercher"
               className="w-full h-full object-contain pointer-events-none select-none"
             />
