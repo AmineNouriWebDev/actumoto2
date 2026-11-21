@@ -23,8 +23,15 @@ export default async function Home() {
       : Promise.resolve([]),
   ]);
 
-  let displayedNouveautes = nouveautesItems;
-  if (displayedNouveautes.length === 0) {
+  const nouveautesHaut = (nouveautesItems as any[]).filter(
+    (item: any) => (item.position || 'HAUT') === 'HAUT'
+  );
+  const nouveautesBas = (nouveautesItems as any[]).filter(
+    (item: any) => item.position === 'BAS'
+  );
+
+  let displayedNouveautesHaut = nouveautesHaut;
+  if (displayedNouveautesHaut.length === 0) {
     const fallbackModels = await prisma.model
       .findMany({
         where: { isVisible: true, isNew: true },
@@ -37,7 +44,7 @@ export default async function Home() {
         orderBy: [{ orderIndex: 'asc' }, { name: 'asc' }],
       })
       .catch(() => []);
-    displayedNouveautes = fallbackModels.map((m, idx) => ({
+    displayedNouveautesHaut = fallbackModels.map((m, idx) => ({
       id: m.id,
       title: m.name,
       subtitle: m.brand.name,
@@ -50,6 +57,7 @@ export default async function Home() {
       currency: m.currency || "DT",
       orderIndex: idx,
       isVisible: true,
+      position: "HAUT",
       modelId: m.id,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -108,10 +116,10 @@ export default async function Home() {
           </p>
         </section>
 
-        {/* 2. SECTION NOUVEAUTÉS */}
+        {/* 2. SECTION NOUVEAUTÉS (HAUT) */}
         <section className="home-nouveautes-section" aria-label="Nouveautés motos en Tunisie">
           <div className="home-nouveautes-wrapper">
-            <NewModelsSection items={displayedNouveautes} />
+            <NewModelsSection items={displayedNouveautesHaut} />
           </div>
         </section>
 
@@ -120,17 +128,28 @@ export default async function Home() {
           <BrandsGrid brands={brands} />
         </section>
 
-        {/* 4. SECTION DU BAS : CARROUSEL BAS DÉFILANT SUR LE MÊME MUR INDUSTRIEL */}
-        {isCarouselBottomVisible && bottomSlides.length > 0 && (
+        {/* 4. SECTION DU BAS : NOUVEAUTÉS (BAS) OU CARROUSEL BAS */}
+        {nouveautesBas.length > 0 ? (
           <section 
-            className="home-bottom-carousel-section" 
-            aria-label="Carrousel inférieur"
+            className="home-nouveautes-section home-bottom-nouveautes-section" 
+            aria-label="Sélection motos en Tunisie"
           >
-            <BottomCarouselSection
-              slides={bottomSlides}
-              slideInterval={settings?.carouselDelayMs}
-            />
+            <div className="home-nouveautes-wrapper">
+              <NewModelsSection items={nouveautesBas} />
+            </div>
           </section>
+        ) : (
+          isCarouselBottomVisible && bottomSlides.length > 0 && (
+            <section 
+              className="home-bottom-carousel-section" 
+              aria-label="Carrousel inférieur"
+            >
+              <BottomCarouselSection
+                slides={bottomSlides}
+                slideInterval={settings?.carouselDelayMs}
+              />
+            </section>
+          )
         )}
       </main>
     </>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 
 const allNavItems = [
@@ -10,7 +10,8 @@ const allNavItems = [
   { href: "/admin/marques", label: "Marques", icon: "🏷️", roles: ["ADMIN"] },
   { href: "/admin/categories", label: "Catégories", icon: "📑", roles: ["ADMIN"] },
   { href: "/admin/modeles", label: "Modèles", icon: "🏍️", roles: ["ADMIN", "DEALER"] },
-  { href: "/admin/nouveautes", label: "Nouveautés", icon: "✨", roles: ["ADMIN"] },
+  { href: "/admin/nouveautes?pos=HAUT", label: "Nouveautés (Haut)", icon: "✨", roles: ["ADMIN"] },
+  { href: "/admin/nouveautes?pos=BAS", label: "Nouveautés (Bas)", icon: "🌟", roles: ["ADMIN"] },
   { href: "/admin/occasion", label: "Occasions", icon: "🔄", roles: ["ADMIN", "DEALER"] },
   { href: "/admin/commentaires", label: "Commentaires", icon: "💬", roles: ["ADMIN"] },
   { href: "/admin/carrousel", label: "Carrousel", icon: "🖼️", roles: ["ADMIN"] },
@@ -24,8 +25,16 @@ const allNavItems = [
 export default function AdminSidebar({ role, pendingReviewsCount = 0 }: { role?: string, pendingReviewsCount?: number }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentPos = searchParams?.get("pos") || "HAUT";
 
   const isActive = (href: string, exact?: boolean) => {
+    if (href.includes("?")) {
+      const [path, query] = href.split("?");
+      if (pathname !== path) return false;
+      const targetPos = query.includes("pos=BAS") ? "BAS" : "HAUT";
+      return currentPos === targetPos;
+    }
     if (exact) return pathname === href;
     return pathname.startsWith(href);
   };

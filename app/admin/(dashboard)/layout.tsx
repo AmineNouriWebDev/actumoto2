@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import prisma from "@/lib/prisma";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminScripts from "@/components/admin/AdminScripts";
@@ -20,7 +21,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="admin-layout-root">
       <AdminScripts />
       <ToastProvider />
-      <AdminSidebar role={role} pendingReviewsCount={pendingReviewsCount} />
+      <Suspense fallback={<aside className="admin-sidebar" />}>
+        <AdminSidebar role={role} pendingReviewsCount={pendingReviewsCount} />
+      </Suspense>
       <main className="admin-main">
         <div className="admin-content-wrapper">
           {children}

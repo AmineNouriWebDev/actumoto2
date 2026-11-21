@@ -134,6 +134,7 @@ export async function POST(req: Request) {
     const priceRaw = formData.get('price')?.toString();
     const promoPriceRaw = formData.get('promoPrice')?.toString();
     const currency = formData.get('currency')?.toString().trim() || 'DT';
+    const position = formData.get('position')?.toString().trim() === 'BAS' ? 'BAS' : 'HAUT';
 
     const price = priceRaw && !isNaN(parseFloat(priceRaw)) ? parseFloat(priceRaw) : null;
     const promoPrice = promoPriceRaw && !isNaN(parseFloat(promoPriceRaw)) ? parseFloat(promoPriceRaw) : null;
@@ -147,7 +148,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Erreur lors de l'enregistrement de l'image." }, { status: 500 });
     }
 
-    const maxOrder = await prisma.nouveauteItem.aggregate({ _max: { orderIndex: true } });
+    const maxOrder = await prisma.nouveauteItem.aggregate({
+      where: { position },
+      _max: { orderIndex: true },
+    });
     const nextOrder = (maxOrder._max.orderIndex ?? -1) + 1;
 
     const newItem = await prisma.nouveauteItem.create({
@@ -161,6 +165,7 @@ export async function POST(req: Request) {
         currency,
         orderIndex: nextOrder,
         isVisible: true,
+        position,
       },
     });
 
@@ -187,17 +192,21 @@ export async function PATCH(req: Request) {
 
     // 1. Ajouter un modèle existant du catalogue aux nouveautés
     if (action === 'add_model') {
-      const { modelId } = body;
+      const { modelId, position = 'HAUT' } = body;
+      const targetPosition = position === 'BAS' ? 'BAS' : 'HAUT';
       if (!modelId) {
         return NextResponse.json({ error: 'modelId is required' }, { status: 400 });
       }
 
-      // Vérifier s'il n'est pas déjà dans les nouveautés
+      // Vérifier s'il n'est pas déjà dans cette section
       const existing = await prisma.nouveauteItem.findFirst({
-        where: { modelId },
+        where: { modelId, position: targetPosition },
       });
       if (existing) {
-        return NextResponse.json({ error: 'Ce modèle est déjà dans les nouveautés' }, { status: 400 });
+        return NextResponse.json(
+          { error: `Ce modèle est déjà dans les nouveautés (${targetPosition === 'BAS' ? 'Bas' : 'Haut'})` },
+          { status: 400 }
+        );
       }
 
       const model = await prisma.model.findUnique({
@@ -212,7 +221,10 @@ export async function PATCH(req: Request) {
         return NextResponse.json({ error: 'Modèle introuvable' }, { status: 404 });
       }
 
-      const maxOrder = await prisma.nouveauteItem.aggregate({ _max: { orderIndex: true } });
+      const maxOrder = await prisma.nouveauteItem.aggregate({
+        where: { position: targetPosition },
+        _max: { orderIndex: true },
+      });
       const nextOrder = (maxOrder._max.orderIndex ?? -1) + 1;
 
       // URL automatique pré-remplie
@@ -234,6 +246,7 @@ export async function PATCH(req: Request) {
           orderIndex: nextOrder,
           modelId: model.id,
           isVisible: true,
+          position: targetPosition,
         },
       });
 
@@ -248,23 +261,29 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ ok: true, item: createdItem });
     }
 
-    // 2. Mettre à jour les informations d'un élément (URL, titre, prix, visibilité)
+    // 2. Mettre à jour les informations d'un élément (URL, titre, sous-titre, prix, visibilité, position)
     if (action === 'update_item') {
-      const { itemId, linkUrl, title, subtitle, price, promoPrice, isVisible } = body;
+      const { itemId, linkUrl, title, subtitle, price, promoPrice, isVisible, position } = body;
       if (!itemId) {
         return NextResponse.json({ error: 'itemId is required' }, { status: 400 });
       }
 
       const updateData: any = {};
       if (linkUrl !== undefined) {
-        // Si vide ou blanc -> null (non cliquable)
         updateData.linkUrl = typeof linkUrl === 'string' && linkUrl.trim() !== '' ? linkUrl.trim() : null;
       }
-      if (title !== undefined) updateData.title = title.trim();
-      if (subtitle !== undefined) updateData.subtitle = subtitle.trim() || null;
-      if (price !== undefined) updateData.price = typeof price === 'number' ? price : null;
-      if (promoPrice !== undefined) updateData.promoPrice = typeof promoPrice === 'number' ? promoPrice : null;
+      if (title !== undefined) updateData.title = typeof title === 'string' ? title.trim() : null;
+      if (subtitle !== undefined) updateData.subtitle = typeof subtitle === 'string' && subtitle.trim() !== '' ? subtitle.trim() : null;
+      if (price !== undefined) {
+        updateData.price = typeof price === 'number' ? price : (price === null || price === '' ? null : parseFloat(price));
+      }
+      if (promoPrice !== undefined) {
+        updateData.promoPrice = typeof promoPrice === 'number' ? promoPrice : (promoPrice === null || promoPrice === '' ? null : parseFloat(promoPrice));
+      }
       if (typeof isVisible === 'boolean') updateData.isVisible = isVisible;
+      if (position !== undefined && (position === 'HAUT' || position === 'BAS')) {
+        updateData.position = position;
+      }
 
       const updated = await prisma.nouveauteItem.update({
         where: { id: itemId },
@@ -329,12 +348,17 @@ export async function PATCH(req: Request) {
         return NextResponse.json({ error: 'Item not found' }, { status: 404 });
       }
 
-      // Si c'était un modèle du catalogue, décocher isNew
+      // Si c'était un modèle du catalogue, décocher isNew seulement si plus aucun item ne le référence
       if (item.modelId) {
-        await prisma.model.update({
-          where: { id: item.modelId },
-          data: { isNew: false },
+        const otherCount = await prisma.nouveauteItem.count({
+          where: { modelId: item.modelId, id: { not: itemId } },
         });
+        if (otherCount === 0) {
+          await prisma.model.update({
+            where: { id: item.modelId },
+            data: { isNew: false },
+          });
+        }
       } else if (item.imageUrl && item.imageUrl.startsWith('/img/nouveautes/')) {
         // Si c'était une image custom uploadée, supprimer le fichier physique
         await deletePhysicalImage(item.imageUrl);

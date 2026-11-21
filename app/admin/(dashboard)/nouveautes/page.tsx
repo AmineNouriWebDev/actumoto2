@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import AdminNouveautesClient from "@/components/admin/AdminNouveautesClient";
@@ -12,14 +13,16 @@ export default async function AdminNouveautesPage() {
         <div>
           <h1 className="admin-page-title">✨ Gestion des Nouveautés</h1>
           <p className="admin-page-subtitle">
-            Choisissez les motos et sélectionnez l&apos;image exacte affichée dans la section Nouveautés de la page d&apos;accueil
+            Gérez les nouveautés du Haut (Section 2) et du Bas (Section 4), modifiez les titres, prix et photos en temps réel.
           </p>
         </div>
         <a href="/" target="_blank" rel="noreferrer" className="btn-secondary">
           🌐 Voir le site en direct
         </a>
       </div>
-      <AdminNouveautesClient />
+      <Suspense fallback={<div style={{ padding: "3rem", textAlign: "center", color: "#9ca3af" }}>Chargement...</div>}>
+        <AdminNouveautesClient />
+      </Suspense>
     </div>
   );
 }

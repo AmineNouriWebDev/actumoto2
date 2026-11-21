@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Sparkles,
   ArrowLeft,
@@ -38,6 +39,7 @@ interface ActiveNouveauteItem {
   orderIndex: number;
   isVisible: boolean;
   modelId: string | null;
+  position?: string;
   linkedModelImages?: ModelImage[];
   defaultModelUrl?: string | null;
   brandName?: string;
@@ -58,12 +60,23 @@ interface BrandOption {
   name: string;
 }
 
+interface EditCardState {
+  title: string;
+  subtitle: string;
+  price: string;
+  promoPrice: string;
+  linkUrl: string;
+}
+
 function cleanSrc(url?: string | null) {
   if (!url) return "/img/placeholder-moto.jpg";
   return url.startsWith("./") ? url.substring(1) : url;
 }
 
 export default function AdminNouveautesClient() {
+  const searchParams = useSearchParams();
+  const [activePos, setActivePos] = useState<"HAUT" | "BAS">("HAUT");
+
   const [items, setItems] = useState<ActiveNouveauteItem[]>([]);
   const [models, setModels] = useState<CatalogModel[]>([]);
   const [brands, setBrands] = useState<BrandOption[]>([]);
@@ -84,8 +97,8 @@ export default function AdminNouveautesClient() {
   const [uploadPromoPrice, setUploadPromoPrice] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
-  // URLs en cours d'édition par carte
-  const [editingUrls, setEditingUrls] = useState<Record<string, string>>({});
+  // État d'édition en direct de chaque carte (titre, marque, prix, promo, url)
+  const [cardEdits, setCardEdits] = useState<Record<string, EditCardState>>({});
 
   // Toast
   const [toast, setToast] = useState<{ msg: string; type: "ok" | "err" } | null>(null);
@@ -95,6 +108,26 @@ export default function AdminNouveautesClient() {
     setTimeout(() => setToast(null), 3500);
   };
 
+  // Synchronisation avec l'URL param ?pos=BAS ou ?pos=HAUT
+  useEffect(() => {
+    const pos = searchParams?.get("pos");
+    if (pos === "BAS") {
+      setActivePos("BAS");
+    } else if (pos === "HAUT") {
+      setActivePos("HAUT");
+    }
+  }, [searchParams]);
+
+  // Changer d'onglet (Haut / Bas)
+  const switchTab = (pos: "HAUT" | "BAS") => {
+    setActivePos(pos);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("pos", pos);
+      window.history.pushState({}, "", url.toString());
+    }
+  };
+
   // Chargement des données
   const loadData = useCallback(async () => {
     try {
@@ -102,16 +135,23 @@ export default function AdminNouveautesClient() {
       const res = await fetch("/api/admin/nouveautes");
       if (!res.ok) throw new Error("Erreur de chargement");
       const data = await res.json();
-      setItems(data.items || []);
+      const loadedItems: ActiveNouveauteItem[] = data.items || [];
+      setItems(loadedItems);
       setModels(data.models || []);
       setBrands(data.brands || []);
 
-      // Initialiser le state des URLs pour l'édition rapide
-      const initialUrls: Record<string, string> = {};
-      (data.items || []).forEach((it: ActiveNouveauteItem) => {
-        initialUrls[it.id] = it.linkUrl || "";
+      // Initialiser le state des champs d'édition pour chaque carte
+      const initialEdits: Record<string, EditCardState> = {};
+      loadedItems.forEach((it) => {
+        initialEdits[it.id] = {
+          title: it.title || "",
+          subtitle: it.subtitle || "",
+          price: it.price !== null && it.price !== undefined ? it.price.toString() : "",
+          promoPrice: it.promoPrice !== null && it.promoPrice !== undefined ? it.promoPrice.toString() : "",
+          linkUrl: it.linkUrl || "",
+        };
       });
-      setEditingUrls(initialUrls);
+      setCardEdits(initialEdits);
     } catch (err: any) {
       showToast(err.message || "Erreur de chargement", "err");
     } finally {
@@ -122,6 +162,92 @@ export default function AdminNouveautesClient() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Modifier un champ dans l'état local d'édition d'une carte
+  const updateCardEditField = (itemId: string, field: keyof EditCardState, value: string) => {
+    setCardEdits((prev) => ({
+      ...prev,
+      [itemId]: {
+        ...(prev[itemId] || { title: "", subtitle: "", price: "", promoPrice: "", linkUrl: "" }),
+        [field]: value,
+      },
+    }));
+  };
+
+  // Enregistrer les modifications de titre, sous-titre, prix et URL pour une carte
+  const saveCardDetails = async (itemId: string) => {
+    const edit = cardEdits[itemId];
+    if (!edit) return;
+
+    setSavingId(itemId);
+    try {
+      const res = await fetch("/api/admin/nouveautes", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_item",
+          itemId,
+          title: edit.title.trim(),
+          subtitle: edit.subtitle.trim() !== "" ? edit.subtitle.trim() : null,
+          price: edit.price !== "" ? parseFloat(edit.price) : null,
+          promoPrice: edit.promoPrice !== "" ? parseFloat(edit.promoPrice) : null,
+          linkUrl: edit.linkUrl.trim() !== "" ? edit.linkUrl.trim() : null,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Erreur lors de l'enregistrement");
+      }
+
+      const data = await res.json();
+      setItems((prev) =>
+        prev.map((it) => (it.id === itemId ? { ...it, ...data.item } : it))
+      );
+
+      showToast("💾 Nom, prix et lien enregistrés avec succès !");
+    } catch (err: any) {
+      showToast(err.message || "❌ Erreur lors de l'enregistrement", "err");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  // Déplacer une nouveauté entre HAUT et BAS
+  const moveItemPosition = async (item: ActiveNouveauteItem) => {
+    const currentPosition = (item.position || "HAUT") === "HAUT" ? "HAUT" : "BAS";
+    const targetPosition = currentPosition === "HAUT" ? "BAS" : "HAUT";
+
+    setSavingId(item.id);
+    try {
+      const res = await fetch("/api/admin/nouveautes", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_item",
+          itemId: item.id,
+          position: targetPosition,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Erreur de déplacement");
+      }
+
+      setItems((prev) =>
+        prev.map((it) => (it.id === item.id ? { ...it, position: targetPosition } : it))
+      );
+
+      showToast(
+        `↔️ Déplacé vers Nouveautés (${targetPosition === "HAUT" ? "Haut - Section 2" : "Bas - Section 4"}) !`
+      );
+    } catch (err: any) {
+      showToast(err.message || "❌ Erreur lors du déplacement", "err");
+    } finally {
+      setSavingId(null);
+    }
+  };
 
   // Gestion du fichier upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,6 +280,7 @@ export default function AdminNouveautesClient() {
       if (uploadLinkUrl.trim()) formData.append("linkUrl", uploadLinkUrl.trim());
       if (uploadPrice.trim()) formData.append("price", uploadPrice.trim());
       if (uploadPromoPrice.trim()) formData.append("promoPrice", uploadPromoPrice.trim());
+      formData.append("position", activePos);
 
       const res = await fetch("/api/admin/nouveautes", {
         method: "POST",
@@ -165,7 +292,7 @@ export default function AdminNouveautesClient() {
         throw new Error(errorData.error || "Erreur lors de l'upload");
       }
 
-      showToast("✅ Nouveauté personnalisée ajoutée avec succès !");
+      showToast(`✅ Nouveauté (${activePos === "HAUT" ? "Haut" : "Bas"}) ajoutée avec succès !`);
       // Réinitialiser le formulaire
       setUploadFile(null);
       setUploadPreview(null);
@@ -193,6 +320,7 @@ export default function AdminNouveautesClient() {
         body: JSON.stringify({
           action: "add_model",
           modelId: model.id,
+          position: activePos,
         }),
       });
 
@@ -201,46 +329,12 @@ export default function AdminNouveautesClient() {
         throw new Error(errorData.error || "Erreur lors de l'ajout");
       }
 
-      showToast(`✅ "${model.name}" ajouté avec son URL automatique !`);
+      showToast(
+        `✅ "${model.name}" ajouté aux Nouveautés (${activePos === "HAUT" ? "Haut" : "Bas"}) !`
+      );
       await loadData();
     } catch (err: any) {
       showToast(err.message || "Erreur lors de l'ajout", "err");
-    } finally {
-      setSavingId(null);
-    }
-  };
-
-  // Mettre à jour l'URL d'un élément
-  const saveItemUrl = async (itemId: string, newUrl: string) => {
-    setSavingId(itemId);
-    try {
-      const res = await fetch("/api/admin/nouveautes", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "update_item",
-          itemId,
-          linkUrl: newUrl.trim(),
-        }),
-      });
-
-      if (!res.ok) throw new Error();
-
-      setItems((prev) =>
-        prev.map((it) =>
-          it.id === itemId
-            ? { ...it, linkUrl: newUrl.trim() !== "" ? newUrl.trim() : null }
-            : it
-        )
-      );
-
-      if (newUrl.trim() === "") {
-        showToast("🔒 Nouveauté rendue NON cliquable sur la page d'accueil !");
-      } else {
-        showToast("🔗 URL mise à jour ! La carte est cliquable.");
-      }
-    } catch {
-      showToast("❌ Impossible de mettre à jour l'URL", "err");
     } finally {
       setSavingId(null);
     }
@@ -274,12 +368,27 @@ export default function AdminNouveautesClient() {
     }
   };
 
-  // Déplacer l'ordre d'affichage (gauche/droite)
+  // Filtrer les éléments de la position active (HAUT ou BAS)
+  const currentItems = useMemo(() => {
+    return items
+      .filter((it) => (it.position || "HAUT") === activePos)
+      .sort((a, b) => a.orderIndex - b.orderIndex);
+  }, [items, activePos]);
+
+  const itemsHautCount = useMemo(() => {
+    return items.filter((it) => (it.position || "HAUT") === "HAUT").length;
+  }, [items]);
+
+  const itemsBasCount = useMemo(() => {
+    return items.filter((it) => it.position === "BAS").length;
+  }, [items]);
+
+  // Déplacer l'ordre d'affichage (gauche/droite) au sein de la section active
   const moveOrder = async (index: number, direction: -1 | 1) => {
     const targetIndex = index + direction;
-    if (targetIndex < 0 || targetIndex >= items.length) return;
+    if (targetIndex < 0 || targetIndex >= currentItems.length) return;
 
-    const reordered = [...items];
+    const reordered = [...currentItems];
     const [moved] = reordered.splice(index, 1);
     reordered.splice(targetIndex, 0, moved);
 
@@ -290,7 +399,7 @@ export default function AdminNouveautesClient() {
       prev.map((m) => {
         const u = updates.find((x) => x.id === m.id);
         return u ? { ...m, orderIndex: u.orderIndex } : m;
-      }).sort((a, b) => a.orderIndex - b.orderIndex)
+      })
     );
 
     try {
@@ -339,9 +448,9 @@ export default function AdminNouveautesClient() {
     }
   };
 
-  // Filtre modèles disponibles du catalogue
+  // Filtre modèles disponibles du catalogue pour la position active
   const availableCatalogModels = useMemo(() => {
-    const activeModelIds = new Set(items.map((it) => it.modelId).filter(Boolean));
+    const activeModelIds = new Set(currentItems.map((it) => it.modelId).filter(Boolean));
 
     return models
       .filter((m) => {
@@ -362,7 +471,7 @@ export default function AdminNouveautesClient() {
         if (a.isAlreadyAdded !== b.isAlreadyAdded) return a.isAlreadyAdded ? 1 : -1;
         return a.brand.name.localeCompare(b.brand.name) || a.name.localeCompare(b.name);
       });
-  }, [models, items, selectedBrand, searchQuery]);
+  }, [models, currentItems, selectedBrand, searchQuery]);
 
   return (
     <div className="admin-nouveautes-container">
@@ -392,6 +501,88 @@ export default function AdminNouveautesClient() {
         </div>
       )}
 
+      {/* Onglets de sélection HAUT / BAS */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "1rem",
+          marginBottom: "1.5rem",
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => switchTab("HAUT")}
+          style={{
+            padding: "1rem 1.25rem",
+            borderRadius: "0.75rem",
+            fontWeight: 700,
+            fontSize: "1rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.6rem",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            background: activePos === "HAUT" ? "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)" : "rgba(31, 41, 55, 0.7)",
+            color: "white",
+            border: activePos === "HAUT" ? "2px solid #ef4444" : "1px solid #374151",
+            boxShadow: activePos === "HAUT" ? "0 4px 16px rgba(220, 38, 38, 0.4)" : "none",
+          }}
+        >
+          <span style={{ fontSize: "1.2rem" }}>✨</span>
+          <span>Nouveautés HAUT (Section 2 - Sous le Hero)</span>
+          <span
+            style={{
+              background: activePos === "HAUT" ? "white" : "rgba(255,255,255,0.15)",
+              color: activePos === "HAUT" ? "#dc2626" : "white",
+              padding: "0.15rem 0.55rem",
+              borderRadius: "999px",
+              fontSize: "0.8rem",
+              fontWeight: 800,
+            }}
+          >
+            {itemsHautCount}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => switchTab("BAS")}
+          style={{
+            padding: "1rem 1.25rem",
+            borderRadius: "0.75rem",
+            fontWeight: 700,
+            fontSize: "1rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.6rem",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            background: activePos === "BAS" ? "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)" : "rgba(31, 41, 55, 0.7)",
+            color: "white",
+            border: activePos === "BAS" ? "2px solid #ef4444" : "1px solid #374151",
+            boxShadow: activePos === "BAS" ? "0 4px 16px rgba(220, 38, 38, 0.4)" : "none",
+          }}
+        >
+          <span style={{ fontSize: "1.2rem" }}>🌟</span>
+          <span>Nouveautés BAS (Section 4 - Au-dessus du Footer)</span>
+          <span
+            style={{
+              background: activePos === "BAS" ? "white" : "rgba(255,255,255,0.15)",
+              color: activePos === "BAS" ? "#dc2626" : "white",
+              padding: "0.15rem 0.55rem",
+              borderRadius: "999px",
+              fontSize: "0.8rem",
+              fontWeight: 800,
+            }}
+          >
+            {itemsBasCount}
+          </span>
+        </button>
+      </div>
+
       {loading ? (
         <div style={{ textAlign: "center", padding: "4rem", color: "#9ca3af" }}>
           <RefreshCw className="animate-spin inline-block mr-2" size={24} />
@@ -400,7 +591,7 @@ export default function AdminNouveautesClient() {
       ) : (
         <>
           {/* ═══════════════════════════════════════════════════════════════ */}
-          {/* SECTION 1 : Éléments actuellement affichés dans les Nouveautés */}
+          {/* SECTION 1 : Éléments actuellement affichés dans la position     */}
           {/* ═══════════════════════════════════════════════════════════════ */}
           <div className="admin-card" style={{ marginBottom: "2.5rem" }}>
             <div
@@ -419,7 +610,7 @@ export default function AdminNouveautesClient() {
                   style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}
                 >
                   <Sparkles className="text-red-500" size={22} />
-                  Motos & Images affichées dans la section Nouveautés
+                  Motos & Plaques dans Nouveautés ({activePos === "HAUT" ? "Haut" : "Bas"})
                   <span
                     style={{
                       background: "#dc2626",
@@ -431,12 +622,17 @@ export default function AdminNouveautesClient() {
                       marginLeft: "0.5rem",
                     }}
                   >
-                    {items.length}
+                    {currentItems.length}
                   </span>
                 </h2>
                 <p style={{ color: "#9ca3af", fontSize: "0.875rem", margin: 0 }}>
-                  Ces cartes défilent sur la page d&apos;accueil. Chaque carte peut avoir son image personnalisée,
-                  et être <strong>cliquable</strong> (avec URL) ou <strong>fixe non cliquable</strong> (sans URL).
+                  Emplacement sur la page d&apos;accueil :{" "}
+                  <strong style={{ color: "#f3f4f6" }}>
+                    {activePos === "HAUT"
+                      ? "Section 2 (juste sous les 4 boutons du hero)"
+                      : "Section 4 (juste au-dessus du footer, remplace l'ancien carrousel)"}
+                  </strong>
+                  . Vous pouvez modifier les noms, prix, photos et liens directement ci-dessous à tout moment.
                 </p>
               </div>
 
@@ -462,7 +658,7 @@ export default function AdminNouveautesClient() {
               </div>
             </div>
 
-            {items.length === 0 ? (
+            {currentItems.length === 0 ? (
               <div
                 style={{
                   padding: "3rem",
@@ -474,19 +670,23 @@ export default function AdminNouveautesClient() {
                 }}
               >
                 <p style={{ fontSize: "1.1rem", fontWeight: 600, color: "#e5e7eb", marginBottom: "0.5rem" }}>
-                  Aucune nouveauté affichée pour le moment
+                  Aucune nouveauté configurée pour la section {activePos === "HAUT" ? "HAUT" : "BAS"}
                 </p>
                 <p style={{ fontSize: "0.875rem" }}>
-                  Uploadez une image spéciale ci-dessous ou ajoutez un modèle existant du catalogue.
+                  Ajoutez un modèle du catalogue ci-dessous ou uploadez une image spéciale pour alimenter cette section.
                 </p>
               </div>
             ) : (
               <div className="nouveautes-active-grid">
-                {items.map((item, idx) => {
-                  const effectivePrice =
-                    item.promoPrice && item.promoPrice > 0 ? item.promoPrice : item.price;
-                  const currentUrlInput = editingUrls[item.id] ?? (item.linkUrl || "");
-                  const isClickable = Boolean(item.linkUrl && item.linkUrl.trim() !== "");
+                {currentItems.map((item, idx) => {
+                  const edit = cardEdits[item.id] || {
+                    title: item.title || "",
+                    subtitle: item.subtitle || "",
+                    price: item.price !== null && item.price !== undefined ? item.price.toString() : "",
+                    promoPrice: item.promoPrice !== null && item.promoPrice !== undefined ? item.promoPrice.toString() : "",
+                    linkUrl: item.linkUrl || "",
+                  };
+                  const isClickable = Boolean(edit.linkUrl && edit.linkUrl.trim() !== "");
 
                   return (
                     <div
@@ -565,120 +765,172 @@ export default function AdminNouveautesClient() {
                         </div>
                       )}
 
-                      {/* Corps des informations */}
-                      <div className="nouveaute-card-body">
-                        {item.subtitle && (
-                          <div className="nouveaute-card-brand">{item.subtitle}</div>
-                        )}
-                        <div className="nouveaute-card-name">{item.title || "Sans titre"}</div>
-
-                        <div className="nouveaute-card-price">
-                          {effectivePrice ? (
-                            <span>
-                              {effectivePrice.toLocaleString("fr-FR")} {item.currency || "DT"}
-                            </span>
-                          ) : (
-                            <span style={{ color: "#ef4444" }}>En arrivage</span>
-                          )}
+                      {/* Corps des informations & Édition en direct */}
+                      <div className="nouveaute-card-body" style={{ gap: "0.6rem" }}>
+                        {/* Titre / Nom du modèle */}
+                        <div>
+                          <label style={{ fontSize: "0.72rem", color: "#9ca3af", fontWeight: 700, display: "block", marginBottom: "0.2rem" }}>
+                            Titre / Nom du modèle
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            style={{ fontSize: "0.82rem", padding: "0.35rem 0.5rem" }}
+                            value={edit.title}
+                            onChange={(e) => updateCardEditField(item.id, "title", e.target.value)}
+                            placeholder="Nom du modèle"
+                          />
                         </div>
 
-                        {/* SECTION URL & CLIQUABILITÉ */}
-                        <div className="nouveaute-url-section">
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.4rem" }}>
-                            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#e5e7eb" }}>
-                              Comportement au clic :
-                            </span>
+                        {/* Marque / Sous-titre */}
+                        <div>
+                          <label style={{ fontSize: "0.72rem", color: "#9ca3af", fontWeight: 700, display: "block", marginBottom: "0.2rem" }}>
+                            Marque / Sous-titre
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            style={{ fontSize: "0.82rem", padding: "0.35rem 0.5rem" }}
+                            value={edit.subtitle}
+                            onChange={(e) => updateCardEditField(item.id, "subtitle", e.target.value)}
+                            placeholder="Marque ou sous-titre"
+                          />
+                        </div>
+
+                        {/* Prix & Prix Promo */}
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.4rem" }}>
+                          <div>
+                            <label style={{ fontSize: "0.72rem", color: "#9ca3af", fontWeight: 700, display: "block", marginBottom: "0.2rem" }}>
+                              Prix (DT)
+                            </label>
+                            <input
+                              type="number"
+                              className="form-control"
+                              style={{ fontSize: "0.82rem", padding: "0.35rem 0.5rem" }}
+                              value={edit.price}
+                              onChange={(e) => updateCardEditField(item.id, "price", e.target.value)}
+                              placeholder="Ex: 8500"
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: "0.72rem", color: "#9ca3af", fontWeight: 700, display: "block", marginBottom: "0.2rem" }}>
+                              Prix Promo (DT)
+                            </label>
+                            <input
+                              type="number"
+                              className="form-control"
+                              style={{ fontSize: "0.82rem", padding: "0.35rem 0.5rem" }}
+                              value={edit.promoPrice}
+                              onChange={(e) => updateCardEditField(item.id, "promoPrice", e.target.value)}
+                              placeholder="Ex: 7900"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Section URL & Cliquabilité */}
+                        <div>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.2rem" }}>
+                            <label style={{ fontSize: "0.72rem", color: "#9ca3af", fontWeight: 700, margin: 0 }}>
+                              Lien cliquable (URL)
+                            </label>
                             {isClickable ? (
-                              <span className="nouveaute-link-badge nouveaute-link-badge-clickable">
-                                <LinkIcon size={11} /> Cliquable
+                              <span className="nouveaute-link-badge nouveaute-link-badge-clickable" style={{ fontSize: "0.65rem", padding: "1px 5px", margin: 0 }}>
+                                <LinkIcon size={10} /> Cliquable
                               </span>
                             ) : (
-                              <span className="nouveaute-link-badge nouveaute-link-badge-unclickable">
-                                <Link2Off size={11} /> Non cliquable
+                              <span className="nouveaute-link-badge nouveaute-link-badge-unclickable" style={{ fontSize: "0.65rem", padding: "1px 5px", margin: 0 }}>
+                                <Link2Off size={10} /> Non cliquable
                               </span>
                             )}
                           </div>
-
-                          {/* Champ URL */}
-                          <div style={{ display: "flex", gap: "0.4rem" }}>
-                            <input
-                              type="text"
-                              value={currentUrlInput}
-                              onChange={(e) =>
-                                setEditingUrls((prev) => ({ ...prev, [item.id]: e.target.value }))
-                              }
-                              placeholder="Lien (ex: /marques/peugeot/...)"
-                              style={{
-                                flex: 1,
-                                fontSize: "0.75rem",
-                                padding: "0.35rem 0.5rem",
-                                background: "#111827",
-                                border: "1px solid #374151",
-                                borderRadius: "4px",
-                                color: "#f3f4f6",
-                              }}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => saveItemUrl(item.id, currentUrlInput)}
-                              disabled={savingId === item.id}
-                              className="btn-primary"
-                              style={{ padding: "0.35rem 0.6rem", fontSize: "0.72rem", whiteSpace: "nowrap" }}
-                              title="Enregistrer cette URL"
-                            >
-                              OK
-                            </button>
-                          </div>
-
-                          {/* Actions rapides sur l'URL */}
-                          <div style={{ display: "flex", gap: "0.4rem", marginTop: "0.4rem", flexWrap: "wrap" }}>
+                          <input
+                            type="text"
+                            className="form-control"
+                            style={{ fontSize: "0.78rem", padding: "0.35rem 0.5rem" }}
+                            value={edit.linkUrl}
+                            onChange={(e) => updateCardEditField(item.id, "linkUrl", e.target.value)}
+                            placeholder="Laissez vide pour non cliquable"
+                          />
+                          <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.25rem", flexWrap: "wrap" }}>
                             {isClickable && (
                               <button
                                 type="button"
-                                onClick={() => {
-                                  setEditingUrls((prev) => ({ ...prev, [item.id]: "" }));
-                                  saveItemUrl(item.id, "");
-                                }}
-                                disabled={savingId === item.id}
+                                onClick={() => updateCardEditField(item.id, "linkUrl", "")}
                                 style={{
-                                  background: "transparent",
-                                  border: "1px solid #4b5563",
-                                  color: "#d1d5db",
-                                  fontSize: "0.68rem",
-                                  padding: "0.15rem 0.4rem",
-                                  borderRadius: "4px",
+                                  background: "none",
+                                  border: "none",
+                                  color: "#9ca3af",
+                                  fontSize: "0.7rem",
+                                  padding: 0,
                                   cursor: "pointer",
+                                  textDecoration: "underline",
                                 }}
-                                title="Supprimer le lien pour rendre la carte non cliquable"
                               >
                                 🔒 Rendre non cliquable
                               </button>
                             )}
-
-                            {item.defaultModelUrl && item.linkUrl !== item.defaultModelUrl && (
+                            {item.defaultModelUrl && edit.linkUrl !== item.defaultModelUrl && (
                               <button
                                 type="button"
-                                onClick={() => {
-                                  setEditingUrls((prev) => ({ ...prev, [item.id]: item.defaultModelUrl! }));
-                                  saveItemUrl(item.id, item.defaultModelUrl!);
-                                }}
-                                disabled={savingId === item.id}
+                                onClick={() => updateCardEditField(item.id, "linkUrl", item.defaultModelUrl!)}
                                 style={{
-                                  background: "transparent",
-                                  border: "1px solid #dc2626",
+                                  background: "none",
+                                  border: "none",
                                   color: "#f87171",
-                                  fontSize: "0.68rem",
-                                  padding: "0.15rem 0.4rem",
-                                  borderRadius: "4px",
+                                  fontSize: "0.7rem",
+                                  padding: 0,
                                   cursor: "pointer",
+                                  textDecoration: "underline",
                                 }}
-                                title="Rétablir le lien automatique vers la fiche du modèle"
                               >
-                                🔗 Lien auto du modèle
+                                🔗 Rétablir le lien auto du modèle
                               </button>
                             )}
                           </div>
                         </div>
+
+                        {/* Bouton Enregistrer Nom & Prix & Lien */}
+                        <button
+                          type="button"
+                          onClick={() => saveCardDetails(item.id)}
+                          disabled={savingId === item.id}
+                          className="btn-primary"
+                          style={{
+                            width: "100%",
+                            padding: "0.45rem",
+                            fontSize: "0.8rem",
+                            fontWeight: 700,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "0.35rem",
+                            background: "#16a34a",
+                            borderColor: "#15803d",
+                            marginTop: "0.2rem",
+                          }}
+                        >
+                          <Check size={14} /> Enregistrer nom, prix & lien
+                        </button>
+
+                        {/* Déplacer vers HAUT ou BAS */}
+                        <button
+                          type="button"
+                          onClick={() => moveItemPosition(item)}
+                          disabled={savingId === item.id}
+                          className="btn-secondary"
+                          style={{
+                            width: "100%",
+                            padding: "0.35rem",
+                            fontSize: "0.75rem",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "0.35rem",
+                          }}
+                          title={`Déplacer cette moto vers la section Nouveautés ${(item.position || "HAUT") === "HAUT" ? "Bas" : "Haut"}`}
+                        >
+                          ↔️ Basculer vers Nouveautés {(item.position || "HAUT") === "HAUT" ? "Bas (Section 4)" : "Haut (Section 2)"}
+                        </button>
 
                         {/* Réorganisation de l'ordre */}
                         <div className="nouveaute-reorder-bar">
@@ -697,7 +949,7 @@ export default function AdminNouveautesClient() {
                           <button
                             type="button"
                             onClick={() => moveOrder(idx, 1)}
-                            disabled={idx === items.length - 1 || savingId === item.id}
+                            disabled={idx === currentItems.length - 1 || savingId === item.id}
                             className="btn-reorder"
                             title="Déplacer vers la droite"
                           >
@@ -705,14 +957,22 @@ export default function AdminNouveautesClient() {
                           </button>
                         </div>
 
-                        {/* Actions */}
-                        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem" }}>
+                        {/* Actions Retirer / Fiche */}
+                        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.2rem" }}>
                           <button
                             type="button"
                             onClick={() => deleteItem(item)}
                             disabled={savingId === item.id}
                             className="btn-danger"
-                            style={{ flex: 1, padding: "0.45rem", fontSize: "0.78rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.3rem" }}
+                            style={{
+                              flex: 1,
+                              padding: "0.45rem",
+                              fontSize: "0.78rem",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: "0.3rem",
+                            }}
                           >
                             <Trash2 size={13} /> Retirer
                           </button>
@@ -741,11 +1001,11 @@ export default function AdminNouveautesClient() {
           <div className="admin-card" style={{ marginBottom: "2.5rem" }}>
             <h2 className="admin-card-title" style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
               <Upload className="text-red-500" size={22} />
-              Uploader une image spécialement pour la section Nouveautés
+              Uploader une nouveauté sur-mesure dans Nouveautés ({activePos === "HAUT" ? "Haut" : "Bas"})
             </h2>
             <p style={{ color: "#9ca3af", fontSize: "0.875rem", marginBottom: "1.5rem" }}>
-              Ajoutez une image sur-mesure (bannière, promo, nouveau modèle non encore catalogué) avec la liberté totale
-              de définir si l&apos;image est <strong>cliquable</strong> ou <strong>non cliquable</strong>.
+              Ajoutez une image sur-mesure (bannière, promo, nouveau modèle non encore catalogué) spécialement pour la section{" "}
+              <strong style={{ color: "#f3f4f6" }}>Nouveautés ({activePos === "HAUT" ? "Haut - Section 2" : "Bas - Section 4"})</strong>.
             </p>
 
             <form onSubmit={handleUploadSubmit}>
@@ -885,7 +1145,7 @@ export default function AdminNouveautesClient() {
                       onChange={(e) => setUploadLinkUrl(e.target.value)}
                     />
                     <p style={{ color: "#9ca3af", fontSize: "0.75rem", marginTop: "0.4rem", margin: 0 }}>
-                      💡 <strong>Règle :</strong> Si vous laissez ce champ vide, l&apos;image sera <strong>non cliquable</strong> sur la page d&apos;accueil. Si vous renseignez une URL, les visiteurs pourront cliquer dessus.
+                      💡 Si vous laissez ce champ vide, l&apos;image sera <strong>non cliquable</strong> sur la page d&apos;accueil.
                     </p>
                   </div>
 
@@ -912,7 +1172,7 @@ export default function AdminNouveautesClient() {
                       ) : (
                         <>
                           <Plus size={18} />
-                          Ajouter cette nouveauté à la page d&apos;accueil
+                          Ajouter aux Nouveautés ({activePos === "HAUT" ? "Haut" : "Bas"})
                         </>
                       )}
                     </button>
@@ -938,10 +1198,10 @@ export default function AdminNouveautesClient() {
             >
               <div>
                 <h2 className="admin-card-title">
-                  🏍️ Ajouter un modèle existant du catalogue ({availableCatalogModels.length})
+                  🏍️ Ajouter un modèle existant aux Nouveautés ({activePos === "HAUT" ? "Haut" : "Bas"}) ({availableCatalogModels.length})
                 </h2>
                 <p style={{ color: "#9ca3af", fontSize: "0.85rem", margin: 0 }}>
-                  Choisissez un modèle : son URL automatique sera pré-remplie, et vous pourrez la modifier ou la retirer en 1 clic pour le rendre non cliquable.
+                  Choisissez un modèle à ajouter à la section {activePos === "HAUT" ? "HAUT" : "BAS"}. Vous pourrez modifier son nom, son prix ou son lien à tout moment.
                 </p>
               </div>
 
@@ -1036,7 +1296,7 @@ export default function AdminNouveautesClient() {
                             borderRadius: "4px",
                           }}
                         >
-                          ✓ Déjà dans les nouveautés
+                          ✓ Déjà dans Nouveautés ({activePos === "HAUT" ? "Haut" : "Bas"})
                         </div>
                       ) : (
                         <button
@@ -1054,7 +1314,7 @@ export default function AdminNouveautesClient() {
                             gap: "0.3rem",
                           }}
                         >
-                          <Plus size={14} /> Ajouter aux Nouveautés
+                          <Plus size={14} /> Ajouter à Nouveautés ({activePos === "HAUT" ? "Haut" : "Bas"})
                         </button>
                       )}
                     </div>
