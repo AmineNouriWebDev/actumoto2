@@ -30,7 +30,7 @@ export default function UserNavButton({ isLoggedIn, isHome = false }: UserNavBut
           title="Connexion"
         >
           <img
-            src="/img/header-bouton-connexion-version2.webp"
+            src="/img/header-bouton-connexion-version3.webp"
             alt="Connexion"
             className="w-full h-full object-contain pointer-events-none select-none"
           />
@@ -60,7 +60,7 @@ export default function UserNavButton({ isLoggedIn, isHome = false }: UserNavBut
         title="Déconnexion"
       >
         <img
-          src="/img/header-bouton-logout-version2.webp"
+          src="/img/header-bouton-logout-version3.webp"
           alt="Déconnexion"
           className="w-full h-full object-contain pointer-events-none select-none"
         />

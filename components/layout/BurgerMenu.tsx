@@ -366,7 +366,7 @@ export default function BurgerMenu({
           aria-expanded={isOpen}
         >
           <img
-            src="/img/header-bouton-menu-burger-version2.webp"
+            src="/img/header-bouton-menu-burger-version3.webp"
             alt="Menu"
             className="w-full h-full object-contain pointer-events-none select-none"
           />

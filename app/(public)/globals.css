@@ -590,7 +590,7 @@ h3,
 
       /* Positionnement du badge NOUVEAU en haut de la plaque, décalé vers la droite pour libérer la vis */
       .nouveaute-plaque-container .nouveau-badge {
-        top: 14px;
+        top: 24px;
         left: 48px;
         background: #000000 !important;
         color: #ffffff !important;
@@ -598,14 +598,14 @@ h3,
 
       @media (min-width: 768px) {
         .nouveaute-plaque-container .nouveau-badge {
-          top: 16px;
+          top: 26px;
           left: 54px;
         }
       }
 
       /* Badge sur la plaque du carrousel bas (5 plaques sur desktop) */
       .bottom-carousel-plaque.nouveaute-plaque-container .nouveau-badge {
-        top: 14px !important;
+        top: 24px !important;
         left: 48px !important;
         font-size: 0.65rem !important;
         padding: 4px 10px !important;
