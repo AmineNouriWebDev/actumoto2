@@ -1,6 +1,20 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+
 export default function Footer() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
   return (
-    <footer className="footer bg-black text-white py-6 mt-0 border-t border-white/10" role="contentinfo">
+    <footer
+      className={`footer text-white py-6 mt-0 ${
+        isHome
+          ? "footer-home-rustic"
+          : "bg-black border-t border-white/10"
+      }`}
+      role="contentinfo"
+    >
       <div className="container mx-auto px-4">
         {/* Desktop Layout (>= 768px): 3 colonnes (Gauche: FB/IG, Centre: Copyright, Droite: YT/TikTok) */}
         <div className="hidden md:grid md:grid-cols-3 items-center">
