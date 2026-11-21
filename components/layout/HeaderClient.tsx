@@ -11,6 +11,7 @@ interface HeaderClientProps {
   dashboardUrl: string;
   categories: any[];
   defaultLogoSrc: string;
+  useHomeNavEverywhere?: boolean;
 }
 
 export default function HeaderClient({
@@ -18,11 +19,18 @@ export default function HeaderClient({
   dashboardUrl,
   categories,
   defaultLogoSrc,
+  useHomeNavEverywhere = true,
 }: HeaderClientProps) {
   const pathname = usePathname();
-  const isHome = pathname === "/";
+  // Masquer totalement le header sur la page de connexion
+  if (pathname === "/connexion") {
+    return null;
+  }
 
-  if (isHome) {
+  const isHome = pathname === "/";
+  const showHomeNav = isHome || useHomeNavEverywhere;
+
+  if (showHomeNav) {
     return (
       <header className="header-futurist header-home-rustic" role="banner">
         <div className="w-full px-3 sm:px-6 md:px-10 h-full">

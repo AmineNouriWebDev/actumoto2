@@ -68,23 +68,45 @@ function LoginForm() {
   };
 
   return (
-    <div className="auth-page-container">
+    <div className="auth-page-container -mt-[80px] min-h-screen relative">
+      {/* Flèche retour en haut à droite — même style que dans les pages modèles */}
+      <Link
+        href={callbackUrl}
+        className="section-back-btn"
+        style={{
+          position: "fixed",
+          top: "1.5rem",
+          right: "1.5rem",
+          zIndex: 100,
+        }}
+        title="Retour"
+        aria-label="Retour à la page précédente"
+      >
+        ←
+      </Link>
+
       <div className="auth-card">
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <img
-            src="/img/logo-final.jpeg"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = "/img/logo2.webp";
-            }}
-            alt="actumoto"
-            style={{
-              height: "45px",
-              width: "auto",
-              marginBottom: "1.5rem",
-              filter: "drop-shadow(0 0 10px rgba(220,38,38,0.5))",
-            }}
-          />
-          <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "#fff", letterSpacing: "0.05em" }}>
+        {/* En-tête : Logo et Titre tous les deux parfaitement centrés */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", marginBottom: "2rem" }}>
+          <Link href="/" style={{ display: "inline-flex", justifyContent: "center", alignItems: "center" }}>
+            <img
+              src="/img/logo-final.jpeg"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = "/img/logo2.webp";
+              }}
+              alt="actumoto"
+              style={{
+                height: "50px",
+                width: "auto",
+                maxWidth: "220px",
+                objectFit: "contain",
+                display: "block",
+                margin: "0 auto 1.25rem auto",
+                filter: "drop-shadow(0 0 10px rgba(220,38,38,0.5))",
+              }}
+            />
+          </Link>
+          <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "#fff", letterSpacing: "0.05em", textAlign: "center", width: "100%", margin: 0 }}>
             Connexion
           </h1>
         </div>
@@ -190,7 +212,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="auth-page-container">
+        <div className="auth-page-container -mt-[80px] min-h-screen">
           <div className="auth-card" style={{ textAlign: "center", color: "#fff", padding: "3rem" }}>
             Chargement...
           </div>

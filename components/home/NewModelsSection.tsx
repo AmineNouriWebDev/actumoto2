@@ -27,16 +27,32 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
   const displayList = items && items.length > 0 ? items : (models || []);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
-  // Boucle infinie : on triple la liste si au moins 2 éléments pour un carrousel sans fin
-  const loopItems =
-    displayList.length >= 2
-      ? [...displayList, ...displayList, ...displayList]
-      : displayList;
+  useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+    checkDesktop();
+    window.addEventListener("resize", checkDesktop);
+    return () => window.removeEventListener("resize", checkDesktop);
+  }, []);
+
+  // Détermination si la section doit boucler / défiler :
+  // Sur Desktop (>= 768px) : défile uniquement si 4 éléments ou plus (car 3 sont visibles à l'écran)
+  // Sur Mobile (< 768px) : défile toujours s'il y a 2 éléments ou plus (1 seul visible à l'écran)
+  const shouldLoop = isDesktop
+    ? displayList.length >= 4
+    : displayList.length >= 2;
+
+  // Boucle infinie : on triple la liste uniquement si le défilement est actif
+  const loopItems = shouldLoop
+    ? [...displayList, ...displayList, ...displayList]
+    : displayList;
 
   // Défilement automatique continu en boucle sans fin (pause au survol souris)
   useEffect(() => {
-    if (!displayList || displayList.length <= 1) return;
+    if (!shouldLoop || !displayList || displayList.length <= 1) return;
 
     const interval = setInterval(() => {
       // Pause si l'utilisateur survole la section avec la souris
@@ -64,20 +80,21 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
 
       // Largeur d'un pas d'avancement = largeur d'une carte + espacement
       const firstCard = cards[0] as HTMLElement;
-      const isDesktop = typeof window !== "undefined" && window.innerWidth >= 768;
-      const gap = isDesktop ? 24 : 16;
+      const isCurrentDesktop = typeof window !== "undefined" && window.innerWidth >= 768;
+      const gap = isCurrentDesktop ? 24 : 16;
       const step = firstCard
         ? firstCard.offsetWidth + gap
-        : container.clientWidth / (isDesktop ? 3 : 1);
+        : container.clientWidth / (isCurrentDesktop ? 3 : 1);
 
       container.scrollBy({ left: step, behavior: "smooth" });
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [displayList, isHovered]);
+  }, [shouldLoop, displayList, isHovered]);
 
   // Gestion du défilement manuel (swipe tactile / trackpad) pour maintenir la boucle infinie
   const handleScroll = () => {
+    if (!shouldLoop) return;
     const container = scrollRef.current;
     if (!container || displayList.length <= 1) return;
     const cards = container.children;
@@ -123,7 +140,7 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
           <div
             ref={scrollRef}
             onScroll={handleScroll}
-            className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory py-2 px-1"
+            className={`flex gap-4 md:gap-6 ${shouldLoop ? "overflow-x-auto snap-x snap-mandatory" : "overflow-x-auto md:overflow-x-visible md:justify-center"} py-2 px-1`}
             style={{
               scrollbarWidth: "none",
               msOverflowStyle: "none",

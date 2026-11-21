@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ToastProvider from "@/components/admin/ToastProvider";
+import prisma from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "actumoto.tn - Comparateur de prix motos et scooters en Tunisie",
@@ -40,11 +41,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await prisma.siteSettings.findFirst().catch(() => null);
+  const hideFooterOnOtherPages = (settings as any)?.hideFooterOnOtherPages !== false;
+
   return (
     <html lang="fr-TN">
       <head>
@@ -64,7 +68,7 @@ export default function RootLayout({
         <main role="main" className="pt-[80px]">
           {children}
         </main>
-        <Footer />
+        <Footer hideFooterOnOtherPages={hideFooterOnOtherPages} />
       </body>
     </html>
   );

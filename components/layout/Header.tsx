@@ -5,13 +5,14 @@ import path from "path";
 import HeaderClient from "@/components/layout/HeaderClient";
 
 export default async function Header() {
-  const [session, categories] = await Promise.all([
+  const [session, categories, settings] = await Promise.all([
     auth(),
     prisma.category.findMany({
       where: { isVisible: true },
       orderBy: { orderIndex: "asc" },
       select: { id: true, name: true, logo: true, isVisible: true },
     }),
+    prisma.siteSettings.findFirst().catch(() => null),
   ]);
 
   const isLoggedIn = !!session?.user;
@@ -22,6 +23,7 @@ export default async function Header() {
     path.join(process.cwd(), "public", "img", "logo-final.jpeg")
   );
   const defaultLogoSrc = hasLogo ? "/img/logo-final.jpeg" : "/img/logo2.webp";
+  const useHomeNavEverywhere = (settings as any)?.useHomeNavEverywhere !== false;
 
   return (
     <HeaderClient
@@ -29,6 +31,7 @@ export default async function Header() {
       dashboardUrl={dashboardUrl}
       categories={categories}
       defaultLogoSrc={defaultLogoSrc}
+      useHomeNavEverywhere={useHomeNavEverywhere}
     />
   );
 }

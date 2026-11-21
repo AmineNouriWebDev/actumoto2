@@ -2,9 +2,22 @@
 
 import { usePathname } from "next/navigation";
 
-export default function Footer() {
+interface FooterProps {
+  hideFooterOnOtherPages?: boolean;
+}
+
+export default function Footer({ hideFooterOnOtherPages = true }: FooterProps) {
   const pathname = usePathname();
+  // Masquer totalement le footer sur la page de connexion
+  if (pathname === "/connexion") {
+    return null;
+  }
+
   const isHome = pathname === "/";
+  // Masquer le footer sur les autres pages si l'option est activée
+  if (hideFooterOnOtherPages && !isHome) {
+    return null;
+  }
 
   return (
     <footer

@@ -20,6 +20,7 @@ const allNavItems = [
   { href: "/admin/admins", label: "Administrateurs", icon: "👤", roles: ["ADMIN"] },
   { href: "/admin/concessionnaires", label: "Concessionnaires", icon: "🏢", roles: ["ADMIN"] },
   { href: "/admin/utilisateurs", label: "Utilisateurs", icon: "👥", roles: ["ADMIN"] },
+  { href: "/admin/parametres", label: "Paramètres", icon: "⚙️", roles: ["ADMIN"] },
 ];
 
 export default function AdminSidebar({ role, pendingReviewsCount = 0 }: { role?: string, pendingReviewsCount?: number }) {

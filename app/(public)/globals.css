@@ -608,7 +608,7 @@ h3,
       /* Positionnement du badge NOUVEAU et étiquettes en haut de la plaque, décalé vers la droite pour libérer la vis */
       .nouveaute-plaque-container .nouveau-badge {
         top: 19px;
-        left: 48px;
+        left: 53px;
         background: #000000 !important;
         color: #ffffff !important;
         z-index: 30 !important;
