@@ -45,7 +45,9 @@ export async function GET(request: Request) {
       price: m.promoPrice || m.price,
       currency: m.currency,
       image: m.images[0]?.url || null,
-      href: `/marques/${encodeURIComponent(m.brand.name)}/${encodeURIComponent(m.name)}`,
+      href: m.hasDetailPage
+        ? `/marques/${encodeURIComponent(m.brand.name)}/${encodeURIComponent(m.name)}`
+        : `/marques/${encodeURIComponent(m.brand.name)}`,
     }));
 
     const formattedBrands = brands.map((b) => ({

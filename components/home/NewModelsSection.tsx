@@ -2,7 +2,6 @@
 
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
 
 export interface NouveauteItemProp {
   id: string;
@@ -182,12 +181,11 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
                     loading="lazy"
                   />
 
-                  {/* Badge NOUVEAU en haut à gauche */}
+                  {/* Badge NOUVEAU en haut à gauche (fond noir, sans icône) */}
                   <div
                     className="nouveau-badge"
                     aria-label="Nouveau modèle"
                   >
-                    <Sparkles className="nouveau-badge-icon" aria-hidden="true" />
                     <span>NOUVEAU</span>
                   </div>
 

@@ -28,7 +28,9 @@ export async function GET() {
           const m = existingNewModels[i];
           const brandName = m.brand?.name || '';
           const autoUrl = brandName
-            ? `/marques/${encodeURIComponent(brandName)}/${encodeURIComponent(m.name)}`
+            ? (m as any).hasDetailPage
+              ? `/marques/${encodeURIComponent(brandName)}/${encodeURIComponent(m.name)}`
+              : `/marques/${encodeURIComponent(brandName)}`
             : null;
 
           await prisma.nouveauteItem.create({
@@ -215,7 +217,9 @@ export async function PATCH(req: Request) {
 
       // URL automatique pré-remplie
       const autoUrl = model.brand?.name
-        ? `/marques/${encodeURIComponent(model.brand.name)}/${encodeURIComponent(model.name)}`
+        ? (model as any).hasDetailPage
+          ? `/marques/${encodeURIComponent(model.brand.name)}/${encodeURIComponent(model.name)}`
+          : `/marques/${encodeURIComponent(model.brand.name)}`
         : null;
 
       const createdItem = await prisma.nouveauteItem.create({

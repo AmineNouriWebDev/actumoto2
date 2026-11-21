@@ -205,25 +205,29 @@ export default async function BrandContactsSection({ brand }: BrandContactsSecti
               <span>🏪</span> Revendeurs agréés
             </div>
             <div className="dealers-grid">
-              {(contacts.salesParts as any[]).map((dealer: any, i: number) => (
-                <div key={i} className="dealer-card">
-                  <div className="dealer-name">{dealer.name}</div>
-                  {dealer.city && <div className="dealer-city">{dealer.city}</div>}
-                  {dealer.address && <div className="dealer-address">{dealer.address}</div>}
-                  {dealer.phone && (
-                    <div className="dealer-phone">
-                      <a href={`tel:${dealer.phone}`}>{dealer.phone}</a>
-                    </div>
-                  )}
-                  {dealer.mapUrl && (
-                    <div className="dealer-map">
-                      <a href={dealer.mapUrl} target="_blank" rel="noopener noreferrer">
-                        📍 Voir sur la carte
-                      </a>
-                    </div>
-                  )}
-                </div>
-              ))}
+              {(contacts.salesParts as any[]).map((dealer: any, i: number) => {
+                const cleanName = (dealer.name || "").normalize("NFKD");
+                const cleanCity = (dealer.city || "").normalize("NFKD");
+                return (
+                  <div key={i} className="dealer-card">
+                    <div className="dealer-card-name dealer-name font-bold">{cleanName}</div>
+                    {dealer.city && <div className="dealer-card-city dealer-city font-normal">{cleanCity}</div>}
+                    {dealer.address && <div className="dealer-card-address dealer-address">{(dealer.address || "").normalize("NFKD")}</div>}
+                    {dealer.phone && (
+                      <div className="dealer-card-phone dealer-phone">
+                        <a href={`tel:${dealer.phone}`}>{dealer.phone}</a>
+                      </div>
+                    )}
+                    {dealer.mapUrl && (
+                      <div className="dealer-card-map-link dealer-map">
+                        <a href={dealer.mapUrl} target="_blank" rel="noopener noreferrer">
+                          📍 Voir sur la carte
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

@@ -363,7 +363,7 @@ export default function ClientCarouselList({
                         : "↕️ Haut & Bas"}
                     </span>
 
-                    {/* Étiquette rouge si configurée */}
+                    {/* Étiquette noire si configurée */}
                     {(slide as any).badgeText && (
                       <span
                         style={{
@@ -371,9 +371,10 @@ export default function ClientCarouselList({
                           borderRadius: "9999px",
                           fontSize: "0.72rem",
                           fontWeight: 800,
-                          background: "linear-gradient(135deg, #e00000 0%, #ff3333 50%, #cc0000 100%)",
+                          background: "#000000",
                           color: "#ffffff",
-                          boxShadow: "0 2px 6px rgba(220, 0, 0, 0.4)",
+                          border: "1px solid rgba(255, 255, 255, 0.25)",
+                          boxShadow: "0 2px 6px rgba(0, 0, 0, 0.4)",
                           display: "inline-flex",
                           alignItems: "center",
                           gap: "4px",

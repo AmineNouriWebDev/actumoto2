@@ -42,7 +42,9 @@ export default async function Home() {
       title: m.name,
       subtitle: m.brand.name,
       imageUrl: m.images[0]?.url || "/img/placeholder-moto.jpg",
-      linkUrl: `/marques/${encodeURIComponent(m.brand.name)}/${encodeURIComponent(m.name)}`,
+      linkUrl: m.hasDetailPage
+        ? `/marques/${encodeURIComponent(m.brand.name)}/${encodeURIComponent(m.name)}`
+        : `/marques/${encodeURIComponent(m.brand.name)}`,
       price: m.price,
       promoPrice: m.promoPrice,
       currency: m.currency || "DT",

@@ -2,7 +2,6 @@
 
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
 
 export interface BottomSlideItem {
   id: string;
@@ -191,10 +190,9 @@ export default function BottomCarouselSection({
                     </picture>
                   </div>
 
-                  {/* Étiquette rouge personnalisable (Badge) - au-dessus de l'image (z-30) */}
+                  {/* Étiquette personnalisable (Badge noir, écriture blanche) - au-dessus de l'image (z-30) */}
                   {hasBadge && (
                     <div className="nouveau-badge" aria-label={slide.badgeText!}>
-                      <Sparkles className="nouveau-badge-icon" aria-hidden="true" />
                       <span>{slide.badgeText}</span>
                     </div>
                   )}
