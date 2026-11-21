@@ -44,16 +44,12 @@ export default function BottomCarouselSection({
     return null;
   }
 
-  const isDesktop = screenWidth >= 1024;
-  const isTablet = screenWidth >= 768 && screenWidth < 1024;
+  const isDesktop = screenWidth >= 768;
 
   // Détermination si le carrousel doit défiler en boucle infinie :
-  // Sur PC Desktop : défile si > 5 slides (5 affichés à la fois)
-  // Sur Tablette : défile si > 3 slides
-  // Sur Mobile : défile si > 1 slide (1 seul affiché à la fois)
+  // Sur PC Desktop (>= 768px) : 3 affichés à la fois, défile si > 3 slides
+  // Sur Mobile (< 768px) : 1 seul affiché à la fois, défile si > 1 slide
   const shouldLoop = isDesktop
-    ? slides.length > 5
-    : isTablet
     ? slides.length > 3
     : slides.length > 1;
 
@@ -88,18 +84,18 @@ export default function BottomCarouselSection({
         }
       }
 
-      // Avancement d'un cran = largeur d'une carte + écart
+      // Avancement d'un cran = largeur d'une carte + écart (24px desktop, 16px mobile)
       const firstCard = cards[0] as HTMLElement;
-      const gap = 16;
+      const gap = isDesktop ? 24 : 16;
       const step = firstCard
         ? firstCard.offsetWidth + gap
-        : container.clientWidth / (isDesktop ? 5 : isTablet ? 3 : 1);
+        : container.clientWidth / (isDesktop ? 3 : 1);
 
       container.scrollBy({ left: step, behavior: "smooth" });
     }, slideInterval);
 
     return () => clearInterval(interval);
-  }, [shouldLoop, slides.length, isHovered, slideInterval, isDesktop, isTablet]);
+  }, [shouldLoop, slides.length, isHovered, slideInterval, isDesktop]);
 
   // Gestion du swipe tactile ou défilement manuel
   const handleScroll = () => {
@@ -137,11 +133,11 @@ export default function BottomCarouselSection({
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          {/* Rail de défilement horizontal */}
+          {/* Rail de défilement horizontal (3 sur desktop, 1 sur mobile comme la section nouveautés) */}
           <div
             ref={scrollRef}
             onScroll={handleScroll}
-            className={`flex gap-4 overflow-x-auto snap-x snap-mandatory py-2 px-1 ${
+            className={`flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory py-2 px-1 ${
               !shouldLoop && isDesktop ? "justify-center" : ""
             }`}
             style={{
@@ -169,7 +165,7 @@ export default function BottomCarouselSection({
                   />
 
                   {/* Zone image du slide : centrée au cœur de la plaque */}
-                  <div className="relative z-[2] w-full flex-1 flex items-center justify-center pt-[10%] px-[6%] pb-[2%] min-h-0">
+                  <div className="relative z-[2] w-full flex-1 flex items-center justify-center pt-[10%] px-[5%] pb-[1%] min-h-0">
                     <picture className="w-full h-full flex items-center justify-center">
                       {slide.imageMobile && (
                         <source media="(max-width: 767px)" srcSet={mobileSrc} />
@@ -190,7 +186,7 @@ export default function BottomCarouselSection({
                     </picture>
                   </div>
 
-                  {/* Étiquette personnalisable (Badge noir, écriture blanche) - au-dessus de l'image (z-30) */}
+                  {/* Étiquette personnalisable (Badge noir, écriture blanche) */}
                   {hasBadge && (
                     <div className="nouveau-badge" aria-label={slide.badgeText!}>
                       <span>{slide.badgeText}</span>
@@ -199,16 +195,16 @@ export default function BottomCarouselSection({
 
                   {/* Titre (si renseigné) gravé dans la plaque en bas */}
                   {slide.title ? (
-                    <div className="relative z-[3] w-full px-3 sm:px-4 pb-[6%] pt-1 text-center select-none">
+                    <div className="relative z-[3] w-full px-5 sm:px-6 pb-[6%] pt-1 text-center select-none">
                       <h3
                         style={{ color: "#000000" }}
-                        className="nouveaute-title futurist-font text-xs sm:text-sm font-black uppercase tracking-wider leading-tight truncate text-black"
+                        className="nouveaute-title futurist-font text-sm sm:text-base md:text-lg font-black uppercase tracking-wider leading-tight truncate text-black"
                       >
                         {slide.title}
                       </h3>
                     </div>
                   ) : (
-                    <div className="pb-[4%]" />
+                    <div className="pb-[6%]" />
                   )}
                 </div>
               );
@@ -216,7 +212,7 @@ export default function BottomCarouselSection({
               return (
                 <div
                   key={`${slide.id}-${idx}`}
-                  className="w-full md:w-[calc((100%-2*1rem)/3)] lg:w-[calc((100%-4*1rem)/5)] flex-shrink-0 snap-center md:snap-start"
+                  className="w-full md:w-[calc((100%-3rem)/3)] flex-shrink-0 snap-center md:snap-start"
                 >
                   {isClickable && linkTarget ? (
                     <Link
