@@ -202,7 +202,7 @@ export default function BurgerMenu({
 
           {/* SECTION 2 : FILTRER PAR (CATÉGORIE / PRIX) */}
           <section aria-label="Filtres" className="space-y-3">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-white">
               Filtrer par :
             </h3>
 
@@ -213,7 +213,7 @@ export default function BurgerMenu({
                 onClick={() => setFilterTab("category")}
                 className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   filterTab === "category"
-                    ? "bg-[#242733] text-red-400 shadow-sm border border-neutral-700/80"
+                    ? "bg-[#242733] text-white shadow-sm border border-neutral-700/80"
                     : "text-gray-400 hover:text-gray-200"
                 }`}
               >
@@ -225,7 +225,7 @@ export default function BurgerMenu({
                 onClick={() => setFilterTab("price")}
                 className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   filterTab === "price"
-                    ? "bg-[#242733] text-red-400 shadow-sm border border-neutral-700/80"
+                    ? "bg-[#242733] text-white shadow-sm border border-neutral-700/80"
                     : "text-gray-400 hover:text-gray-200"
                 }`}
               >
@@ -244,11 +244,11 @@ export default function BurgerMenu({
                         key={cat.id || idx}
                         href={`/categories/${encodeURIComponent(cat.name)}`}
                         onClick={closeMenu}
-                        className="w-[calc((100%-16px)/3)] flex items-center justify-center p-2 rounded-xl bg-red-600 hover:bg-red-700 border border-red-500 hover:border-red-400 shadow-md transition-all duration-200 group"
+                        className="w-[calc((100%-16px)/3)] flex items-center justify-center p-2 rounded-xl bg-white hover:bg-gray-100 border border-gray-200 hover:border-gray-300 shadow-sm transition-all duration-200 group"
                         title={cat.name}
                         aria-label={cat.name}
                       >
-                        {/* Icône agrandie sans texte sur fond rouge */}
+                        {/* Icône agrandie sans texte sur fond blanc */}
                         <div className="w-full h-12 sm:h-14 flex items-center justify-center p-1">
                           <img
                             src={cleanImgSrc(cat.logo)}
