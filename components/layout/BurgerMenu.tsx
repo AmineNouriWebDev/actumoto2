@@ -391,7 +391,7 @@ export default function BurgerMenu({
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="w-12 h-12 md:w-14 md:h-14 xl:w-[58px] xl:h-[58px] flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer filter drop-shadow(0 2px 6px rgba(0,0,0,0.6)) shrink-0"
+          className="w-12 h-12 md:w-16 md:h-16 xl:w-[68px] xl:h-[68px] flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer filter drop-shadow(0 2px 6px rgba(0,0,0,0.6)) shrink-0"
           aria-label="Ouvrir le menu"
           aria-expanded={isOpen}
         >

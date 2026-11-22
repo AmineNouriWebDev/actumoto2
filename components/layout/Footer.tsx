@@ -29,13 +29,13 @@ export default function Footer({ hideFooterOnOtherPages = true }: FooterProps) {
       role="contentinfo"
     >
       <div className="container mx-auto px-4">
-        {/* Desktop Layout (>= 768px): 3 colonnes (Gauche: FB/IG, Centre: Copyright, Droite: YT/TikTok) */}
-        <div className="hidden md:grid md:grid-cols-3 items-center">
+        {/* Desktop Layout (>= 768px): Centré, boutons agrandis et rapprochés du copyright */}
+        <div className="hidden md:flex items-center justify-center gap-6 lg:gap-10">
           {/* Gauche : Facebook & Instagram */}
-          <div className="flex items-center justify-start gap-3">
+          <div className="flex items-center gap-3.5">
             <a
               href="https://www.facebook.com/profile.php?id=61584281323170"
-              className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50"
+              className="w-10 h-10 lg:w-11 lg:h-11 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-2 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50 shadow-sm"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook actumoto.tn"
@@ -44,7 +44,7 @@ export default function Footer({ hideFooterOnOtherPages = true }: FooterProps) {
             </a>
             <a
               href="https://www.instagram.com/actumoto.tn?stkn=MTRqNzhiczQ3aWFvNw=="
-              className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50"
+              className="w-10 h-10 lg:w-11 lg:h-11 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-2 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50 shadow-sm"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram actumoto.tn"
@@ -54,17 +54,17 @@ export default function Footer({ hideFooterOnOtherPages = true }: FooterProps) {
           </div>
 
           {/* Milieu : Copyright */}
-          <div className="text-center">
-            <p className="text-sm text-gray-300">
+          <div className="text-center px-2">
+            <p className="text-sm lg:text-base text-gray-300 font-medium whitespace-nowrap">
               Copyright © 2026 actumoto.tn - Tous droits réservés
             </p>
           </div>
 
           {/* Droite : YouTube & TikTok */}
-          <div className="flex items-center justify-end gap-3">
+          <div className="flex items-center gap-3.5">
             <a
               href="https://www.youtube.com/@ActumotoTn"
-              className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50"
+              className="w-10 h-10 lg:w-11 lg:h-11 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-2 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50 shadow-sm"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="YouTube actumoto.tn"
@@ -73,7 +73,7 @@ export default function Footer({ hideFooterOnOtherPages = true }: FooterProps) {
             </a>
             <a
               href="https://www.tiktok.com/@actumoto.tn?_r=1&_t=ZS-9AFrMJkO9jz"
-              className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-1.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50"
+              className="w-10 h-10 lg:w-11 lg:h-11 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center p-2 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/50 shadow-sm"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="TikTok actumoto.tn"

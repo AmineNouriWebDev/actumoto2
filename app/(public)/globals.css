@@ -122,8 +122,15 @@ h3,
 
 @media (min-width: 768px) {
     .header-logo-home {
-        height: 60px;
-        max-height: 64px;
+        height: 66px;
+        max-height: 70px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .header-logo-home {
+        height: 72px;
+        max-height: 74px;
     }
 }
 
@@ -621,8 +628,8 @@ h3,
 
       @media (min-width: 768px) {
         .nouveaute-plaque-container .nouveau-badge {
-          top: 26px;
-          left: 54px;
+          top: 31px;
+          left: 74px;
         }
       }
 

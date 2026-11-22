@@ -50,8 +50,8 @@ export default function HeaderClient({
                   src="/img/header-logo-version2.webp"
                   alt="actumoto.tn - Logo concessionnaire motos en Tunisie"
                   className="header-logo header-logo-home"
-                  width={210}
-                  height={70}
+                  width={240}
+                  height={72}
                   loading="eager"
                 />
               </Link>
