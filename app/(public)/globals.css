@@ -710,9 +710,22 @@ h3,
 
 
 
-      /* ============================================================ */
-      /* SECTION MARQUES — PLAQUES MÉTAL SUR LE MUR CONTINU           */
-      /* ============================================================ */
+/* Hauteur pleine viewport garantie sur tous les smartphones (iOS Safari, Android) */
+.burger-drawer-fullheight {
+  top: 0 !important;
+  bottom: 0 !important;
+  height: 100% !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 100% !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  min-height: -webkit-fill-available !important;
+}
+
+/* ============================================================ */
+/* SECTION MARQUES — PLAQUES MÉTAL SUR LE MUR CONTINU           */
+/* ============================================================ */
       .home-brands-section,
       .home-brands-wall-section {
         position: relative;

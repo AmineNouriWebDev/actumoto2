@@ -94,20 +94,34 @@ export default function BurgerMenu({
     <>
       {/* Overlay Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[99998] transition-opacity duration-300 ${
+        className={`fixed inset-0 top-0 bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm z-[99998] transition-opacity duration-300 ${
           isOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
         }`}
+        style={{
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: "100%",
+          minHeight: "100dvh",
+        }}
         onClick={closeMenu}
         aria-hidden="true"
       />
 
-      {/* Drawer Panel Latéral - Thème sombre accordé au style de la page d'accueil */}
+      {/* Drawer Panel Latéral - Couvre 100% de la hauteur sur smartphone et desktop */}
       <aside
-        className={`fixed top-0 right-0 h-[100dvh] w-full max-w-[420px] bg-[#12141a] text-gray-100 border-l border-neutral-800 shadow-2xl z-[99999] flex flex-col justify-between overflow-hidden transition-transform duration-300 ease-out transform ${
+        className={`burger-drawer-fullheight fixed inset-y-0 top-0 bottom-0 right-0 w-full sm:max-w-[420px] bg-[#12141a] text-gray-100 border-l border-neutral-800 shadow-2xl z-[99999] flex flex-col justify-between overflow-hidden transition-transform duration-300 ease-out transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        style={{
+          top: 0,
+          bottom: 0,
+          height: "100dvh",
+          minHeight: "-webkit-fill-available",
+        }}
         role="dialog"
         aria-label="Menu"
       >
@@ -331,7 +345,10 @@ export default function BurgerMenu({
         </div>
 
         {/* PIED DU DRAWER : ADRESSE EMAIL (SUPPORT) */}
-        <div className="p-4 border-t border-neutral-800 bg-[#0a0c10]">
+        <div
+          className="p-4 border-t border-neutral-800 bg-[#0a0c10]"
+          style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom, 1rem))" }}
+        >
           <a
             href="mailto:actumoto.tn@gmail.com"
             className="flex items-center gap-3 p-3 rounded-xl bg-[#181a22] hover:bg-[#20232f] border border-neutral-800 hover:border-red-500/40 transition-all group shadow-2xs"
