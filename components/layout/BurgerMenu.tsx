@@ -111,16 +111,16 @@ export default function BurgerMenu({
         role="dialog"
         aria-label="Menu"
       >
-        {/* En-tête du Drawer : Fond noir pour le logo qui s'étend jusqu'au bouton X */}
-        <div className="flex items-center justify-between pl-5 pr-4 py-3.5 border-b border-neutral-800 bg-[#0a0c10]">
+        {/* En-tête du Drawer : Logo centré sans fond noir */}
+        <div className="relative flex items-center justify-center px-12 py-3.5 border-b border-neutral-800">
           <Link
             href="/"
             onClick={closeMenu}
-            className="flex items-center flex-1 h-full"
+            className="flex items-center justify-center"
             aria-label="Accueil actumoto.tn"
           >
             <img
-              src="/img/logo-final.jpeg"
+              src="/img/logo-final.webp"
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = "/img/logo2.webp";
               }}
@@ -131,7 +131,7 @@ export default function BurgerMenu({
           <button
             type="button"
             onClick={closeMenu}
-            className="w-9 h-9 rounded-xl bg-neutral-800/90 hover:bg-red-600 text-gray-300 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm ml-3 shrink-0"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl bg-neutral-800/90 hover:bg-red-600 text-gray-300 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm shrink-0"
             aria-label="Fermer le menu"
           >
             <X className="w-5 h-5" />
@@ -181,7 +181,7 @@ export default function BurgerMenu({
               <Link
                 href={loginUrl}
                 onClick={closeMenu}
-                className="flex items-center justify-between p-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all shadow-md group"
+                className="flex items-center p-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all shadow-md group"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-lg bg-white/20 text-white flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -196,7 +196,6 @@ export default function BurgerMenu({
                     </span>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-1 transition-all" />
               </Link>
             )}
           </section>
@@ -245,11 +244,11 @@ export default function BurgerMenu({
                         key={cat.id || idx}
                         href={`/categories/${encodeURIComponent(cat.name)}`}
                         onClick={closeMenu}
-                        className="w-[calc((100%-16px)/3)] flex items-center justify-center p-2 rounded-xl bg-[#181a22] hover:bg-[#20232f] border border-neutral-800 hover:border-red-500/60 hover:shadow-md transition-all duration-200 group"
+                        className="w-[calc((100%-16px)/3)] flex items-center justify-center p-2 rounded-xl bg-red-600 hover:bg-red-700 border border-red-500 hover:border-red-400 shadow-md transition-all duration-200 group"
                         title={cat.name}
                         aria-label={cat.name}
                       >
-                        {/* Icône agrandie sans texte */}
+                        {/* Icône agrandie sans texte sur fond rouge */}
                         <div className="w-full h-12 sm:h-14 flex items-center justify-center p-1">
                           <img
                             src={cleanImgSrc(cat.logo)}
