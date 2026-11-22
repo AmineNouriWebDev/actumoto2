@@ -111,7 +111,7 @@ export default function BurgerMenu({
         role="dialog"
         aria-label="Menu"
       >
-        {/* En-tête du Drawer : Logo centré sans fond noir */}
+        {/* En-tête du Drawer : Logo centré avec ombre rouge identique à la page connexion */}
         <div className="relative flex items-center justify-center px-12 py-3.5 border-b border-neutral-800">
           <Link
             href="/"
@@ -120,13 +120,13 @@ export default function BurgerMenu({
             aria-label="Accueil actumoto.tn"
           >
             <img
-              src="/img/logo-final.webp"
+              src="/img/logo-final.jpeg"
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = "/img/logo2.webp";
               }}
               alt="actumoto.tn"
-              className="h-8 sm:h-9 w-auto object-contain"
-              style={{ filter: "drop-shadow(0 0 10px rgba(220,38,38,0.5))" }}
+              className="h-9 sm:h-10 w-auto object-contain"
+              style={{ filter: "drop-shadow(0 0 10px rgba(220,38,38,0.6))" }}
             />
           </Link>
           <button
