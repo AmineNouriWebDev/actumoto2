@@ -1989,6 +1989,43 @@ h3,
         box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
       }
 
+      /* Flèche retour fixe intégrée entre la bannière et les cards */
+      .section-back-btn-inline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.95);
+        color: #b22222;
+        border: 2px solid #b22222;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        cursor: pointer;
+        font-size: 1.4rem;
+        font-weight: bold;
+        transition: all 0.25s ease;
+        text-decoration: none;
+        box-shadow: 0 3px 12px rgba(255, 0, 0, 0.3);
+        margin-top: 2px;
+        margin-bottom: 2px;
+        z-index: 50;
+      }
+
+      .section-back-btn-inline:hover {
+        background: #b22222;
+        color: white;
+        transform: scale(1.08);
+        box-shadow: 0 4px 16px rgba(255, 0, 0, 0.45);
+      }
+
+      @media (max-width: 767px) {
+        .section-back-btn-inline {
+          width: 40px;
+          height: 40px;
+          font-size: 1.15rem;
+        }
+      }
+
       .modal-back-btn {
         position: absolute;
         top: 2rem;

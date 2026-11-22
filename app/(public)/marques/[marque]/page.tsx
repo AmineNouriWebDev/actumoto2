@@ -126,16 +126,6 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
 
   return (
     <>
-      {/* Floating back button — exactly like original .section-back-btn */}
-      <Link
-        href="/"
-        className="section-back-btn"
-        title="Retour à l'accueil"
-        aria-label="Retour à la page d'accueil"
-      >
-        ←
-      </Link>
-
       {/* BANNIÈRE HAUT OU CARROUSEL (PLEINE LARGEUR) */}
       {topBanners.length > 0 && (
         <BrandBannerSection
@@ -145,7 +135,19 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
         />
       )}
 
-      <section className={`${topBanners.length > 0 ? "pt-6" : "pt-28"} pb-8 relative`} role="main">
+      {/* Flèche retour fixe entre la bannière et les cards de motos, avec marge top et bottom de 2px */}
+      <div className="container mx-auto px-4 flex justify-end items-center my-[2px]">
+        <Link
+          href="/"
+          className="section-back-btn-inline"
+          title="Retour à l'accueil"
+          aria-label="Retour à la page d'accueil"
+        >
+          ←
+        </Link>
+      </div>
+
+      <section className="pt-[2px] pb-8 relative" role="main">
         <div className="container mx-auto px-4">
           {/* SEO hidden title */}
           <div className="sr-only">

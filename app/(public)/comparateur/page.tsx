@@ -109,12 +109,14 @@ export default function ComparateurPage() {
 
   return (
     <>
-      {/* Floating back button */}
-      <Link href="/" className="section-back-btn" title="Retour à l'accueil" aria-label="Retour à la page d'accueil">
-        ←
-      </Link>
+      {/* Flèche retour fixe */}
+      <div className="container mx-auto px-4 flex justify-end items-center my-[2px]">
+        <Link href="/" className="section-back-btn-inline" title="Retour à l'accueil" aria-label="Retour à la page d'accueil">
+          ←
+        </Link>
+      </div>
 
-      <section className="pt-24 pb-12 relative min-h-[60vh]" role="main">
+      <section className="pt-[2px] pb-12 relative min-h-[60vh]" role="main">
         <div className="container mx-auto px-4">
           {/* Header actions */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 pr-16 md:pr-20">

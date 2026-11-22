@@ -1,8 +1,7 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import CatalogClient from "@/components/modeles/CatalogClient";
 import prisma from "@/lib/prisma";
-
-
 
 export const metadata = {
   title: "Modèles de Motos & Scooters - Catalogue & Prix | actumoto.tn",
@@ -25,7 +24,19 @@ export default async function ModelesPage() {
 
   return (
     <>
-      <section className="pt-24 pb-8 md:pt-32 md:pb-12 text-center bg-gray-50 border-b border-gray-200">
+      {/* Flèche retour fixe */}
+      <div className="container mx-auto px-4 flex justify-end items-center my-[2px]">
+        <Link
+          href="/"
+          className="section-back-btn-inline"
+          title="Retour à l'accueil"
+          aria-label="Retour à la page d'accueil"
+        >
+          ←
+        </Link>
+      </div>
+
+      <section className="pt-2 pb-6 md:pt-4 md:pb-8 text-center bg-gray-50 border-b border-gray-200">
         <div className="container mx-auto px-4">
           <h1 className="futurist-font text-3xl md:text-5xl text-gray-900 mb-4 uppercase">
             CATALOGUE <span className="text-red-600">MOTOS & SCOOTERS</span>

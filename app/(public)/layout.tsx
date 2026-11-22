@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import MainLayoutWrapper from "@/components/layout/MainLayoutWrapper";
 import ToastProvider from "@/components/admin/ToastProvider";
 import prisma from "@/lib/prisma";
 
@@ -65,9 +66,9 @@ export default async function RootLayout({
       <body suppressHydrationWarning>
         <ToastProvider />
         <Header />
-        <main role="main" className="pt-[80px]">
+        <MainLayoutWrapper>
           {children}
-        </main>
+        </MainLayoutWrapper>
         <Footer hideFooterOnOtherPages={hideFooterOnOtherPages} />
       </body>
     </html>

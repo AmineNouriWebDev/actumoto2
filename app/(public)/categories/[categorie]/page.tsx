@@ -65,12 +65,14 @@ export default async function CategoriePage({ params }: { params: Promise<{ cate
 
   return (
     <>
-      {/* Floating back button — exact .section-back-btn */}
-      <Link href="/" className="section-back-btn" title="Retour à l'accueil" aria-label="Retour à la page d'accueil">
-        ←
-      </Link>
+      {/* Flèche retour fixe */}
+      <div className="container mx-auto px-4 flex justify-end items-center my-[2px]">
+        <Link href="/" className="section-back-btn-inline" title="Retour à l'accueil" aria-label="Retour à la page d'accueil">
+          ←
+        </Link>
+      </div>
 
-      <section className="pt-28 pb-8 relative" role="main">
+      <section className="pt-[2px] pb-8 relative" role="main">
         <div className="container mx-auto px-4">
           <div className="sr-only">
             <h1>Catalogue {categoryName} - Motos et Scooters en Tunisie</h1>

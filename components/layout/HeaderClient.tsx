@@ -22,17 +22,15 @@ export default function HeaderClient({
   useHomeNavEverywhere = true,
 }: HeaderClientProps) {
   const pathname = usePathname();
-  // Masquer totalement le header sur la page de connexion
-  if (pathname === "/connexion") {
+  const isHome = pathname === "/";
+
+  // Le header (menu nav) est UNIQUEMENT affiché sur la page d'accueil
+  if (!isHome) {
     return null;
   }
 
-  const isHome = pathname === "/";
-  const showHomeNav = isHome || useHomeNavEverywhere;
-
-  if (showHomeNav) {
-    return (
-      <header className="header-futurist header-home-rustic" role="banner">
+  return (
+    <header className="header-futurist header-home-rustic" role="banner">
         <div className="w-full px-3 sm:px-6 md:px-10 h-full">
           <div className="header-container">
             {/* Gauche : Bouton Recherche métallique avec dropdown */}
@@ -73,45 +71,5 @@ export default function HeaderClient({
         </div>
       </header>
     );
-  }
-
-  // Header standard actuel conservé intact pour toutes les autres pages
-  return (
-    <header className="header-futurist main-header" role="banner">
-      <div className="w-full px-4 md:px-10 h-full">
-        <div className="header-container">
-          {/* Gauche : Barre de recherche instantanée standard */}
-          <div className="header-search-container flex items-center justify-start">
-            <HeaderSearch isHome={false} />
-          </div>
-
-          {/* Centre : Logo standard */}
-          <div className="flex items-center">
-            <h1 className="sr-only">actumoto.tn - Concessionnaire moto Tunisie</h1>
-            <Link href="/" aria-label="Retour à l'accueil actumoto.tn">
-              <img
-                src={defaultLogoSrc}
-                alt="actumoto.tn - Logo concessionnaire motos en Tunisie"
-                className="header-logo main-header-logo"
-                width={200}
-                height={47}
-              />
-            </Link>
-          </div>
-
-          {/* Droite : Bouton Connexion/Déconnexion + Menu Burger standard */}
-          <div className="header-burger-container flex items-center justify-end gap-2 md:gap-3">
-            <UserNavButton isLoggedIn={isLoggedIn} isHome={false} />
-            <BurgerMenu
-              isLoggedIn={isLoggedIn}
-              dashboardUrl={dashboardUrl}
-              categories={categories}
-              isHome={false}
-            />
-          </div>
-        </div>
-      </div>
-    </header>
-  );
 }
 

@@ -103,16 +103,16 @@ export default function BurgerMenu({
         aria-hidden="true"
       />
 
-      {/* Drawer Panel Latéral */}
+      {/* Drawer Panel Latéral - Thème sombre accordé au style de la page d'accueil */}
       <aside
-        className={`fixed top-0 right-0 h-[100dvh] w-full max-w-[420px] bg-white border-l border-gray-200 shadow-2xl z-[99999] flex flex-col justify-between overflow-hidden transition-transform duration-300 ease-out transform ${
+        className={`fixed top-0 right-0 h-[100dvh] w-full max-w-[420px] bg-[#12141a] text-gray-100 border-l border-neutral-800 shadow-2xl z-[99999] flex flex-col justify-between overflow-hidden transition-transform duration-300 ease-out transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
         aria-label="Menu"
       >
         {/* En-tête du Drawer : Fond noir pour le logo qui s'étend jusqu'au bouton X */}
-        <div className="flex items-center justify-between pl-5 pr-4 py-3.5 border-b border-neutral-900 bg-black">
+        <div className="flex items-center justify-between pl-5 pr-4 py-3.5 border-b border-neutral-800 bg-[#0a0c10]">
           <Link
             href="/"
             onClick={closeMenu}
@@ -131,7 +131,7 @@ export default function BurgerMenu({
           <button
             type="button"
             onClick={closeMenu}
-            className="w-9 h-9 rounded-xl bg-neutral-800 hover:bg-red-600 text-gray-300 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm ml-3 shrink-0"
+            className="w-9 h-9 rounded-xl bg-neutral-800/90 hover:bg-red-600 text-gray-300 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm ml-3 shrink-0"
             aria-label="Fermer le menu"
           >
             <X className="w-5 h-5" />
@@ -139,7 +139,7 @@ export default function BurgerMenu({
         </div>
 
         {/* Corps déroulant du Drawer */}
-        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-6 scrollbar-thin scrollbar-thumb-gray-300">
+        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-6 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent">
           {/* SECTION 1 : CONNEXION / MON ESPACE */}
           <section aria-label="Compte utilisateur" className="space-y-2.5">
             {isLoggedIn ? (
@@ -147,22 +147,22 @@ export default function BurgerMenu({
                 <Link
                   href={dashboardUrl}
                   onClick={closeMenu}
-                  className="flex-1 flex items-center justify-between p-3.5 rounded-xl bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-500/50 text-gray-900 transition-all group"
+                  className="flex-1 flex items-center justify-between p-3.5 rounded-xl bg-[#181a22] hover:bg-[#20232f] border border-neutral-800 hover:border-red-500/50 text-white transition-all group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-blue-100 text-blue-600 border border-blue-200 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <div className="w-9 h-9 rounded-lg bg-red-500/15 text-red-400 border border-red-500/30 flex items-center justify-center group-hover:scale-105 transition-transform">
                       <User className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="font-bold text-sm block text-gray-900 group-hover:text-blue-600 transition-colors">
+                      <span className="font-bold text-sm block text-white group-hover:text-red-400 transition-colors">
                         Mon Espace
                       </span>
-                      <span className="text-[11px] text-gray-500">
+                      <span className="text-[11px] text-gray-400">
                         Tableau de bord
                       </span>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all" />
                 </Link>
                 <button
                   type="button"
@@ -170,7 +170,7 @@ export default function BurgerMenu({
                     closeMenu();
                     signOut({ callbackUrl: "/" });
                   }}
-                  className="w-12 h-14 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 flex items-center justify-center transition-all cursor-pointer"
+                  className="w-12 h-14 rounded-xl bg-neutral-900 hover:bg-red-950/60 border border-neutral-800 hover:border-red-700/50 text-red-400 flex items-center justify-center transition-all cursor-pointer"
                   title="Déconnexion"
                   aria-label="Se déconnecter"
                 >
@@ -203,19 +203,19 @@ export default function BurgerMenu({
 
           {/* SECTION 2 : FILTRER PAR (CATÉGORIE / PRIX) */}
           <section aria-label="Filtres" className="space-y-3">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
               Filtrer par :
             </h3>
 
             {/* Onglets interactifs */}
-            <div className="flex rounded-xl bg-gray-100 p-1 border border-gray-200">
+            <div className="flex rounded-xl bg-[#181a22] p-1 border border-neutral-800">
               <button
                 type="button"
                 onClick={() => setFilterTab("category")}
                 className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   filterTab === "category"
-                    ? "bg-white text-red-600 shadow-sm border border-gray-200/80"
-                    : "text-gray-600 hover:text-gray-900"
+                    ? "bg-[#242733] text-red-400 shadow-sm border border-neutral-700/80"
+                    : "text-gray-400 hover:text-gray-200"
                 }`}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
@@ -226,8 +226,8 @@ export default function BurgerMenu({
                 onClick={() => setFilterTab("price")}
                 className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   filterTab === "price"
-                    ? "bg-white text-red-600 shadow-sm border border-gray-200/80"
-                    : "text-gray-600 hover:text-gray-900"
+                    ? "bg-[#242733] text-red-400 shadow-sm border border-neutral-700/80"
+                    : "text-gray-400 hover:text-gray-200"
                 }`}
               >
                 <Sliders className="w-3.5 h-3.5" />
@@ -245,7 +245,7 @@ export default function BurgerMenu({
                         key={cat.id || idx}
                         href={`/categories/${encodeURIComponent(cat.name)}`}
                         onClick={closeMenu}
-                        className="w-[calc((100%-16px)/3)] flex items-center justify-center p-2 rounded-xl bg-white hover:bg-red-50/50 border border-gray-200 hover:border-red-500 hover:shadow-md transition-all duration-200 group"
+                        className="w-[calc((100%-16px)/3)] flex items-center justify-center p-2 rounded-xl bg-[#181a22] hover:bg-[#20232f] border border-neutral-800 hover:border-red-500/60 hover:shadow-md transition-all duration-200 group"
                         title={cat.name}
                         aria-label={cat.name}
                       >
@@ -272,10 +272,10 @@ export default function BurgerMenu({
             {/* Contenu de l'onglet : PAR PRIX (Curseur de budget / rang interactif, sans tranches rapides) */}
             {filterTab === "price" && (
               <div className="pt-1">
-                <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-3.5">
+                <div className="p-4 rounded-xl bg-[#181a22] border border-neutral-800 space-y-3.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-600 font-medium">Budget max :</span>
-                    <span className="text-sm font-bold text-red-600 font-mono">
+                    <span className="text-gray-400 font-medium">Budget max :</span>
+                    <span className="text-sm font-bold text-red-400 font-mono">
                       {sliderPrice.toLocaleString("fr-FR")} DT
                     </span>
                   </div>
@@ -287,7 +287,7 @@ export default function BurgerMenu({
                     step="1000"
                     value={sliderPrice}
                     onChange={(e) => setSliderPrice(Number(e.target.value))}
-                    className="w-full accent-red-600 cursor-pointer h-2 bg-gray-200 rounded-lg"
+                    className="w-full accent-red-600 cursor-pointer h-2 bg-neutral-700 rounded-lg"
                     aria-label="Sélectionner le prix maximum"
                   />
 
@@ -315,36 +315,36 @@ export default function BurgerMenu({
             <Link
               href="/occasion"
               onClick={closeMenu}
-              className="flex items-center justify-between p-3.5 rounded-xl bg-gray-50 hover:bg-red-50/80 border border-gray-200 hover:border-red-500/50 text-gray-900 transition-all group"
+              className="flex items-center justify-between p-3.5 rounded-xl bg-[#181a22] hover:bg-[#20232f] border border-neutral-800 hover:border-red-500/50 text-white transition-all group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-red-100 text-red-600 border border-red-200 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-9 h-9 rounded-lg bg-red-500/15 text-red-400 border border-red-500/30 flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Tag className="w-4 h-4" />
                 </div>
-                <span className="font-bold text-sm text-gray-900 group-hover:text-red-600 transition-colors">
+                <span className="font-bold text-sm text-white group-hover:text-red-400 transition-colors">
                   Motos d'Occasion
                 </span>
               </div>
-              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all" />
+              <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all" />
             </Link>
           </section>
         </div>
 
         {/* PIED DU DRAWER : ADRESSE EMAIL (SUPPORT) */}
-        <div className="p-4 border-t border-gray-100 bg-gray-50/70">
+        <div className="p-4 border-t border-neutral-800 bg-[#0a0c10]">
           <a
             href="mailto:actumoto.tn@gmail.com"
-            className="flex items-center gap-3 p-3 rounded-xl bg-white hover:bg-red-50 border border-gray-200 hover:border-red-500/40 transition-all group shadow-2xs"
+            className="flex items-center gap-3 p-3 rounded-xl bg-[#181a22] hover:bg-[#20232f] border border-neutral-800 hover:border-red-500/40 transition-all group shadow-2xs"
             aria-label="Nous contacter par email"
           >
-            <div className="w-9 h-9 rounded-lg bg-red-100 text-red-600 border border-red-200 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-lg bg-red-500/15 text-red-400 border border-red-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Mail className="w-4 h-4" />
             </div>
             <div className="min-w-0">
-              <span className="text-[10px] text-gray-500 block uppercase tracking-wider font-semibold">
+              <span className="text-[10px] text-gray-400 block uppercase tracking-wider font-semibold">
                 Contact & Support
               </span>
-              <span className="text-xs font-bold text-gray-900 group-hover:text-red-600 transition-colors truncate block">
+              <span className="text-xs font-bold text-gray-200 group-hover:text-red-400 transition-colors truncate block">
                 actumoto.tn@gmail.com
               </span>
             </div>

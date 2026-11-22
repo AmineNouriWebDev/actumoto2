@@ -180,16 +180,25 @@ export default async function ModelDetailPage({
       />
 
       {/* Header section */}
-      <section className="pt-24 pb-4 md:pt-28 md:pb-6 bg-gray-50 border-b border-gray-200">
-        <div className="container mx-auto px-4 max-w-[1200px]">
+      <section className="pt-3 pb-3 md:pt-4 md:pb-4 bg-gray-50 border-b border-gray-200">
+        <div className="container mx-auto px-4 max-w-[1200px] flex items-center justify-between gap-4">
           {/* Breadcrumb */}
-          <nav className="detail-breadcrumb mb-4" aria-label="Fil d'Ariane">
+          <nav className="detail-breadcrumb mb-0" aria-label="Fil d'Ariane">
             <Link href="/">Accueil</Link>
             <span className="sep">›</span>
             <Link href={`/marques/${encodeURIComponent(brandName)}`}>{brandName}</Link>
             <span className="sep">›</span>
             <span className="current">{modelName}</span>
           </nav>
+
+          <Link
+            href={`/marques/${encodeURIComponent(brandName)}`}
+            className="section-back-btn-inline"
+            title={`Retour aux modèles ${brandName}`}
+            aria-label={`Retour aux modèles ${brandName}`}
+          >
+            ←
+          </Link>
 
           {/* H1 pour le SEO */}
           <h1 className="sr-only">

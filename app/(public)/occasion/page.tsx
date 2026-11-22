@@ -33,15 +33,19 @@ export default async function OccasionPage() {
 
   return (
     <>
-      <section className="pt-8 pb-8 relative" role="main">
+      {/* Flèche retour fixe */}
+      <div className="container mx-auto px-4 flex justify-end items-center my-[2px]">
         <Link
           href="/"
-          className="section-back-btn"
+          className="section-back-btn-inline"
           title="Retour à l'accueil"
           aria-label="Retour à la page d'accueil"
         >
           ←
         </Link>
+      </div>
+
+      <section className="pt-[2px] pb-8 relative" role="main">
 
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
