@@ -10,7 +10,7 @@ interface Brand {
 
 export default function BrandsGrid({ brands }: { brands: Brand[] }) {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 pt-4 md:pt-6 pb-1">
       {/* Titre masqué visuellement pour respecter la consigne (conservé sr-only pour SEO) */}
       <h2 id="marques-main-title" className="sr-only">
         Toutes les marques moto disponibles en Tunisie

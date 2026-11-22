@@ -126,6 +126,7 @@ export default function BurgerMenu({
               }}
               alt="actumoto.tn"
               className="h-8 sm:h-9 w-auto object-contain"
+              style={{ filter: "drop-shadow(0 0 10px rgba(220,38,38,0.5))" }}
             />
           </Link>
           <button
