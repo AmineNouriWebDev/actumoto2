@@ -710,17 +710,37 @@ h3,
 
 
 
+/* Verrouillage du scroll en arrière-plan lorsque le burger menu est ouvert */
+html.burger-menu-open,
+body.burger-menu-open {
+  overflow: hidden !important;
+  height: 100% !important;
+  touch-action: none !important;
+  overscroll-behavior: none !important;
+}
+
 /* Hauteur pleine viewport garantie sur tous les smartphones (iOS Safari, Android) */
 .burger-drawer-fullheight {
+  position: fixed !important;
   top: 0 !important;
   bottom: 0 !important;
+  right: 0 !important;
   height: 100% !important;
-  height: 100vh !important;
-  height: 100dvh !important;
   min-height: 100% !important;
-  min-height: 100vh !important;
-  min-height: 100dvh !important;
-  min-height: -webkit-fill-available !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 639px) {
+  .burger-drawer-fullheight {
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    min-height: -webkit-fill-available !important;
+  }
 }
 
 /* ============================================================ */
@@ -2338,6 +2358,12 @@ h3,
         display: flex;
         flex-direction: column;
         padding: 1.5rem;
+      }
+
+      @media (max-width: 639px) {
+        .card-content {
+          padding: 1rem;
+        }
       }
 
       .card-footer {

@@ -62,14 +62,20 @@ export default function BurgerMenu({
     setMounted(true);
   }, []);
 
-  // Bloquer le scroll du body quand le menu est ouvert
+  // Bloquer le scroll du body et de l'arbre document quand le menu est ouvert
   useEffect(() => {
     if (isOpen) {
+      document.documentElement.classList.add("burger-menu-open");
+      document.body.classList.add("burger-menu-open");
       document.body.style.overflow = "hidden";
     } else {
+      document.documentElement.classList.remove("burger-menu-open");
+      document.body.classList.remove("burger-menu-open");
       document.body.style.overflow = "";
     }
     return () => {
+      document.documentElement.classList.remove("burger-menu-open");
+      document.body.classList.remove("burger-menu-open");
       document.body.style.overflow = "";
     };
   }, [isOpen]);
@@ -94,7 +100,7 @@ export default function BurgerMenu({
     <>
       {/* Overlay Backdrop */}
       <div
-        className={`fixed inset-0 top-0 bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm z-[99998] transition-opacity duration-300 ${
+        className={`fixed inset-0 top-0 bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm z-[99998] transition-opacity duration-300 touch-none overscroll-none ${
           isOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -105,7 +111,7 @@ export default function BurgerMenu({
           left: 0,
           right: 0,
           height: "100%",
-          minHeight: "100dvh",
+          minHeight: "100%",
         }}
         onClick={closeMenu}
         aria-hidden="true"
@@ -113,14 +119,15 @@ export default function BurgerMenu({
 
       {/* Drawer Panel Latéral - Couvre 100% de la hauteur sur smartphone et desktop */}
       <aside
-        className={`burger-drawer-fullheight fixed inset-y-0 top-0 bottom-0 right-0 w-full sm:max-w-[420px] bg-[#12141a] text-gray-100 border-l border-neutral-800 shadow-2xl z-[99999] flex flex-col justify-between overflow-hidden transition-transform duration-300 ease-out transform ${
+        className={`burger-drawer-fullheight fixed top-0 bottom-0 right-0 w-full sm:max-w-[420px] bg-[#12141a] text-gray-100 border-l border-neutral-800 shadow-2xl z-[99999] flex flex-col justify-between overflow-hidden transition-transform duration-300 ease-out transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         style={{
           top: 0,
           bottom: 0,
-          height: "100dvh",
-          minHeight: "-webkit-fill-available",
+          height: "100%",
+          minHeight: "100%",
+          overscrollBehavior: "contain",
         }}
         role="dialog"
         aria-label="Menu"
@@ -154,7 +161,13 @@ export default function BurgerMenu({
         </div>
 
         {/* Corps déroulant du Drawer */}
-        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-6 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent">
+        <div
+          className="flex-1 overflow-y-auto px-5 py-5 space-y-6 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent overscroll-contain touch-pan-y"
+          style={{
+            overscrollBehavior: "contain",
+            WebkitOverflowScrolling: "touch",
+          }}
+        >
           {/* SECTION 1 : CONNEXION / MON ESPACE */}
           <section aria-label="Compte utilisateur" className="space-y-2.5">
             {isLoggedIn ? (
@@ -346,7 +359,7 @@ export default function BurgerMenu({
 
         {/* PIED DU DRAWER : ADRESSE EMAIL (SUPPORT) */}
         <div
-          className="p-4 border-t border-neutral-800 bg-[#0a0c10]"
+          className="p-4 border-t border-neutral-800 bg-[#0a0c10] shrink-0"
           style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom, 1rem))" }}
         >
           <a

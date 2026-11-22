@@ -11,20 +11,20 @@ import { toast } from "react-toastify";
 // Réplique exacte de formatPriceHtml() de data.js
 function formatPriceDisplay(price: number | null | undefined, promoPrice: number | null | undefined, currency: string = "DT") {
   if (price === null || price === undefined) {
-    return <span className="text-red-600 font-bold text-xl">En arrivage</span>;
+    return <span className="text-red-600 font-bold text-base sm:text-lg md:text-xl leading-none whitespace-nowrap shrink-0">En arrivage</span>;
   }
   
   const formatNumber = (num: number) => num.toLocaleString("fr-FR").replace(/\s/g, " ");
 
   if (promoPrice) {
     return (
-      <div className="flex items-center gap-2">
-        <span className="text-gray-400 line-through text-sm font-medium">
+      <div className="flex items-baseline gap-1.5 shrink-0 whitespace-nowrap">
+        <span className="text-gray-400 line-through text-xs sm:text-sm font-medium whitespace-nowrap">
           {formatNumber(price)} {currency}
         </span>
-        <span className="text-red-600 font-bold text-2xl leading-none flex items-baseline">
+        <span className="text-red-600 font-bold text-lg sm:text-xl md:text-2xl leading-none flex items-baseline whitespace-nowrap">
           {formatNumber(promoPrice)}
-          <span className="text-sm font-normal ml-1">{currency}</span>
+          <span className="text-xs sm:text-sm font-normal ml-1">{currency}</span>
         </span>
       </div>
     );
@@ -32,9 +32,9 @@ function formatPriceDisplay(price: number | null | undefined, promoPrice: number
 
   const formatted = formatNumber(price);
   return (
-    <span className="text-red-600 font-bold text-2xl leading-none flex items-baseline">
+    <span className="text-red-600 font-bold text-lg sm:text-xl md:text-2xl leading-none flex items-baseline shrink-0 whitespace-nowrap">
       {formatted}
-      <span className="text-sm font-normal ml-1">{currency}</span>
+      <span className="text-xs sm:text-sm font-normal ml-1">{currency}</span>
     </span>
   );
 }
@@ -379,16 +379,21 @@ export default function ModelCard({ model, brand, index, isLoggedIn = false }: M
 
         {/* Card content */}
         <div className="card-content">
-          <div className="flex justify-between items-end gap-3 mb-3">
-            <div className="flex flex-col items-start">
-              <h2 className="futurist-font text-xl leading-none mt-0.5">{model.name}</h2>
+          <div className="flex justify-between items-baseline gap-2 sm:gap-3 mb-3 min-w-0">
+            <div className="flex-1 min-w-0 flex flex-col items-start">
+              <h2
+                className="futurist-font text-base sm:text-lg md:text-xl leading-none truncate max-w-full"
+                title={model.name}
+              >
+                {model.name}
+              </h2>
               {isElectric && (
-                <div className="electric-badge mt-1.5">
+                <div className="electric-badge mt-1.5 shrink-0">
                   <span>⚡</span> ÉLECTRIQUE
                 </div>
               )}
             </div>
-            <div className="flex flex-col items-end text-right">
+            <div className="shrink-0 flex items-baseline justify-end text-right whitespace-nowrap">
               {formatPriceDisplay(model.price, model.promoPrice, model.currency || "DT")}
             </div>
           </div>
