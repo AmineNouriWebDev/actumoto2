@@ -10,12 +10,15 @@ import {
   LayoutTemplate,
   Footprints,
   ExternalLink,
+  ShieldCheck,
 } from "lucide-react";
 
 interface SiteSettingsData {
   id: string;
   useHomeNavEverywhere: boolean;
   hideFooterOnOtherPages: boolean;
+  showGoogleLogin?: boolean;
+  showFacebookLogin?: boolean;
   carouselVisible?: boolean;
   carouselBottomVisible?: boolean;
   carouselDelayMs?: number;
@@ -325,6 +328,197 @@ export default function AdminSettingsClient() {
               </p>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* PARAMÈTRE 3 : BOUTONS DE CONNEXION RÉSEAUX SOCIAUX */}
+      <div className="admin-card" style={{ marginBottom: "2rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.4rem" }}>
+          <ShieldCheck className="text-red-500" size={22} />
+          <h2 className="admin-card-title" style={{ margin: 0 }}>
+            Boutons de connexion (Réseaux Sociaux)
+          </h2>
+        </div>
+        <p style={{ color: "#9ca3af", fontSize: "0.88rem", margin: "0 0 1.25rem 0" }}>
+          Affichez ou masquez visuellement les boutons Google et Facebook sur les pages de connexion et d&apos;inscription tout en conservant la configuration technique intacte.
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {/* Toggle Google */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "1rem",
+              padding: "1rem",
+              borderRadius: "0.6rem",
+              background: "rgba(0, 0, 0, 0.25)",
+              border: "1px solid rgba(255, 255, 255, 0.06)",
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <div style={{ fontWeight: 600, color: "#f9fafb", fontSize: "0.95rem" }}>
+                Bouton « Continuer avec Google »
+              </div>
+              <div style={{ fontSize: "0.8rem", color: "#9ca3af", marginTop: "0.15rem" }}>
+                {settings.showGoogleLogin !== false
+                  ? "Affiché sur les pages /connexion et /inscription"
+                  : "Masqué visuellement pour les visiteurs"}
+              </div>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span
+                style={{
+                  fontSize: "0.8rem",
+                  fontWeight: 700,
+                  padding: "0.25rem 0.65rem",
+                  borderRadius: "999px",
+                  background: settings.showGoogleLogin !== false ? "rgba(22, 163, 74, 0.2)" : "rgba(107, 114, 128, 0.2)",
+                  color: settings.showGoogleLogin !== false ? "#4ade80" : "#9ca3af",
+                  border: settings.showGoogleLogin !== false ? "1px solid rgba(22, 163, 74, 0.4)" : "1px solid rgba(107, 114, 128, 0.3)",
+                }}
+              >
+                {settings.showGoogleLogin !== false ? "Visible" : "Masqué"}
+              </span>
+
+              <label
+                style={{
+                  position: "relative",
+                  display: "inline-block",
+                  width: "56px",
+                  height: "30px",
+                  cursor: savingKey === "showGoogleLogin" ? "not-allowed" : "pointer",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={settings.showGoogleLogin !== false}
+                  disabled={savingKey === "showGoogleLogin"}
+                  onChange={(e) => updateSetting("showGoogleLogin", e.target.checked)}
+                  style={{ opacity: 0, width: 0, height: 0 }}
+                />
+                <span
+                  style={{
+                    position: "absolute",
+                    cursor: "pointer",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: settings.showGoogleLogin !== false ? "#dc2626" : "#374151",
+                    transition: "0.3s",
+                    borderRadius: "34px",
+                    boxShadow: settings.showGoogleLogin !== false ? "0 0 10px rgba(220, 38, 38, 0.5)" : "none",
+                  }}
+                >
+                  <span
+                    style={{
+                      position: "absolute",
+                      content: "",
+                      height: "22px",
+                      width: "22px",
+                      left: settings.showGoogleLogin !== false ? "28px" : "4px",
+                      bottom: "4px",
+                      backgroundColor: "white",
+                      transition: "0.3s",
+                      borderRadius: "50%",
+                    }}
+                  />
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* Toggle Facebook */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "1rem",
+              padding: "1rem",
+              borderRadius: "0.6rem",
+              background: "rgba(0, 0, 0, 0.25)",
+              border: "1px solid rgba(255, 255, 255, 0.06)",
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <div style={{ fontWeight: 600, color: "#f9fafb", fontSize: "0.95rem" }}>
+                Bouton « Continuer avec Facebook »
+              </div>
+              <div style={{ fontSize: "0.8rem", color: "#9ca3af", marginTop: "0.15rem" }}>
+                {settings.showFacebookLogin !== false
+                  ? "Affiché sur les pages /connexion et /inscription"
+                  : "Masqué visuellement pour les visiteurs (code conservé)"}
+              </div>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span
+                style={{
+                  fontSize: "0.8rem",
+                  fontWeight: 700,
+                  padding: "0.25rem 0.65rem",
+                  borderRadius: "999px",
+                  background: settings.showFacebookLogin !== false ? "rgba(22, 163, 74, 0.2)" : "rgba(220, 38, 38, 0.2)",
+                  color: settings.showFacebookLogin !== false ? "#4ade80" : "#f87171",
+                  border: settings.showFacebookLogin !== false ? "1px solid rgba(22, 163, 74, 0.4)" : "1px solid rgba(220, 38, 38, 0.4)",
+                }}
+              >
+                {settings.showFacebookLogin !== false ? "Visible" : "Masqué"}
+              </span>
+
+              <label
+                style={{
+                  position: "relative",
+                  display: "inline-block",
+                  width: "56px",
+                  height: "30px",
+                  cursor: savingKey === "showFacebookLogin" ? "not-allowed" : "pointer",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={settings.showFacebookLogin !== false}
+                  disabled={savingKey === "showFacebookLogin"}
+                  onChange={(e) => updateSetting("showFacebookLogin", e.target.checked)}
+                  style={{ opacity: 0, width: 0, height: 0 }}
+                />
+                <span
+                  style={{
+                    position: "absolute",
+                    cursor: "pointer",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: settings.showFacebookLogin !== false ? "#dc2626" : "#374151",
+                    transition: "0.3s",
+                    borderRadius: "34px",
+                    boxShadow: settings.showFacebookLogin !== false ? "0 0 10px rgba(220, 38, 38, 0.5)" : "none",
+                  }}
+                >
+                  <span
+                    style={{
+                      position: "absolute",
+                      content: "",
+                      height: "22px",
+                      width: "22px",
+                      left: settings.showFacebookLogin !== false ? "28px" : "4px",
+                      bottom: "4px",
+                      backgroundColor: "white",
+                      transition: "0.3s",
+                      borderRadius: "50%",
+                    }}
+                  />
+                </span>
+              </label>
+            </div>
+          </div>
         </div>
       </div>
 

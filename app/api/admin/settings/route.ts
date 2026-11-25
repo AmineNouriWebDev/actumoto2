@@ -19,6 +19,8 @@ export async function GET() {
           carouselBottomVisible: false,
           useHomeNavEverywhere: true,
           hideFooterOnOtherPages: true,
+          showGoogleLogin: true,
+          showFacebookLogin: true,
         },
       });
     }
@@ -56,6 +58,12 @@ export async function PATCH(req: Request) {
     if (typeof body.carouselDelayMs === 'number') {
       updateData.carouselDelayMs = body.carouselDelayMs;
     }
+    if (typeof body.showGoogleLogin === 'boolean') {
+      updateData.showGoogleLogin = body.showGoogleLogin;
+    }
+    if (typeof body.showFacebookLogin === 'boolean') {
+      updateData.showFacebookLogin = body.showFacebookLogin;
+    }
 
     if (!settings) {
       settings = await prisma.siteSettings.create({
@@ -65,6 +73,8 @@ export async function PATCH(req: Request) {
           carouselBottomVisible: false,
           useHomeNavEverywhere: true,
           hideFooterOnOtherPages: true,
+          showGoogleLogin: true,
+          showFacebookLogin: true,
           ...updateData,
         },
       });
@@ -80,6 +90,8 @@ export async function PATCH(req: Request) {
     revalidatePath('/modeles');
     revalidatePath('/occasion');
     revalidatePath('/comparateur');
+    revalidatePath('/connexion');
+    revalidatePath('/inscription');
 
     return NextResponse.json({ ok: true, settings });
   } catch (err: any) {
