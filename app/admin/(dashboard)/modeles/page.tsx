@@ -109,7 +109,7 @@ export default async function AdminModelsPage({
           <p>Veuillez choisir une marque ou taper un nom pour afficher les modèles.</p>
         </div>
       ) : (
-        <div className="admin-table-card">
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <ClientModelList initialModels={models as any} />
 
           {/* Pagination */}
