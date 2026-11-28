@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import MainLayoutWrapper from "@/components/layout/MainLayoutWrapper";
 import ToastProvider from "@/components/admin/ToastProvider";
 import PushNotificationPrompt from "@/components/notifications/PushNotificationPrompt";
+import ProfileCompletionPrompt from "@/components/client/ProfileCompletionPrompt";
 import AnalyticsScripts from "@/components/seo/AnalyticsScripts";
 import prisma from "@/lib/prisma";
 
@@ -144,6 +145,7 @@ export default async function RootLayout({
           enabled={pushPromptEnabled}
           vapidPublicKey={vapidPublicKey}
         />
+        <ProfileCompletionPrompt />
       </body>
     </html>
   );

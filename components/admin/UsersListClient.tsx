@@ -12,6 +12,9 @@ type User = {
   id: string;
   name: string | null;
   email: string | null;
+  phone: string | null;
+  hasWhatsapp: boolean;
+  city: string | null;
   role: "ADMIN" | "DEALER" | "CLIENT";
   emailVerified: Date | null;
   modelsQuota: number;
@@ -104,8 +107,11 @@ export default function UsersListClient({ initialUsers }: { initialUsers: User[]
 
   // Filtres
   const filteredUsers = users.filter((u) => {
-    const matchesSearch = (u.name?.toLowerCase().includes(search.toLowerCase()) || "") ||
-                          (u.email?.toLowerCase().includes(search.toLowerCase()) || "");
+    const q = search.toLowerCase();
+    const matchesSearch = (u.name?.toLowerCase().includes(q) || "") ||
+                          (u.email?.toLowerCase().includes(q) || "") ||
+                          (u.phone?.toLowerCase().includes(q) || "") ||
+                          (u.city?.toLowerCase().includes(q) || "");
     const matchesRole = roleFilter === "ALL" || u.role === roleFilter;
     return matchesSearch && matchesRole;
   });
@@ -119,12 +125,15 @@ export default function UsersListClient({ initialUsers }: { initialUsers: User[]
     const formData = new FormData(e.currentTarget);
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
+    const phone = ((formData.get("phone") as string) || "").trim() || null;
+    const hasWhatsapp = Boolean(phone) && formData.get("hasWhatsapp") === "on";
+    const city = ((formData.get("city") as string) || "").trim() || null;
     const role = formData.get("role") as "ADMIN" | "DEALER" | "CLIENT";
     const modelsQuota = parseInt(formData.get("modelsQuota") as string) || 0;
     const isVerified = formData.get("emailVerified") === "on";
 
     const res = await updateUser(editingUser.id, { 
-      name, email, role, modelsQuota, emailVerified: isVerified 
+      name, email, phone, hasWhatsapp, city, role, modelsQuota, emailVerified: isVerified 
     });
 
     if (res.error) {
@@ -132,7 +141,7 @@ export default function UsersListClient({ initialUsers }: { initialUsers: User[]
     } else {
       toast.success("Utilisateur mis à jour avec succès.");
       setUsers(users.map(u => u.id === editingUser.id ? { 
-        ...u, name, email, role, modelsQuota, emailVerified: isVerified ? new Date() : null 
+        ...u, name, email, phone, hasWhatsapp, city, role, modelsQuota, emailVerified: isVerified ? new Date() : null 
       } : u));
       setEditingUser(null);
       router.refresh();
@@ -199,7 +208,7 @@ export default function UsersListClient({ initialUsers }: { initialUsers: User[]
         <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "center" }}>
           <input 
             type="text" 
-            placeholder="Rechercher (nom, email)..." 
+            placeholder="Rechercher (nom, email, téléphone, ville)..." 
             className="form-input" 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -224,6 +233,7 @@ export default function UsersListClient({ initialUsers }: { initialUsers: User[]
             <tr>
               <th>Nom</th>
               <th>Email</th>
+              <th>Téléphone / Ville</th>
               <th>Rôle</th>
               <th>Activité</th>
               <th>Statut</th>
@@ -234,13 +244,44 @@ export default function UsersListClient({ initialUsers }: { initialUsers: User[]
           <tbody>
             {filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ textAlign: "center", padding: "2rem" }}>Aucun utilisateur trouvé.</td>
+                <td colSpan={8} style={{ textAlign: "center", padding: "2rem" }}>Aucun utilisateur trouvé.</td>
               </tr>
             ) : (
               filteredUsers.map((user) => (
                 <tr key={user.id}>
                   <td style={{ fontWeight: 500 }}>{user.name || "N/A"}</td>
                   <td>{user.email}</td>
+                  <td>
+                    {user.phone ? (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}>
+                          <span style={{ fontWeight: 600, color: "#f9fafb" }}>{user.phone}</span>
+                          {user.hasWhatsapp && (
+                            <span
+                              style={{
+                                fontSize: "0.7rem",
+                                fontWeight: 700,
+                                padding: "0.1rem 0.45rem",
+                                borderRadius: "9999px",
+                                background: "rgba(34, 197, 94, 0.16)",
+                                color: "#4ade80",
+                                border: "1px solid rgba(34, 197, 94, 0.35)",
+                              }}
+                            >
+                              WhatsApp
+                            </span>
+                          )}
+                        </div>
+                        {user.city && (
+                          <span style={{ fontSize: "0.76rem", color: "#9ca3af" }}>📍 {user.city}</span>
+                        )}
+                      </div>
+                    ) : (
+                      <span style={{ color: "#6b7280", fontSize: "0.85rem" }}>
+                        {user.city ? `📍 ${user.city}` : "—"}
+                      </span>
+                    )}
+                  </td>
                   <td>
                     <span style={{ 
                       padding: "0.25rem 0.5rem", borderRadius: "0.25rem", fontSize: "0.75rem", fontWeight: 700,
@@ -349,6 +390,20 @@ export default function UsersListClient({ initialUsers }: { initialUsers: User[]
               <div className="form-group">
                 <label>Email</label>
                 <input type="email" name="email" className="form-input" defaultValue={editingUser.email || ""} required />
+              </div>
+              <div className="form-group">
+                <label>Téléphone</label>
+                <input type="tel" name="phone" className="form-input" defaultValue={editingUser.phone || ""} placeholder="Ex: 20 123 456" />
+              </div>
+              <div className="form-group">
+                <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
+                  <input type="checkbox" name="hasWhatsapp" defaultChecked={editingUser.hasWhatsapp} style={{ width: "1rem", height: "1rem" }} />
+                  <span>Numéro lié à WhatsApp</span>
+                </label>
+              </div>
+              <div className="form-group">
+                <label>Ville / Gouvernorat</label>
+                <input type="text" name="city" className="form-input" defaultValue={editingUser.city || ""} placeholder="Ex: Tunis" />
               </div>
               <div className="form-group">
                 <label>Rôle</label>
@@ -481,6 +536,15 @@ export default function UsersListClient({ initialUsers }: { initialUsers: User[]
                 </div>
                 <p style={{ color: "#9ca3af", margin: "0.35rem 0 0", fontSize: "0.875rem" }}>
                   📧 {detailsUser.email} &bull; Inscrit le {new Date(detailsUser.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                </p>
+                <p style={{ color: "#d1d5db", margin: "0.35rem 0 0", fontSize: "0.875rem", display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                  <span>📞 {detailsUser.phone || "Téléphone non renseigné"}</span>
+                  {detailsUser.phone && detailsUser.hasWhatsapp && (
+                    <span style={{ background: "rgba(34, 197, 94, 0.16)", color: "#4ade80", border: "1px solid rgba(34, 197, 94, 0.35)", borderRadius: "9999px", padding: "0.1rem 0.5rem", fontSize: "0.72rem", fontWeight: 700 }}>
+                      WhatsApp
+                    </span>
+                  )}
+                  {detailsUser.city && <span>&bull; 📍 {detailsUser.city}</span>}
                 </p>
               </div>
               <button

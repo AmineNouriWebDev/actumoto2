@@ -189,8 +189,12 @@ model User {
   quotaRequests      QuotaRequest[]
 
   // Champs spécifiques CLIENT
-  favorites Favorite[]
-  reviews   Review[]
+  phone                  String?
+  hasWhatsapp            Boolean   @default(false)
+  city                   String?
+  profilePromptDismissed Boolean   @default(false)
+  favorites              Favorite[]
+  reviews                Review[]
 
   // NextAuth
   accounts Account[]

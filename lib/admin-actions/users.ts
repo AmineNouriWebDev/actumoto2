@@ -21,6 +21,9 @@ export async function getUsers() {
       id: true,
       name: true,
       email: true,
+      phone: true,
+      hasWhatsapp: true,
+      city: true,
       role: true,
       emailVerified: true,
       modelsQuota: true,
@@ -70,7 +73,19 @@ export async function getUserDetails(id: string) {
   return user;
 }
 
-export async function updateUser(id: string, data: { name?: string; email?: string; role?: "ADMIN" | "DEALER" | "CLIENT"; modelsQuota?: number; emailVerified?: boolean }) {
+export async function updateUser(
+  id: string,
+  data: {
+    name?: string;
+    email?: string;
+    phone?: string | null;
+    hasWhatsapp?: boolean;
+    city?: string | null;
+    role?: "ADMIN" | "DEALER" | "CLIENT";
+    modelsQuota?: number;
+    emailVerified?: boolean;
+  }
+) {
   await checkAdmin();
 
   // Handle email changes (check if exists)
@@ -85,6 +100,17 @@ export async function updateUser(id: string, data: { name?: string; email?: stri
   }
 
   const updateData: any = { ...data };
+
+  if (data.phone !== undefined) {
+    const trimmedPhone = data.phone ? data.phone.trim() : "";
+    updateData.phone = trimmedPhone || null;
+    if (!trimmedPhone) {
+      updateData.hasWhatsapp = false;
+    }
+  }
+  if (data.city !== undefined) {
+    updateData.city = data.city ? data.city.trim() || null : null;
+  }
   
   if (data.emailVerified !== undefined) {
     if (data.emailVerified) {

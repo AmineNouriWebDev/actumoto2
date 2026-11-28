@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import ClientLogoutButton from "@/components/client/ClientLogoutButton";
+import ClientProfileForm from "@/components/client/ClientProfileForm";
 
 export default async function ClientDashboardPage() {
   const session = await auth();
@@ -50,6 +51,17 @@ export default async function ClientDashboardPage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2.5rem" }}>
           
+          {/* Informations Personnelles */}
+          <ClientProfileForm
+            initialUser={{
+              name: user.name,
+              email: user.email,
+              phone: user.phone,
+              hasWhatsapp: user.hasWhatsapp,
+              city: user.city,
+            }}
+          />
+
           {/* Favoris */}
           <div className="auth-card" style={{ maxWidth: "100%", padding: "2rem" }}>
             <h2 style={{ fontSize: "1.5rem", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "1rem", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.75rem", color: "#fff" }}>
