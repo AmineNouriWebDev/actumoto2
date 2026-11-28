@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Bell, X, Sparkles, Check } from "lucide-react";
+import { Bell, X, Check } from "lucide-react";
 import { toast } from "react-toastify";
 
 interface PushNotificationPromptProps {
@@ -33,6 +33,9 @@ export default function PushNotificationPrompt({
   const [visible, setVisible] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
+  const [retryHint, setRetryHint] = useState<string | null>(null);
+  const isRequestingRef = useRef(false);
+  const swRegRef = useRef<ServiceWorkerRegistration | null>(null);
 
   const isExcludedRoute =
     pathname?.startsWith("/admin") ||
@@ -51,32 +54,41 @@ export default function PushNotificationPrompt({
       return;
     }
 
-    const syncExistingSubscription = async () => {
+    let cancelled = false;
+
+    const ensureServiceWorkerAndSync = async () => {
       try {
         const reg = await navigator.serviceWorker.register("/sw.js");
-        const existing = await reg.pushManager.getSubscription();
-        if (existing) {
-          const json = existing.toJSON();
+        swRegRef.current = reg;
+
+        // Si l'utilisateur a déjà accordé la permission, on s'assure qu'il est bien abonné en base
+        if (Notification.permission === "granted") {
+          const readyReg = await navigator.serviceWorker.ready;
+          let sub = await readyReg.pushManager.getSubscription();
+          if (!sub) {
+            sub = await readyReg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+            });
+          }
+          const json = sub.toJSON();
           await fetch("/api/push/subscribe", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              endpoint: existing.endpoint,
+              endpoint: sub.endpoint,
               keys: json.keys,
             }),
           }).catch(() => {});
         }
       } catch {
-        // Silencieux en cas de blocage navigateur
+        // Silencieux en cas de restriction navigateur
       }
     };
 
-    if (Notification.permission === "granted") {
-      syncExistingSubscription();
-      return;
-    }
+    ensureServiceWorkerAndSync();
 
-    if (Notification.permission === "denied") {
+    if (Notification.permission === "granted" || Notification.permission === "denied") {
       return;
     }
 
@@ -86,13 +98,21 @@ export default function PushNotificationPrompt({
     }
 
     const timer = setTimeout(() => {
+      if (cancelled) return;
+      // Vérifie une dernière fois avant d'afficher
+      if (Notification.permission !== "default") return;
       setVisible(true);
       requestAnimationFrame(() => {
-        setTimeout(() => setAnimateIn(true), 40);
+        setTimeout(() => {
+          if (!cancelled) setAnimateIn(true);
+        }, 40);
       });
-    }, 3500);
+    }, 3000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [enabled, vapidPublicKey, isExcludedRoute]);
 
   const handleDismiss = () => {
@@ -102,22 +122,43 @@ export default function PushNotificationPrompt({
   };
 
   const handleAccept = async () => {
-    setSubscribing(true);
+    if (isRequestingRef.current) return;
+    isRequestingRef.current = true;
+    setRetryHint(null);
+
     try {
+      // Appel direct dans le geste utilisateur sans modifier/désactiver le bouton avant réponse
       const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        localStorage.setItem(DISMISS_STORAGE_KEY, String(Date.now()));
-        setAnimateIn(false);
-        setTimeout(() => setVisible(false), 350);
+
+      if (permission === "default") {
+        // La fenêtre navigateur s'est fermée sans choix définitif -> ne pas masquer pour 7 jours !
+        setRetryHint(
+          "Cliquez sur « Autoriser » en haut de votre navigateur (icône 🔔 ou 🔒) si la fenêtre s'est réduite, puis réessayez."
+        );
+        isRequestingRef.current = false;
         return;
       }
 
-      const registration = await navigator.serviceWorker.register("/sw.js");
-      await navigator.serviceWorker.ready;
+      if (permission === "denied") {
+        toast.info(
+          "Notifications bloquées par votre navigateur. Vous pouvez les autoriser depuis l'icône 🔒 dans la barre d'adresse."
+        );
+        setAnimateIn(false);
+        setTimeout(() => setVisible(false), 350);
+        isRequestingRef.current = false;
+        return;
+      }
 
-      let subscription = await registration.pushManager.getSubscription();
+      // permission === "granted"
+      setSubscribing(true);
+
+      const registration =
+        swRegRef.current || (await navigator.serviceWorker.register("/sw.js"));
+      const readyReg = await navigator.serviceWorker.ready;
+
+      let subscription = await readyReg.pushManager.getSubscription();
       if (!subscription) {
-        subscription = await registration.pushManager.subscribe({
+        subscription = await readyReg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
         });
@@ -133,18 +174,22 @@ export default function PushNotificationPrompt({
         }),
       });
 
-      if (res.ok) {
-        toast.success("Alertes activées ! Vous recevrez nos nouveautés et promos en direct.");
-        if (registration.showNotification) {
-          registration
-            .showNotification("actumoto.tn — Alertes activées !", {
-              body: "Vous serez informé en avant-première des nouveaux modèles et baisses de prix.",
-              icon: "/img/icon-192x192.png",
-              badge: "/img/favicon-32x32.png",
-              tag: "actumoto-welcome",
-            })
-            .catch(() => {});
-        }
+      if (!res.ok) {
+        throw new Error("Erreur d'enregistrement serveur");
+      }
+
+      toast.success(
+        "Alertes activées ! Vous recevrez nos nouveautés et promos en direct."
+      );
+      if (readyReg.showNotification) {
+        readyReg
+          .showNotification("actumoto.tn — Alertes activées !", {
+            body: "Vous serez informé en avant-première des nouveaux modèles et baisses de prix.",
+            icon: "/img/icon-192x192.png",
+            badge: "/img/favicon-32x32.png",
+            tag: "actumoto-welcome",
+          })
+          .catch(() => {});
       }
 
       setAnimateIn(false);
@@ -153,6 +198,7 @@ export default function PushNotificationPrompt({
       console.error("Push subscription failed:", error);
       toast.error("Impossible d'activer les notifications sur ce navigateur.");
       setSubscribing(false);
+      isRequestingRef.current = false;
     }
   };
 
@@ -183,8 +229,8 @@ export default function PushNotificationPrompt({
         </button>
 
         <div className="p-4 sm:p-5">
-          {/* En-tête icône animée + badge */}
-          <div className="flex items-start gap-3.5 pr-6">
+          {/* En-tête icône animée + titre (sans badge "Alertes en direct") */}
+          <div className="flex items-center gap-3.5 pr-6">
             <div className="relative shrink-0">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-600/25 to-red-900/40 border border-red-500/40 flex items-center justify-center shadow-[0_0_20px_rgba(220,38,38,0.35)]">
                 <Bell className="w-6 h-6 text-red-400 actumoto-bell-ring" />
@@ -196,10 +242,6 @@ export default function PushNotificationPrompt({
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/30 text-[10px] font-bold uppercase tracking-wider text-red-300 mb-1.5">
-                <Sparkles className="w-2.5 h-2.5" />
-                Alertes en direct
-              </div>
               <h4 className="font-bold text-sm sm:text-[15px] text-white leading-snug">
                 Ne ratez aucun arrivage ni promo moto !
               </h4>
@@ -210,13 +252,18 @@ export default function PushNotificationPrompt({
             Recevez nos notifications instantanées sur les nouveaux modèles, baisses de prix et offres exclusives en Tunisie.
           </p>
 
+          {retryHint && (
+            <div className="mt-2.5 p-2.5 rounded-lg bg-amber-500/15 border border-amber-500/35 text-[11px] text-amber-200 leading-snug">
+              {retryHint}
+            </div>
+          )}
+
           {/* Boutons d'action */}
           <div className="flex items-center gap-2.5 mt-4">
             <button
               type="button"
               onClick={handleAccept}
-              disabled={subscribing}
-              className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs sm:text-[13px] font-bold shadow-[0_6px_20px_rgba(220,38,38,0.4)] hover:shadow-[0_8px_24px_rgba(220,38,38,0.6)] transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60"
+              className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs sm:text-[13px] font-bold shadow-[0_6px_20px_rgba(220,38,38,0.4)] hover:shadow-[0_8px_24px_rgba(220,38,38,0.6)] transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer"
             >
               {subscribing ? (
                 <>
@@ -226,7 +273,7 @@ export default function PushNotificationPrompt({
               ) : (
                 <>
                   <Check className="w-4 h-4" />
-                  Activer les alertes
+                  {retryHint ? "Réessayer" : "Activer les alertes"}
                 </>
               )}
             </button>
@@ -234,7 +281,6 @@ export default function PushNotificationPrompt({
             <button
               type="button"
               onClick={handleDismiss}
-              disabled={subscribing}
               className="py-2.5 px-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white text-xs font-semibold transition-colors cursor-pointer"
             >
               Plus tard

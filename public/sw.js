@@ -1,6 +1,6 @@
 // Service Worker Actumoto.tn — Notifications Push Natives (VAPID)
 
-self.addEventListener("install", (event) => {
+self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
@@ -14,7 +14,7 @@ self.addEventListener("push", (event) => {
   let data = {};
   try {
     data = event.data.json();
-  } catch (e) {
+  } catch {
     data = {
       title: "actumoto.tn",
       body: event.data.text(),
@@ -22,11 +22,10 @@ self.addEventListener("push", (event) => {
   }
 
   const title = data.title || "actumoto.tn — Nouveauté Moto";
-  const options = {
+  const baseOptions = {
     body: data.body || "Découvrez les dernières nouveautés et offres sur actumoto.tn",
     icon: data.icon || "/img/icon-192x192.png",
     badge: data.badge || "/img/favicon-32x32.png",
-    image: data.image || undefined,
     tag: data.tag || "actumoto-promo",
     renotify: true,
     vibrate: [120, 60, 120],
@@ -41,7 +40,20 @@ self.addEventListener("push", (event) => {
     ],
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  const options = data.image
+    ? { ...baseOptions, image: data.image }
+    : baseOptions;
+
+  event.waitUntil(
+    self.registration.showNotification(title, options).catch(() => {
+      // Repli sans image/actions si le navigateur refuse l'image externe
+      return self.registration.showNotification(title, {
+        body: baseOptions.body,
+        icon: "/img/icon-192x192.png",
+        data: baseOptions.data,
+      });
+    })
+  );
 });
 
 self.addEventListener("notificationclick", (event) => {

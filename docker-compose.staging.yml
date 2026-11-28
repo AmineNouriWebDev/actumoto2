@@ -56,6 +56,14 @@ services:
       - traefik_net
     labels:
       - "traefik.enable=true"
+      # Icônes et images de notifications accessibles sans basic auth pour le Service Worker Push
+      - "traefik.http.routers.actumoto-static-push.rule=Host(`test.actumoto.tn`) && (PathPrefix(`/img/icon-`) || PathPrefix(`/img/favicon-`) || PathPrefix(`/img/notifications`))"
+      - "traefik.http.routers.actumoto-static-push.entrypoints=websecure"
+      - "traefik.http.routers.actumoto-static-push.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.actumoto-static-push.middlewares=noindex-staging"
+      - "traefik.http.routers.actumoto-static-push.priority=110"
+      - "traefik.http.routers.actumoto-static-push.service=actumoto-static"
+
       - "traefik.http.routers.actumoto-static.rule=Host(`test.actumoto.tn`) && PathPrefix(`/img`)"
       - "traefik.http.routers.actumoto-static.entrypoints=websecure"
       - "traefik.http.routers.actumoto-static.tls.certresolver=letsencrypt"
