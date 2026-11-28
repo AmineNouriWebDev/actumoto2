@@ -236,7 +236,7 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
                     {/* Titre du modèle */}
                     <h3
                       style={{ color: "#000000" }}
-                      className="nouveaute-title futurist-font text-sm sm:text-base md:text-lg font-black uppercase tracking-wider leading-tight truncate text-black"
+                      className="nouveaute-title futurist-font text-base sm:text-lg md:text-xl font-black uppercase tracking-wider leading-tight truncate text-black"
                     >
                       {title}
                     </h3>
@@ -244,12 +244,12 @@ export default function NewModelsSection({ items, models }: NewModelsSectionProp
                     {/* Prix ou En arrivage sans "À partir de" */}
                     <div className="mt-0.5">
                       {hasPrice && effectivePrice ? (
-                        <p className="nouveaute-price text-sm sm:text-base md:text-lg font-black tracking-wide leading-tight">
+                        <p className="nouveaute-price text-base sm:text-lg md:text-xl font-black tracking-wide leading-tight">
                           {effectivePrice.toLocaleString("fr-FR")}{" "}
                           {item.currency || "DT"}
                         </p>
                       ) : (
-                        <p className="nouveaute-price text-xs sm:text-sm md:text-base font-black uppercase tracking-wide leading-tight">
+                        <p className="nouveaute-price text-sm sm:text-base md:text-lg font-black uppercase tracking-wide leading-tight">
                           En arrivage
                         </p>
                       )}

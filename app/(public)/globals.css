@@ -608,8 +608,8 @@ h3,
 
       .nouveaute-plaque-container .nouveaute-price {
         color: #000000 !important;
-        font-weight: 800 !important;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+        font-weight: 900 !important;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) !important;
       }
 
       /* Positionnement du badge NOUVEAU et étiquettes en haut de la plaque, décalé vers la droite pour libérer la vis */

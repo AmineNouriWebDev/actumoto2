@@ -198,7 +198,7 @@ export default function BottomCarouselSection({
                     <div className="relative z-[3] w-full px-5 sm:px-6 pb-[6%] pt-1 text-center select-none">
                       <h3
                         style={{ color: "#000000" }}
-                        className="nouveaute-title futurist-font text-sm sm:text-base md:text-lg font-black uppercase tracking-wider leading-tight truncate text-black"
+                        className="nouveaute-title futurist-font text-base sm:text-lg md:text-xl font-black uppercase tracking-wider leading-tight truncate text-black"
                       >
                         {slide.title}
                       </h3>
