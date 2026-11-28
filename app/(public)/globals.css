@@ -628,8 +628,10 @@ h3,
 
       @media (min-width: 768px) {
         .nouveaute-plaque-container .nouveau-badge {
-          top: 31px;
-          left: 74px;
+          top: 9.7%;
+          left: 15.2%;
+          transform: translateY(-50%);
+          max-width: 80% !important;
         }
       }
 
