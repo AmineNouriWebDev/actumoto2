@@ -22,6 +22,10 @@ export async function GET() {
           showGoogleLogin: true,
           showFacebookLogin: true,
           pushPromptEnabled: true,
+          ga4MeasurementId: 'G-WGY6N6E618',
+          ga4Enabled: true,
+          metaPixelId: '2443539866090948',
+          metaPixelEnabled: false,
         },
       });
     }
@@ -68,6 +72,30 @@ export async function PATCH(req: Request) {
     if (typeof body.pushPromptEnabled === 'boolean') {
       updateData.pushPromptEnabled = body.pushPromptEnabled;
     }
+    if (typeof body.ga4Enabled === 'boolean') {
+      updateData.ga4Enabled = body.ga4Enabled;
+    }
+    if (typeof body.ga4MeasurementId === 'string') {
+      updateData.ga4MeasurementId = body.ga4MeasurementId.trim();
+    }
+    if (typeof body.googleSiteVerification === 'string') {
+      updateData.googleSiteVerification = body.googleSiteVerification.trim() || null;
+    }
+    if (typeof body.metaPixelEnabled === 'boolean') {
+      updateData.metaPixelEnabled = body.metaPixelEnabled;
+    }
+    if (typeof body.metaPixelId === 'string') {
+      updateData.metaPixelId = body.metaPixelId.trim() || null;
+    }
+    if (typeof body.seoSiteTitle === 'string') {
+      updateData.seoSiteTitle = body.seoSiteTitle.trim() || null;
+    }
+    if (typeof body.seoSiteDescription === 'string') {
+      updateData.seoSiteDescription = body.seoSiteDescription.trim() || null;
+    }
+    if (typeof body.seoKeywords === 'string') {
+      updateData.seoKeywords = body.seoKeywords.trim() || null;
+    }
 
     if (!settings) {
       settings = await prisma.siteSettings.create({
@@ -80,6 +108,10 @@ export async function PATCH(req: Request) {
           showGoogleLogin: true,
           showFacebookLogin: true,
           pushPromptEnabled: true,
+          ga4MeasurementId: 'G-WGY6N6E618',
+          ga4Enabled: true,
+          metaPixelId: '2443539866090948',
+          metaPixelEnabled: false,
           ...updateData,
         },
       });

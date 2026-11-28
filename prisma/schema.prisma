@@ -10,12 +10,15 @@ datasource db {
 }
 
 model Brand {
-  id         String  @id @default(uuid())
-  name       String  @unique
-  logo       String
-  comingSoon Boolean @default(false)
-  isVisible  Boolean @default(true)
-  orderIndex Int     @default(0)
+  id             String  @id @default(uuid())
+  name           String  @unique
+  logo           String
+  comingSoon     Boolean @default(false)
+  isVisible      Boolean @default(true)
+  orderIndex     Int     @default(0)
+  seoKeywords    String?
+  seoTitle       String?
+  seoDescription String?
 
   models        Model[]
   dealerContact DealerContact?
@@ -341,6 +344,14 @@ model SiteSettings {
   showGoogleLogin        Boolean @default(true)
   showFacebookLogin      Boolean @default(true)
   pushPromptEnabled      Boolean @default(true)
+  ga4MeasurementId       String  @default("G-WGY6N6E618")
+  ga4Enabled             Boolean @default(true)
+  googleSiteVerification String?
+  metaPixelId            String? @default("2443539866090948")
+  metaPixelEnabled       Boolean @default(false)
+  seoSiteTitle           String?
+  seoSiteDescription     String?
+  seoKeywords            String?
 }
 
 model NouveauteItem {

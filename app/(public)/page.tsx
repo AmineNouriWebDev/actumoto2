@@ -74,8 +74,73 @@ export default async function Home() {
     (s: any) => s.position === "BOTTOM" || s.position === "BOTH"
   );
 
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://actumoto.tn").replace(/\/$/, "");
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Comparateur de Prix Moto N°1 en Tunisie",
+    alternateName: "actumoto.tn",
+    url: baseUrl,
+    description:
+      "🇹🇳 Trouvez la meilleure moto au meilleur prix en Tunisie grâce à notre comparateur. Catalogues neufs, occasions, fiches techniques et concessionnaires officiels.",
+    inLanguage: "fr-TN",
+    creator: {
+      "@type": "Organization",
+      name: "MaxSolving",
+      url: "https://maxsolving.com",
+      email: "contact@maxsolving.com",
+    },
+    publisher: {
+      "@type": "MotorcycleDealer",
+      name: "actumoto.tn — ActuMoto Tunisie",
+      url: baseUrl,
+      logo: {
+        "@type": "ImageObject",
+        url: `${baseUrl}/img/logo-principal-6.png`,
+      },
+      email: "actumoto.tn@gmail.com",
+      sameAs: [
+        "https://www.facebook.com/profile.php?id=61584281323170",
+        "https://www.instagram.com/actumoto.tn",
+        "https://www.youtube.com/@ActumotoTn",
+        "https://www.tiktok.com/@actumoto.tn",
+      ],
+      areaServed: {
+        "@type": "Country",
+        name: "Tunisie",
+      },
+    },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${baseUrl}/modeles?search={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Accueil",
+        item: baseUrl,
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <WelcomePopup />
       
       {/* Flux d'accueil continu et harmonieux */}

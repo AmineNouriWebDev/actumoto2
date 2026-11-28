@@ -60,6 +60,40 @@ export default async function EditBrandPage({ params }: { params: Promise<{ id: 
         </div>
 
         <div className="admin-card">
+          <h2 className="admin-card-title">🔍 Référencement SEO de la Marque</h2>
+          <div className="admin-form-grid">
+            <div className="form-group span-2">
+              <label>Mots-clés SEO (Keywords)</label>
+              <textarea
+                name="seoKeywords"
+                rows={2}
+                placeholder={`Ex: ${brand.name} tunisie, moto ${brand.name}, scooter ${brand.name} prix tunisie, concessionnaire ${brand.name}`}
+                defaultValue={(brand as any).seoKeywords || ""}
+              />
+              <span className="form-hint">Séparés par des virgules. Utilisés dans les balises meta keywords de la page marque et de ses modèles.</span>
+            </div>
+            <div className="form-group">
+              <label>Titre SEO personnalisé (Optionnel)</label>
+              <input
+                type="text"
+                name="seoTitle"
+                placeholder={`Modèles ${brand.name} - actumoto.tn | Moto Tunisie`}
+                defaultValue={(brand as any).seoTitle || ""}
+              />
+            </div>
+            <div className="form-group">
+              <label>Méta-description personnalisée (Optionnel)</label>
+              <input
+                type="text"
+                name="seoDescription"
+                placeholder={`Découvrez tous les modèles ${brand.name} disponibles chez actumoto.tn...`}
+                defaultValue={(brand as any).seoDescription || ""}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="admin-card">
           <h2 className="admin-card-title">Concessionnaire / Contact</h2>
           <div className="admin-form-grid">
             <div className="form-group">

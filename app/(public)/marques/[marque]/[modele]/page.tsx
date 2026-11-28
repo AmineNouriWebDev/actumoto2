@@ -37,7 +37,12 @@ export async function generateMetadata({
 
   const model = await prisma.model.findFirst({
     where: { name: modelName, brand: { name: brandName }, hasDetailPage: true },
-    include: { specs: true, images: { orderBy: { orderIndex: "asc" }, take: 1 } },
+    include: {
+      brand: { select: { name: true, seoKeywords: true } },
+      category: { select: { name: true } },
+      specs: true,
+      images: { orderBy: { orderIndex: "asc" }, take: 1 },
+    },
   });
 
   if (!model) {
@@ -52,10 +57,15 @@ export async function generateMetadata({
     : "En arrivage";
 
   const mainImage = model.images[0]?.url;
+  const baseKeywords = `${brandName} ${modelName}, ${modelName} prix tunisie, fiche technique ${brandName} ${modelName}, ${model.category?.name || "moto"} ${model.fuelType || ""} tunisie`;
+  const keywords = (model.brand as any)?.seoKeywords
+    ? `${baseKeywords}, ${(model.brand as any).seoKeywords}`
+    : baseKeywords;
 
   return {
     title: `${brandName} ${modelName} — Prix & Fiche Technique en Tunisie | actumoto.tn`,
     description: `${priceText} — Découvrez la ${brandName} ${modelName} en Tunisie : prix en ${model.currency}, fiche technique complète, photos et caractéristiques.`,
+    keywords,
     openGraph: {
       title: `${brandName} ${modelName} — Prix & Fiche Technique`,
       description: `${priceText} — Fiche complète de la ${brandName} ${modelName}`,
@@ -152,23 +162,59 @@ export default async function ModelDetailPage({
     specRows.push({ label: "Freinage", value: frein });
   }
 
-  // JSON-LD structured data (Schema.org Vehicle/Product)
+  // JSON-LD structured data (Schema.org Product / Vehicle + AggregateRating + BreadcrumbList)
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://actumoto.tn").replace(/\/$/, "");
+  const effectiveOfferPrice = model.promoPrice || model.price;
+  const absoluteImage = images[0]
+    ? images[0].startsWith("/")
+      ? `${baseUrl}${images[0]}`
+      : images[0]
+    : undefined;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: `${brandName} ${modelName}`,
     brand: { "@type": "Brand", name: brandName },
+    category: model.category?.name || "Moto & Scooter",
     description: model.description ?? `${brandName} ${modelName} — Prix et fiche technique en Tunisie`,
-    image: images[0] ?? undefined,
-    offers: model.price
+    ...(absoluteImage ? { image: absoluteImage } : {}),
+    url: `${baseUrl}/marques/${encodeURIComponent(brandName)}/${encodeURIComponent(modelName)}`,
+    ...(totalRatings > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: Number(averageRating.toFixed(1)),
+            reviewCount: totalRatings,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
+    offers: effectiveOfferPrice
       ? {
           "@type": "Offer",
           priceCurrency: model.currency === "DT" ? "TND" : model.currency,
-          price: model.price,
+          price: effectiveOfferPrice,
           availability: "https://schema.org/InStock",
           seller: { "@type": "Organization", name: "actumoto.tn" },
         }
       : undefined,
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: baseUrl },
+      { "@type": "ListItem", position: 2, name: brandName, item: `${baseUrl}/marques/${encodeURIComponent(brandName)}` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: modelName,
+        item: `${baseUrl}/marques/${encodeURIComponent(brandName)}/${encodeURIComponent(modelName)}`,
+      },
+    ],
   };
 
   return (
@@ -177,6 +223,10 @@ export default async function ModelDetailPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
       {/* Header section */}

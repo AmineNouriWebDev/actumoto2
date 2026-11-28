@@ -5,6 +5,8 @@ import Link from "next/link";
 export const metadata = {
   title: "Motos & Scooters d'Occasion - Prix Tunisie | actumoto.tn",
   description: "🇹🇳 Motos et scooters d'occasion en Tunisie au meilleur prix. Découvrez des motos occasion vérifiées, prix intéressants, toutes marques. Honda, CFMOTO, Kawasaki, BMW, Peugeot occasion.",
+  keywords: "moto occasion tunisie, scooter occasion tunisie, vente moto occasion, moto pas cher tunisie, actumoto occasion",
+  alternates: { canonical: "/occasion" },
 };
 
 
@@ -31,8 +33,48 @@ export default async function OccasionPage() {
     } : null,
   }));
 
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://actumoto.tn").replace(/\/$/, "");
+  const occasionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Motos & Scooters d'Occasion en Tunisie",
+    description: metadata.description,
+    url: `${baseUrl}/occasion`,
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: formattedOccasions.length,
+      itemListElement: formattedOccasions.map((occ: any, idx: number) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        item: {
+          "@type": "Product",
+          name: `${occ.marque} ${occ.name}`,
+          brand: { "@type": "Brand", name: occ.marque },
+          itemCondition: "https://schema.org/UsedCondition",
+        },
+      })),
+    },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: baseUrl },
+      { "@type": "ListItem", position: 2, name: "Occasions", item: `${baseUrl}/occasion` },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(occasionSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       {/* Flèche retour fixe */}
       <div className="container mx-auto px-4 flex justify-end items-center my-[2px]">
         <Link

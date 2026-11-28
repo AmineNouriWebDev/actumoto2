@@ -45,6 +45,26 @@ export default function NewBrandPage() {
             </label>
           </div>
 
+          <div className="admin-form-grid" style={{ marginBottom: "1rem" }}>
+            <div className="form-group span-2">
+              <label>Mots-clés SEO (Optionnel)</label>
+              <textarea
+                name="seoKeywords"
+                rows={2}
+                placeholder="Ex: honda tunisie, moto honda prix, scooter honda tunisie..."
+              />
+              <span className="form-hint">Séparés par des virgules pour le référencement Google de la page marque.</span>
+            </div>
+            <div className="form-group">
+              <label>Titre SEO personnalisé (Optionnel)</label>
+              <input type="text" name="seoTitle" placeholder="Modèles Honda - actumoto.tn | Moto Tunisie" />
+            </div>
+            <div className="form-group">
+              <label>Méta-description SEO (Optionnel)</label>
+              <input type="text" name="seoDescription" placeholder="Découvrez tous les modèles Honda disponibles en Tunisie..." />
+            </div>
+          </div>
+
           <div className="admin-form-actions">
             <Link href="/admin/marques" className="btn-secondary">Annuler</Link>
             <button type="submit" className="btn-primary">✅ Créer la marque</button>

@@ -209,17 +209,17 @@ export default function BurgerMenu({
               <Link
                 href={loginUrl}
                 onClick={closeMenu}
-                className="flex items-center p-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all shadow-md group"
+                className="flex items-center p-3.5 rounded-xl bg-[#181a22] hover:bg-[#20232f] border border-neutral-800 hover:border-red-500/50 text-white transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-white/20 text-white flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <div className="w-9 h-9 rounded-lg bg-red-500/15 text-red-400 border border-red-500/30 flex items-center justify-center group-hover:scale-105 transition-transform">
                     <LogIn className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="font-bold text-sm block">
+                    <span className="font-bold text-sm block text-white group-hover:text-red-400 transition-colors">
                       Connexion
                     </span>
-                    <span className="text-[11px] text-red-100">
+                    <span className="text-[11px] text-gray-400">
                       Accéder à votre compte
                     </span>
                   </div>

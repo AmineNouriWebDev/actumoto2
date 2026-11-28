@@ -22,6 +22,8 @@ export async function generateMetadata({ params }: { params: Promise<{ budget: s
   return {
     title: `Motos ${range.label} en Tunisie | actumoto.tn`,
     description: `Découvrez toutes les motos et scooters disponibles entre ${range.label} en Tunisie.`,
+    keywords: `moto ${range.label} tunisie, scooter ${range.label}, prix moto tunisie, actumoto`,
+    alternates: { canonical: `/budget/${budget}` },
   };
 }
 

@@ -13,6 +13,8 @@ export async function generateMetadata({ params }: { params: Promise<{ categorie
   return {
     title: `${categoryName} en Tunisie - Prix et Modèles | actumoto.tn`,
     description: `Découvrez tous les modèles de la catégorie ${categoryName} disponibles en Tunisie. Prix, fiches techniques et comparateur.`,
+    keywords: `${categoryName} tunisie, moto ${categoryName}, prix ${categoryName} tunisie, actumoto`,
+    alternates: { canonical: `/categories/${encodeURIComponent(categoryName)}` },
   };
 }
 

@@ -12,9 +12,50 @@ import ComingSoonBanner from "@/components/modeles/ComingSoonBanner";
 export async function generateMetadata({ params }: { params: Promise<{ marque: string }> }) {
   const { marque } = await params;
   const brandName = decodeURIComponent(marque);
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://actumoto.tn").replace(/\/$/, "");
+
+  const brand = (await prisma.brand
+    .findFirst({
+      where: { name: { equals: brandName, mode: "insensitive" } },
+      select: { name: true, logo: true, seoKeywords: true, seoTitle: true, seoDescription: true },
+    })
+    .catch(() => null)) as any;
+
+  const actualName = brand?.name || brandName;
+  const title = brand?.seoTitle?.trim() || `Modèles ${actualName} - actumoto.tn | Moto Tunisie`;
+  const description =
+    brand?.seoDescription?.trim() ||
+    `Découvrez tous les modèles ${actualName} disponibles chez actumoto.tn. Prix, photos et caractéristiques des motos ${actualName} en Tunisie.`;
+  const defaultKeywords = `${actualName} tunisie, moto ${actualName}, scooter ${actualName}, prix ${actualName} tunisie, fiche technique ${actualName}, actumoto.tn`;
+  const keywords = brand?.seoKeywords?.trim()
+    ? `${brand.seoKeywords.trim()}, ${defaultKeywords}`
+    : defaultKeywords;
+  const canonicalPath = `/marques/${encodeURIComponent(actualName)}`;
+  const ogLogo = brand?.logo
+    ? brand.logo.startsWith("./")
+      ? brand.logo.substring(1)
+      : brand.logo
+    : "/img/og-preview2.png";
+
   return {
-    title: `Modèles ${brandName} - actumoto.tn | Moto Tunisie`,
-    description: `Découvrez tous les modèles ${brandName} disponibles chez actumoto.tn. Prix, photos et caractéristiques des motos ${brandName} en Tunisie.`,
+    title,
+    description,
+    keywords,
+    alternates: {
+      canonical: canonicalPath,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${baseUrl}${canonicalPath}`,
+      images: [{ url: ogLogo }],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 
@@ -124,8 +165,99 @@ export default async function MarquePage({ params }: { params: Promise<{ marque:
 
   const orderedModels = [...models];
 
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://actumoto.tn").replace(/\/$/, "");
+  const brandUrl = `${baseUrl}/marques/${encodeURIComponent(brandName)}`;
+  const validBrandRatings = approvedBrandReviews.filter((r) => r.rating > 0);
+  const brandAvgRating =
+    validBrandRatings.length > 0
+      ? Number(
+          (
+            validBrandRatings.reduce((acc, r) => acc + r.rating, 0) /
+            validBrandRatings.length
+          ).toFixed(1)
+        )
+      : 0;
+
+  const brandSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `Modèles ${brandName} en Tunisie`,
+    description:
+      (brand as any).seoDescription ||
+      `Catalogue des modèles de motos et scooters ${brandName} disponibles en Tunisie avec prix et fiches techniques.`,
+    url: brandUrl,
+    ...(validBrandRatings.length > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: brandAvgRating,
+            reviewCount: validBrandRatings.length,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
+    mainEntity: {
+      "@type": "ItemList",
+      name: `Catalogue ${brandName}`,
+      numberOfItems: orderedModels.length,
+      itemListElement: orderedModels.map((m: any, idx: number) => {
+        const effPrice = m.promoPrice || m.price;
+        const firstImg = m.images?.[0]
+          ? m.images[0].startsWith("./")
+            ? `${baseUrl}${m.images[0].substring(1)}`
+            : m.images[0].startsWith("/")
+            ? `${baseUrl}${m.images[0]}`
+            : m.images[0]
+          : undefined;
+        return {
+          "@type": "ListItem",
+          position: idx + 1,
+          item: {
+            "@type": "Product",
+            name: `${brandName} ${m.name}`,
+            brand: { "@type": "Brand", name: brandName },
+            category: m.category || "Moto",
+            ...(firstImg ? { image: firstImg } : {}),
+            url: m.hasDetailPage
+              ? `${brandUrl}/${encodeURIComponent(m.name)}`
+              : brandUrl,
+            ...(effPrice
+              ? {
+                  offers: {
+                    "@type": "Offer",
+                    priceCurrency: m.currency === "DT" || !m.currency ? "TND" : m.currency,
+                    price: effPrice,
+                    availability: "https://schema.org/InStock",
+                    seller: { "@type": "Organization", name: "actumoto.tn" },
+                  },
+                }
+              : {}),
+          },
+        };
+      }),
+    },
+  };
+
+  const brandBreadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: baseUrl },
+      { "@type": "ListItem", position: 2, name: brandName, item: brandUrl },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(brandSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(brandBreadcrumbSchema) }}
+      />
       {/* BANNIÈRE HAUT OU CARROUSEL (PLEINE LARGEUR) */}
       {topBanners.length > 0 && (
         <BrandBannerSection

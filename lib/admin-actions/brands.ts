@@ -35,6 +35,9 @@ export async function createBrand(formData: FormData) {
   const name = formData.get("name") as string;
   const logoFile = formData.get("logoFile") as File;
   const comingSoon = formData.get("comingSoon") === "on";
+  const seoKeywords = (formData.get("seoKeywords") as string || "").trim() || null;
+  const seoTitle = (formData.get("seoTitle") as string || "").trim() || null;
+  const seoDescription = (formData.get("seoDescription") as string || "").trim() || null;
 
   if (!name || !logoFile || logoFile.size === 0) return { error: "Nom et logo sont requis." };
 
@@ -47,8 +50,19 @@ export async function createBrand(formData: FormData) {
   });
   const newOrderIndex = maxOrder ? maxOrder.orderIndex + 1 : 0;
 
-  await prisma.brand.create({ data: { name: name.trim(), logo: logoUrl, comingSoon, orderIndex: newOrderIndex } });
+  await prisma.brand.create({
+    data: {
+      name: name.trim(),
+      logo: logoUrl,
+      comingSoon,
+      orderIndex: newOrderIndex,
+      seoKeywords,
+      seoTitle,
+      seoDescription,
+    },
+  });
   revalidatePath("/admin/marques");
+  revalidatePath("/sitemap.xml");
   revalidatePath("/");
 }
 
@@ -56,6 +70,9 @@ export async function updateBrand(id: string, formData: FormData) {
   const name = formData.get("name") as string;
   const logoFile = formData.get("logoFile") as File | null;
   const comingSoon = formData.get("comingSoon") === "on";
+  const seoKeywords = (formData.get("seoKeywords") as string || "").trim() || null;
+  const seoTitle = (formData.get("seoTitle") as string || "").trim() || null;
+  const seoDescription = (formData.get("seoDescription") as string || "").trim() || null;
 
   const brand = await prisma.brand.findUnique({ where: { id } });
   if (!brand) return { error: "Marque introuvable" };
@@ -75,8 +92,17 @@ export async function updateBrand(id: string, formData: FormData) {
 
   await prisma.brand.update({
     where: { id },
-    data: { name: name.trim(), logo: logoUrl, comingSoon },
+    data: {
+      name: name.trim(),
+      logo: logoUrl,
+      comingSoon,
+      seoKeywords,
+      seoTitle,
+      seoDescription,
+    },
   });
+  revalidatePath(`/marques/${encodeURIComponent(name.trim())}`);
+  revalidatePath("/sitemap.xml");
 
   // Dealer contact fields
   const phones = (formData.get("phones") as string || "").split("\n").map(s => s.trim()).filter(Boolean);

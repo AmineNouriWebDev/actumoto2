@@ -11,6 +11,9 @@ import {
   Footprints,
   ExternalLink,
   ShieldCheck,
+  BarChart3,
+  Search,
+  Save,
 } from "lucide-react";
 
 interface SiteSettingsData {
@@ -22,12 +25,27 @@ interface SiteSettingsData {
   carouselVisible?: boolean;
   carouselBottomVisible?: boolean;
   carouselDelayMs?: number;
+  ga4Enabled?: boolean;
+  ga4MeasurementId?: string;
+  googleSiteVerification?: string | null;
+  metaPixelEnabled?: boolean;
+  metaPixelId?: string | null;
+  seoSiteTitle?: string | null;
+  seoSiteDescription?: string | null;
+  seoKeywords?: string | null;
 }
 
 export default function AdminSettingsClient() {
   const [settings, setSettings] = useState<SiteSettingsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
+  const [savingSeo, setSavingSeo] = useState(false);
+  const [ga4Id, setGa4Id] = useState("G-WGY6N6E618");
+  const [gscCode, setGscCode] = useState("");
+  const [pixelId, setPixelId] = useState("2443539866090948");
+  const [seoTitle, setSeoTitle] = useState("");
+  const [seoDesc, setSeoDesc] = useState("");
+  const [seoKeywords, setSeoKeywords] = useState("");
   const [toast, setToast] = useState<{ msg: string; type: "ok" | "err" } | null>(null);
 
   const showToast = (msg: string, type: "ok" | "err" = "ok") => {
@@ -42,6 +60,14 @@ export default function AdminSettingsClient() {
       if (!res.ok) throw new Error("Erreur de chargement des paramètres");
       const data = await res.json();
       setSettings(data.settings);
+      if (data.settings) {
+        setGa4Id(data.settings.ga4MeasurementId || "G-WGY6N6E618");
+        setGscCode(data.settings.googleSiteVerification || "");
+        setPixelId(data.settings.metaPixelId || "2443539866090948");
+        setSeoTitle(data.settings.seoSiteTitle || "");
+        setSeoDesc(data.settings.seoSiteDescription || "");
+        setSeoKeywords(data.settings.seoKeywords || "");
+      }
     } catch (err: any) {
       showToast(err.message || "Erreur", "err");
     } finally {
@@ -79,6 +105,33 @@ export default function AdminSettingsClient() {
       loadSettings();
     } finally {
       setSavingKey(null);
+    }
+  };
+
+  const handleSaveSeoSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSeo(true);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ga4MeasurementId: ga4Id,
+          googleSiteVerification: gscCode,
+          metaPixelId: pixelId,
+          seoSiteTitle: seoTitle,
+          seoSiteDescription: seoDesc,
+          seoKeywords: seoKeywords,
+        }),
+      });
+      if (!res.ok) throw new Error("Erreur lors de la sauvegarde SEO");
+      const data = await res.json();
+      setSettings(data.settings);
+      showToast("✅ Paramètres SEO & Suivi Google enregistrés !");
+    } catch (err: any) {
+      showToast(err.message || "Erreur", "err");
+    } finally {
+      setSavingSeo(false);
     }
   };
 
@@ -521,6 +574,166 @@ export default function AdminSettingsClient() {
           </div>
         </div>
       </div>
+
+      {/* PARAMÈTRE 4 : SEO, GOOGLE ANALYTICS 4 & SEARCH CONSOLE */}
+      <form onSubmit={handleSaveSeoSettings} className="admin-card" style={{ marginBottom: "2rem" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap", marginBottom: "0.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <BarChart3 className="text-red-500" size={22} />
+            <h2 className="admin-card-title" style={{ margin: 0 }}>
+              SEO, Google Analytics 4 & Search Console
+            </h2>
+          </div>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            <a href="/sitemap.xml" target="_blank" rel="noreferrer" className="btn-secondary" style={{ fontSize: "0.75rem", padding: "0.3rem 0.65rem" }}>
+              🗺️ Sitemap XML
+            </a>
+            <a href="/robots.txt" target="_blank" rel="noreferrer" className="btn-secondary" style={{ fontSize: "0.75rem", padding: "0.3rem 0.65rem" }}>
+              🤖 Robots.txt
+            </a>
+          </div>
+        </div>
+        <p style={{ color: "#9ca3af", fontSize: "0.88rem", margin: "0 0 1.25rem 0" }}>
+          Conservez vos statistiques existantes (GA4, Google Search Console, Meta Pixel) lors du basculement et gérez le référencement global du site. Schema.org et la balise auteur MaxSolving sont intégrés automatiquement.
+        </p>
+
+        {/* Toggles GA4 & Meta Pixel */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.25rem" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", padding: "1rem", borderRadius: "0.6rem", background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.06)", flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontWeight: 600, color: "#f9fafb", fontSize: "0.95rem" }}>
+                Google Analytics 4 (gtag.js)
+              </div>
+              <div style={{ fontSize: "0.8rem", color: "#9ca3af" }}>
+                Active la balise de suivi GA4 sur toutes les pages du site (y compris navigation SPA).
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span style={{ fontSize: "0.8rem", fontWeight: 700, padding: "0.25rem 0.65rem", borderRadius: "999px", background: settings.ga4Enabled !== false ? "rgba(22,163,74,0.2)" : "rgba(107,114,128,0.2)", color: settings.ga4Enabled !== false ? "#4ade80" : "#9ca3af" }}>
+                {settings.ga4Enabled !== false ? "Actif" : "Désactivé"}
+              </span>
+              <label style={{ position: "relative", display: "inline-block", width: "56px", height: "30px", cursor: savingKey === "ga4Enabled" ? "not-allowed" : "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={settings.ga4Enabled !== false}
+                  disabled={savingKey === "ga4Enabled"}
+                  onChange={(e) => updateSetting("ga4Enabled", e.target.checked)}
+                  style={{ opacity: 0, width: 0, height: 0 }}
+                />
+                <span style={{ position: "absolute", inset: 0, backgroundColor: settings.ga4Enabled !== false ? "#dc2626" : "#374151", borderRadius: "34px", transition: "0.3s" }}>
+                  <span style={{ position: "absolute", height: "22px", width: "22px", left: settings.ga4Enabled !== false ? "28px" : "4px", bottom: "4px", backgroundColor: "white", borderRadius: "50%", transition: "0.3s" }} />
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", padding: "1rem", borderRadius: "0.6rem", background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.06)", flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontWeight: 600, color: "#f9fafb", fontSize: "0.95rem" }}>
+                Meta Pixel (Facebook Ads)
+              </div>
+              <div style={{ fontSize: "0.8rem", color: "#9ca3af" }}>
+                Suivi des événements PageView avec l&apos;ancien Pixel Facebook du site.
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span style={{ fontSize: "0.8rem", fontWeight: 700, padding: "0.25rem 0.65rem", borderRadius: "999px", background: settings.metaPixelEnabled ? "rgba(22,163,74,0.2)" : "rgba(107,114,128,0.2)", color: settings.metaPixelEnabled ? "#4ade80" : "#9ca3af" }}>
+                {settings.metaPixelEnabled ? "Actif" : "Désactivé"}
+              </span>
+              <label style={{ position: "relative", display: "inline-block", width: "56px", height: "30px", cursor: savingKey === "metaPixelEnabled" ? "not-allowed" : "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={settings.metaPixelEnabled === true}
+                  disabled={savingKey === "metaPixelEnabled"}
+                  onChange={(e) => updateSetting("metaPixelEnabled", e.target.checked)}
+                  style={{ opacity: 0, width: 0, height: 0 }}
+                />
+                <span style={{ position: "absolute", inset: 0, backgroundColor: settings.metaPixelEnabled ? "#dc2626" : "#374151", borderRadius: "34px", transition: "0.3s" }}>
+                  <span style={{ position: "absolute", height: "22px", width: "22px", left: settings.metaPixelEnabled ? "28px" : "4px", bottom: "4px", backgroundColor: "white", borderRadius: "50%", transition: "0.3s" }} />
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Champs de configuration SEO & IDs */}
+        <div className="admin-form-grid">
+          <div className="form-group">
+            <label>ID Google Analytics 4 (Measurement ID)</label>
+            <input
+              type="text"
+              value={ga4Id}
+              onChange={(e) => setGa4Id(e.target.value)}
+              placeholder="G-WGY6N6E618"
+            />
+            <span className="form-hint">Identifiant de l&apos;ancien site : G-WGY6N6E618</span>
+          </div>
+
+          <div className="form-group">
+            <label>Code Google Search Console (meta verification)</label>
+            <input
+              type="text"
+              value={gscCode}
+              onChange={(e) => setGscCode(e.target.value)}
+              placeholder="Ex: xYz123AbC..."
+            />
+            <span className="form-hint">Valeur du champ content=&quot;...&quot; de la balise google-site-verification</span>
+          </div>
+
+          <div className="form-group">
+            <label>ID Meta Pixel (Facebook)</label>
+            <input
+              type="text"
+              value={pixelId}
+              onChange={(e) => setPixelId(e.target.value)}
+              placeholder="2443539866090948"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Titre SEO Global (Page d&apos;accueil)</label>
+            <input
+              type="text"
+              value={seoTitle}
+              onChange={(e) => setSeoTitle(e.target.value)}
+              placeholder="Comparateur de Prix Moto & Scooter N°1 en Tunisie | actumoto.tn"
+            />
+          </div>
+
+          <div className="form-group span-2">
+            <label>Méta-Description Globale SEO</label>
+            <textarea
+              rows={2}
+              value={seoDesc}
+              onChange={(e) => setSeoDesc(e.target.value)}
+              placeholder="🇹🇳 Trouvez la meilleure moto au meilleur prix. Comparateur de prix motos et scooters..."
+            />
+          </div>
+
+          <div className="form-group span-2">
+            <label style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+              <Search size={14} className="text-red-400" />
+              Mots-clés SEO Globaux (séparés par des virgules)
+            </label>
+            <textarea
+              rows={2}
+              value={seoKeywords}
+              onChange={(e) => setSeoKeywords(e.target.value)}
+              placeholder="moto Tunisie, scooter Tunisie, prix moto Tunisie, scooter électrique, comparateur de prix..."
+            />
+            <span className="form-hint">
+              Laissez vide pour conserver les valeurs SEO par défaut optimisées. Les mots-clés de chaque marque se gèrent dans Marques &gt; Modifier.
+            </span>
+          </div>
+        </div>
+
+        <div className="admin-form-actions" style={{ marginTop: "1rem" }}>
+          <button type="submit" disabled={savingSeo} className="btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: "0.45rem" }}>
+            <Save size={16} />
+            {savingSeo ? "Enregistrement..." : "Enregistrer les paramètres SEO & Google"}
+          </button>
+        </div>
+      </form>
 
       {/* INFORMATION : PAGE CONNEXION */}
       <div
