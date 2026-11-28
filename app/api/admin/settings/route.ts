@@ -21,6 +21,7 @@ export async function GET() {
           hideFooterOnOtherPages: true,
           showGoogleLogin: true,
           showFacebookLogin: true,
+          pushPromptEnabled: true,
         },
       });
     }
@@ -64,6 +65,9 @@ export async function PATCH(req: Request) {
     if (typeof body.showFacebookLogin === 'boolean') {
       updateData.showFacebookLogin = body.showFacebookLogin;
     }
+    if (typeof body.pushPromptEnabled === 'boolean') {
+      updateData.pushPromptEnabled = body.pushPromptEnabled;
+    }
 
     if (!settings) {
       settings = await prisma.siteSettings.create({
@@ -75,6 +79,7 @@ export async function PATCH(req: Request) {
           hideFooterOnOtherPages: true,
           showGoogleLogin: true,
           showFacebookLogin: true,
+          pushPromptEnabled: true,
           ...updateData,
         },
       });
@@ -85,6 +90,7 @@ export async function PATCH(req: Request) {
       });
     }
 
+    revalidatePath('/', 'layout');
     revalidatePath('/');
     revalidatePath('/marques');
     revalidatePath('/modeles');

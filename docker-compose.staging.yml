@@ -19,8 +19,8 @@ services:
       - staging_internal
     labels:
       - "traefik.enable=true"
-      # Routeur public pour Facebook / Google (RGPD, Conditions, Callbacks OAuth) sans basic auth
-      - "traefik.http.routers.actumoto-staging-public.rule=Host(`test.actumoto.tn`) && (PathPrefix(`/politique-de-confidentialite`) || PathPrefix(`/conditions-de-service`) || PathPrefix(`/suppression-donnees`) || PathPrefix(`/api/auth`))"
+      # Routeur public pour Facebook / Google / Web Push (RGPD, Conditions, Callbacks OAuth, Service Worker) sans basic auth
+      - "traefik.http.routers.actumoto-staging-public.rule=Host(`test.actumoto.tn`) && (PathPrefix(`/politique-de-confidentialite`) || PathPrefix(`/conditions-de-service`) || PathPrefix(`/suppression-donnees`) || PathPrefix(`/api/auth`) || PathPrefix(`/sw.js`) || PathPrefix(`/manifest.webmanifest`) || PathPrefix(`/api/push`))"
       - "traefik.http.routers.actumoto-staging-public.entrypoints=websecure"
       - "traefik.http.routers.actumoto-staging-public.tls.certresolver=letsencrypt"
       - "traefik.http.routers.actumoto-staging-public.middlewares=noindex-staging"

@@ -15,6 +15,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
+    "@types/web-push": "^3.6.4",
     "bcryptjs": "^3.0.3",
     "jodit-react": "^5.4.70",
     "lucide-react": "^1.31.0",
@@ -26,7 +27,8 @@
     "react-toastify": "^11.1.0",
     "sharp": "^0.35.3",
     "ts-node": "^10.9.2",
-    "uuid": "^14.0.1"
+    "uuid": "^14.0.1",
+    "web-push": "^4.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

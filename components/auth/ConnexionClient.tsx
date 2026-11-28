@@ -143,6 +143,14 @@ function LoginForm({ showGoogle = true, showFacebook = true }: ConnexionClientPr
           </div>
         )}
 
+        <SocialAuthButtons
+          callbackUrl={callbackUrl}
+          showGoogle={showGoogle}
+          showFacebook={showFacebook}
+          separatorPosition="bottom"
+          separatorLabel="OU PAR EMAIL"
+        />
+
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           <div className="auth-form-group">
             <label>Email</label>
@@ -196,12 +204,6 @@ function LoginForm({ showGoogle = true, showFacebook = true }: ConnexionClientPr
             )}
           </button>
         </form>
-
-        <SocialAuthButtons
-          callbackUrl={callbackUrl}
-          showGoogle={showGoogle}
-          showFacebook={showFacebook}
-        />
 
         <div style={{ marginTop: "2rem", textAlign: "center", fontSize: "0.9rem", color: "rgba(255,255,255,0.5)" }}>
           Pas encore de compte ?{" "}

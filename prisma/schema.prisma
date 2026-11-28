@@ -340,6 +340,7 @@ model SiteSettings {
   hideFooterOnOtherPages Boolean @default(true)
   showGoogleLogin        Boolean @default(true)
   showFacebookLogin      Boolean @default(true)
+  pushPromptEnabled      Boolean @default(true)
 }
 
 model NouveauteItem {
@@ -357,4 +358,30 @@ model NouveauteItem {
   modelId    String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model PushSubscription {
+  id         String   @id @default(uuid())
+  endpoint   String   @unique
+  p256dh     String
+  auth       String
+  userAgent  String?
+  deviceType String?  // "mobile" | "desktop"
+  userId     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model PushCampaign {
+  id          String    @id @default(uuid())
+  title       String
+  body        String
+  url         String?
+  imageUrl    String?
+  status      String    @default("DRAFT") // DRAFT | SENT
+  sentCount   Int       @default(0)
+  failedCount Int       @default(0)
+  sentAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

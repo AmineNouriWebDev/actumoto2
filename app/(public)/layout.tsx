@@ -4,6 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import MainLayoutWrapper from "@/components/layout/MainLayoutWrapper";
 import ToastProvider from "@/components/admin/ToastProvider";
+import PushNotificationPrompt from "@/components/notifications/PushNotificationPrompt";
 import prisma from "@/lib/prisma";
 
 export const metadata: Metadata = {
@@ -49,10 +50,14 @@ export default async function RootLayout({
 }>) {
   const settings = await prisma.siteSettings.findFirst().catch(() => null);
   const hideFooterOnOtherPages = (settings as any)?.hideFooterOnOtherPages !== false;
+  const pushPromptEnabled = (settings as any)?.pushPromptEnabled !== false;
+  const vapidPublicKey =
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || process.env.VAPID_PUBLIC_KEY || "";
 
   return (
     <html lang="fr-TN">
       <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png" />
@@ -70,6 +75,10 @@ export default async function RootLayout({
           {children}
         </MainLayoutWrapper>
         <Footer hideFooterOnOtherPages={hideFooterOnOtherPages} />
+        <PushNotificationPrompt
+          enabled={pushPromptEnabled}
+          vapidPublicKey={vapidPublicKey}
+        />
       </body>
     </html>
   );

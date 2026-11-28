@@ -1,0 +1,23 @@
+{
+  "name": "actumoto.tn — Comparateur Moto Tunisie",
+  "short_name": "actumoto.tn",
+  "description": "Le 1er comparateur de prix de motos et scooters en Tunisie.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0c10",
+  "theme_color": "#dc2626",
+  "icons": [
+    {
+      "src": "/img/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/img/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

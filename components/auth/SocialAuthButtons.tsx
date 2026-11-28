@@ -8,12 +8,16 @@ interface SocialAuthButtonsProps {
   callbackUrl?: string;
   showGoogle?: boolean;
   showFacebook?: boolean;
+  separatorPosition?: "top" | "bottom";
+  separatorLabel?: string;
 }
 
 export default function SocialAuthButtons({
   callbackUrl = "/compte",
   showGoogle = true,
   showFacebook = true,
+  separatorPosition = "top",
+  separatorLabel = "OU AVEC",
 }: SocialAuthButtonsProps) {
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
@@ -32,11 +36,15 @@ export default function SocialAuthButtons({
     }
   };
 
+  const separator = (
+    <div className="auth-separator">
+      <span>{separatorLabel}</span>
+    </div>
+  );
+
   return (
     <>
-      <div className="auth-separator">
-        <span>OU AVEC</span>
-      </div>
+      {separatorPosition === "top" && separator}
 
       <div className="social-auth-group">
         {/* Google button */}
@@ -94,6 +102,8 @@ export default function SocialAuthButtons({
           </button>
         )}
       </div>
+
+      {separatorPosition === "bottom" && separator}
     </>
   );
 }

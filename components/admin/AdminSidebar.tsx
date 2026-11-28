@@ -16,6 +16,7 @@ const allNavItems = [
   { href: "/admin/commentaires", label: "Commentaires", icon: "💬", roles: ["ADMIN"] },
   { href: "/admin/carrousel", label: "Carrousel", icon: "🖼️", roles: ["ADMIN"] },
   { href: "/admin/popup", label: "Popup", icon: "📢", roles: ["ADMIN"] },
+  { href: "/admin/notifications", label: "Notifications", icon: "🔔", roles: ["ADMIN"] },
   { href: "/admin/banniere", label: "Bannière", icon: "🖼", roles: ["ADMIN"] },
   { href: "/admin/admins", label: "Administrateurs", icon: "👤", roles: ["ADMIN"] },
   { href: "/admin/concessionnaires", label: "Concessionnaires", icon: "🏢", roles: ["ADMIN"] },
